@@ -1,4 +1,4 @@
-FROM scilus/scilus-base:latest
+FROM scilus/base-scilus:1.0.0
 
 ENV ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=8
 ENV OPENBLAS_NUM_THREADS=1
@@ -52,6 +52,7 @@ RUN pip3 install nibabel==3.0.1
 RUN pip3 install nilearn==0.6.1
 RUN pip3 install numpy==1.18.4
 RUN pip3 install Pillow==7.1.2
+RUN pip3 install bids-validator==1.6.0
 RUN pip3 install pybids==0.10.2
 RUN pip3 install pyparsing==2.2.0
 RUN pip3 install python-dateutil==2.7.2

@@ -1,2 +1,2 @@
 BootStrap: docker
-From: scilus/tractoflow:latest
+From: scilus/scilus:1.1.0
