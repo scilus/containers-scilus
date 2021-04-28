@@ -1,0 +1,2 @@
+BootStrap: docker
+From: scilus/scilus:1.1.0
