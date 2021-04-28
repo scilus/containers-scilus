@@ -18,7 +18,7 @@ To build the docker use the following command:
 Singularity
 -----------
 The image for Singularity can be built using `singularity_scilus.def` with the command:
-`sudo singularity build scil_${SCILPY_VERSION}.img singularity_scilus.def`.
+`sudo singularity build scilus_${SCILPY_VERSION}.img singularity_scilus.def`.
 
 Singularity container is built from the Docker stored on dockerhub.
 
