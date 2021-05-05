@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-          name: Check out repository
+        name: Check out repository
       - uses: mr-smithers-excellent/docker-build-push@v5
         name: Docker Build & Push
         with:
