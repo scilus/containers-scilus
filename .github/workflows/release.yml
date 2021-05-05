@@ -1,0 +1,23 @@
+on:
+  release:
+    types: [created]
+
+name: Release container
+
+jobs:
+  Build_Docker:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+          name: Check out repository
+      - uses: mr-smithers-excellent/docker-build-push@v5
+        name: Docker Build & Push
+        with:
+          image: scilus/scilus
+          tags: ${{ github.event.release.tag_name }}, latest
+          dockerfile: Dockerfile
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
