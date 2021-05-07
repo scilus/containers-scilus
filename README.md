@@ -1,8 +1,9 @@
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/scilus/containers-scilus)](https://github.com/scilus/containers-scilus/releases)
-[![Build Status](https://travis-ci.org/scilus/containers-scilus.svg?branch=master)](https://travis-ci.org/scilus/containers-scilus)
 
 Containers related files for SCILUS flows
 =========================================
+[![Build Docker and Singularity](https://github.com/scilus/containers-scilus/actions/workflows/main.yml/badge.svg)](https://github.com/scilus/containers-scilus/actions/workflows/main.yml)
+[![Release container](https://github.com/scilus/containers-scilus/actions/workflows/release.yml/badge.svg)](https://github.com/scilus/containers-scilus/actions/workflows/release.yml)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/scilus/containers-scilus)](https://github.com/scilus/containers-scilus/releases)
 
 Containers update
 -----------------
