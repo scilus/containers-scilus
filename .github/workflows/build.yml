@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
         name: Check out repository
       - name: Change scilpy version
-          run: sed -i '/ENV SCILPY_VERSION=/c\ENV SCILPY_VERSION=${{ github.event.inputs.scilpy_commit }}' Dockerfile
+        run: sed -i '/ENV SCILPY_VERSION=/c\ENV SCILPY_VERSION=${{ github.event.inputs.scilpy_commit }}' Dockerfile
       - uses: mr-smithers-excellent/docker-build-push@v3.1
         name: Docker Build & Push
         with:
