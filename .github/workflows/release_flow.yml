@@ -1,0 +1,31 @@
+name: Release Docker for a flow
+
+on:
+  workflow_dispatch:
+    inputs:
+      scilpy_commit:
+        description: Scilpy commit id or release id
+        required: true
+      docker_tag:
+        description: Docker tag
+        required: true
+
+jobs:
+  Build_Docker:
+    if: github.actor == 'GuillaumeTh' || github.actor == 'arnaudbore'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Check out repository
+      - name: Change scilpy version
+        run: sed -i '/ENV SCILPY_VERSION=/c\ENV SCILPY_VERSION=${{ github.event.inputs.scilpy_commit }}' Dockerfile
+      - uses: mr-smithers-excellent/docker-build-push@v3.1
+        name: Docker Build & Push
+        with:
+          image: scilus/scilus
+          tag: ${{ github.event.inputs.docker_tag }}
+          dockerfile: Dockerfile
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
