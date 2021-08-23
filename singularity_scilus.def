@@ -1,2 +1,2 @@
 BootStrap: docker
-From: scilus/scilus:1.2.0
+From: scilus/scilus:1.2.1

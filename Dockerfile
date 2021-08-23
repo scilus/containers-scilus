@@ -32,7 +32,7 @@ RUN apt -y install unzip
 RUN apt -y install python3.7-tk
 
 WORKDIR /
-ENV SCILPY_VERSION="1.2.0"
+ENV SCILPY_VERSION="1.2.1"
 RUN wget https://github.com/scilus/scilpy/archive/${SCILPY_VERSION}.zip
 RUN unzip ${SCILPY_VERSION}.zip
 RUN mv scilpy-${SCILPY_VERSION} scilpy
