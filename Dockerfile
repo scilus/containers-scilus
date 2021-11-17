@@ -70,5 +70,3 @@ RUN pip3 install MarkupSafe==2.0.1
 RUN pip3 install tenacity==8.0.1
 
 RUN pip3 install -e .
-
-RUN pip3 uninstall -y vtk
