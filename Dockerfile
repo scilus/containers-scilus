@@ -1,4 +1,4 @@
-FROM scilus/singularity-base-tractoflow:testing
+FROM scilus/base-scilus:dev
 
 ENV ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=8
 ENV OPENBLAS_NUM_THREADS=1
