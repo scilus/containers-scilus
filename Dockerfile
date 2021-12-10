@@ -36,7 +36,6 @@ RUN pip3 install bz2file==0.98 &&\
     pip3 install scipy==1.4.1 &&\
     pip3 install setuptools==46.1.3 &&\
     pip3 install six==1.15.0 &&\
-    pip3 install vtk==9.0.1 &&\
     pip3 install trimeshpy==0.0.2 &&\
     pip3 install coloredlogs==10.0 &&\
     pip3 install nilearn==0.6.1 &&\
@@ -56,11 +55,10 @@ RUN python3 setup.py build_ext --inplace &&\
     sed -i '41s/.*/backend : Agg/' /usr/local/lib/python3.7/dist-packages/matplotlib/mpl-data/matplotlibrc
 
 WORKDIR /
-RUN apt-get -y install fonts-freefont-ttf &&\
-    DMRIQCPY_VERSION="0.1.5-rc9" && wget https://github.com/scilus/dmriqcpy/archive/refs/tags/${DMRIQCPY_VERSION}.zip &&\
+RUN DMRIQCPY_VERSION="0.1.5-rc9" &&\
+    wget https://github.com/scilus/dmriqcpy/archive/refs/tags/${DMRIQCPY_VERSION}.zip &&\
     unzip ${DMRIQCPY_VERSION}.zip &&\
     mv dmriqcpy-${DMRIQCPY_VERSION} dmriqcpy
 
 WORKDIR /dmriqcpy
-RUN pip3 install -e . &&\
-    pip3 uninstall -y vtk
+RUN pip3 install -e .
