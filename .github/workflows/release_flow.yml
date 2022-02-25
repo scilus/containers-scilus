@@ -6,6 +6,9 @@ on:
       scilpy_commit:
         description: Scilpy commit id or release id
         required: true
+      dmriqcpy_commit:
+        description: Dmriqcpy commit id or release id
+        required: true
       docker_tag:
         description: Docker tag
         required: true
@@ -20,6 +23,8 @@ jobs:
         name: Check out repository
       - name: Change scilpy version
         run: sed -i '/ENV SCILPY_VERSION=/c\ENV SCILPY_VERSION=${{ github.event.inputs.scilpy_commit }}' Dockerfile
+      - name: Change dmriqcpy version
+        run: sed -i '/ENV DMRIQCPY_VERSION=/c\ENV DMRIQCPY_VERSION=${{ github.event.inputs.dmriqcpy_commit }}' Dockerfile
       - uses: mr-smithers-excellent/docker-build-push@v3.1
         name: Docker Build & Push
         with:
