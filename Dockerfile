@@ -1,4 +1,4 @@
-FROM scilus/base-scilus:dev
+FROM scilus/base-scilus:2.0.0
 
 ENV ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=8
 ENV OPENBLAS_NUM_THREADS=1
@@ -8,7 +8,7 @@ ENV LC_ALL=C
 ADD human-data_master_1d3abfb.tar.bz2 /human-data
 
 WORKDIR /
-RUN SCILPY_VERSION="1.1.0" && wget https://github.com/scilus/scilpy/archive/${SCILPY_VERSION}.zip &&\
+RUN SCILPY_VERSION="1.3.0-rc1" && wget https://github.com/scilus/scilpy/archive/${SCILPY_VERSION}.zip &&\
     unzip ${SCILPY_VERSION}.zip &&\
     mv scilpy-${SCILPY_VERSION} scilpy
 
