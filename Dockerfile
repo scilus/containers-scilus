@@ -62,3 +62,5 @@ RUN DMRIQCPY_VERSION="0.1.5-rc9" &&\
 
 WORKDIR /dmriqcpy
 RUN pip3 install -e .
+
+RUN pip3 uninstall -y vtk
