@@ -47,20 +47,13 @@ RUN pip3 install bz2file==0.98 &&\
     pip3 install bctpy==0.5.2 &&\
     pip3 install statsmodels==0.11.1 &&\
     pip3 install dmri-commit==1.4.5 &&\
-    pip3 install cvxpy==1.0.31
+    pip3 install cvxpy==1.1.18
 
-RUN python3 setup.py build_ext --inplace &&\
-    python3 setup.py install &&\
-    python3 setup.py install_scripts &&\
-    sed -i '41s/.*/backend : Agg/' /usr/local/lib/python3.7/dist-packages/matplotlib/mpl-data/matplotlibrc
+ENV SCILPY_VERSION="1.3.0-rc1"
+ENV DMRIQCPY_VERSION="0.1.5-rc9"
 
 WORKDIR /
-RUN DMRIQCPY_VERSION="0.1.5-rc9" &&\
-    wget https://github.com/scilus/dmriqcpy/archive/refs/tags/${DMRIQCPY_VERSION}.zip &&\
-    unzip ${DMRIQCPY_VERSION}.zip &&\
-    mv dmriqcpy-${DMRIQCPY_VERSION} dmriqcpy
-
-WORKDIR /dmriqcpy
-RUN pip3 install -e .
+RUN pip3 install git+https://github.com/scilus/scilpy.git@${SCILPY_VERSION}
+RUN pip3 install git+https://github.com/scilus/dmriqcpy.git@${DMRIQCPY_VERSION}
 
 RUN pip3 uninstall -y vtk
