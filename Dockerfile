@@ -8,7 +8,8 @@ ENV LC_ALL=C
 ADD human-data_master_1d3abfb.tar.bz2 /human-data
 
 WORKDIR /
-RUN SCILPY_VERSION="1.3.0-rc1" && wget https://github.com/scilus/scilpy/archive/${SCILPY_VERSION}.zip &&\
+ENV SCILPY_VERSION="1.3.0-rc2"
+RUN wget https://github.com/scilus/scilpy/archive/${SCILPY_VERSION}.zip &&\
     unzip ${SCILPY_VERSION}.zip &&\
     mv scilpy-${SCILPY_VERSION} scilpy
 
@@ -26,7 +27,7 @@ RUN pip3 install bz2file==0.98 &&\
     pip3 install nibabel==3.0.2 &&\
     pip3 install nilearn==0.6.2 &&\
     pip3 install numpy==1.21.5 &&\
-    pip3 install Pillow==9.0.0 &&\
+    pip3 install Pillow==9.0.1 &&\
     pip3 install bids-validator==1.6.0 &&\
     pip3 install pybids==0.10.2 &&\
     pip3 install pyparsing==2.2.2 &&\
@@ -49,11 +50,12 @@ RUN pip3 install bz2file==0.98 &&\
     pip3 install dmri-commit==1.4.5 &&\
     pip3 install cvxpy==1.1.18
 
-ENV SCILPY_VERSION="1.3.0-rc1"
-ENV DMRIQCPY_VERSION="0.1.5-rc9"
+ENV DMRIQCPY_VERSION="0.1.5-rc11"
 
 WORKDIR /
 RUN pip3 install git+https://github.com/scilus/scilpy.git@${SCILPY_VERSION}
 RUN pip3 install git+https://github.com/scilus/dmriqcpy.git@${DMRIQCPY_VERSION}
+RUN cp -r /scilpy/data /usr/local/lib/python3.7/dist-packages/
 
+RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python3.7/dist-packages/matplotlib/mpl-data/matplotlibrc
 RUN pip3 uninstall -y vtk
