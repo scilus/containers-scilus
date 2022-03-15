@@ -50,7 +50,7 @@ RUN pip3 install bz2file==0.98 &&\
     pip3 install dmri-commit==1.4.5 &&\
     pip3 install cvxpy==1.1.18
 
-ENV DMRIQCPY_VERSION="0.1.5-rc11"
+ENV DMRIQCPY_VERSION="0.1.5-rc12"
 
 WORKDIR /
 RUN pip3 install git+https://github.com/scilus/scilpy.git@${SCILPY_VERSION}
