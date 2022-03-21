@@ -8,7 +8,7 @@ ENV LC_ALL=C
 ADD human-data_master_1d3abfb.tar.bz2 /human-data
 
 WORKDIR /
-ENV SCILPY_VERSION="1.3.0-rc2"
+ENV SCILPY_VERSION="1.3.0"
 RUN wget https://github.com/scilus/scilpy/archive/${SCILPY_VERSION}.zip &&\
     unzip ${SCILPY_VERSION}.zip &&\
     mv scilpy-${SCILPY_VERSION} scilpy
@@ -50,7 +50,7 @@ RUN pip3 install bz2file==0.98 &&\
     pip3 install dmri-commit==1.4.5 &&\
     pip3 install cvxpy==1.1.18
 
-ENV DMRIQCPY_VERSION="0.1.5-rc12"
+ENV DMRIQCPY_VERSION="0.1.6"
 
 WORKDIR /
 RUN pip3 install git+https://github.com/scilus/scilpy.git@${SCILPY_VERSION}
