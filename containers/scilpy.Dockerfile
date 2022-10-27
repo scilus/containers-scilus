@@ -3,8 +3,11 @@
 FROM scilpy-base as scilpy
 
 ARG BLAS_NUM_THREADS
+ARG PYTHON_VERSION
 ARG SCILPY_VERSION
 
+ENV PYTHON_PACKAGE_DIR=${PYTHON_PACKAGE_DIR:-dist-package}
+ENV PYTHON_VERSION=${PYTHON_VERSION:-3.7}
 ENV SCILPY_VERSION=${SCILPY_VERSION:-master}
 ENV OPENBLAS_NUM_THREADS=${BLAS_NUM_THREADS:-1}
 
@@ -25,10 +28,11 @@ RUN wget https://github.com/scilus/scilpy/archive/${SCILPY_VERSION}.zip && \
     rm ${SCILPY_VERSION}.zip
 
 WORKDIR /scilpy
-RUN pip install -e .
+RUN python${PYTHON_VERSION} -m pip install -e . && \
+    python${PYTHON_VERSION} -m pip cache purge
 
-RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python3.7/site-packages/matplotlib/mpl-data/matplotlibrc && \
-    cp -r /scilpy/data /usr/local/lib/python3.7/dist-packages/ && \
+RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/${PYTHON_PACKAGE_DIR}/matplotlib/mpl-data/matplotlibrc && \
+    cp -r /scilpy/data /usr/local/lib/python${PYTHON_VERSION}/${PYTHON_PACKAGE_DIR}/ && \
     apt-get -y remove \
         wget \
         unzip && \

@@ -4,11 +4,12 @@ FROM python-base AS scilus-python
 
 ARG PYTHON_VERSION
 
+ENV PYTHON_PACKAGE_DIR=${PYTHON_PACKAGE_DIR:-dist-packages}
 ENV PYTHON_VERSION=${PYTHON_VERSION:-3.7}
 
-RUN PYTHON_MAJOR=${VTK_PYTHON_VERSION%%.*} && \
+RUN export PYTHON_MAJOR=${PYTHON_VERSION%%.*} && \
     if [ "$PYTHON_MAJOR" = "3" ]; then export PYTHON_MOD=3; fi && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
         python${PYTHON_MOD}-pip \
         python${PYTHON_VERSION} && \
     update-alternatives --install /usr/bin/python${PYTHON_MOD} python${PYTHON_MOD} /usr/bin/python${PYTHON_VERSION} 1 && \
@@ -17,7 +18,7 @@ RUN PYTHON_MAJOR=${VTK_PYTHON_VERSION%%.*} && \
     python${PYTHON_VERSION} -m pip install pip && \
     pip${PYTHON_MOD} install --upgrade pip && \
     pip${PYTHON_MOD} install -U setuptools && \
-    apt-get -y install \
+    DEBIAN_FRONTEND=noninteractive apt-get -y install \
         python${PYTHON_MOD}-lxml \
         python${PYTHON_MOD}-six \
         python${PYTHON_VERSION}-dev \
