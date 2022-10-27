@@ -93,7 +93,7 @@ RUN wget https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK
           -DCMAKE_INSTALL_PREFIX=${VTK_INSTALL_PATH} \
           -DPYTHON_EXECUTABLE=/usr/bin/python${VTK_PYTHON_VERSION} \
           -DPYTHON_INCLUDE_DIR=/usr/include/python${VTK_PYTHON_VERSION} \
-          -DPYTHON_LIBRARY=/usr/lib/python${PYTHON_VERSION}/config-${PYTHON_VERSION}m-x86_64-linux-gnu/libpython${PYTHON_VERSION}.so \
+          -DPYTHON_LIBRARY=/usr/lib/python${VTK_PYTHON_VERSION}/config-${VTK_PYTHON_VERSION}m-x86_64-linux-gnu/libpython${VTK_PYTHON_VERSION}.so \
           vtk-v${VTK_VERSION}/ && \
     make -j $(nproc --all) && \
     make install
