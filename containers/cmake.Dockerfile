@@ -3,6 +3,7 @@
 FROM cmake-builder AS cmake
 
 ARG CMAKE_VERSION
+
 ENV CMAKE_VERSION=${CMAKE_VERSION:-3.16.3}
 
 RUN apt-get update && \

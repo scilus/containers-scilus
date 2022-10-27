@@ -2,22 +2,28 @@
 
 FROM python-base AS scilus-python
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
-        python3-pip \
-        python3.7 && \
-    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1 && \
-    update-alternatives --config python3 && \
-    update-alternatives  --set python3 /usr/bin/python3.7 && \
-    python3.7 -m pip install pip && \
-    pip3 install --upgrade pip && \
-    pip3 install -U setuptools && \
+ARG PYTHON_VERSION
+
+ENV PYTHON_VERSION=${PYTHON_VERSION:-3.7}
+
+RUN PYTHON_MAJOR=${VTK_PYTHON_VERSION%%.*} && \
+    if [ "$PYTHON_MAJOR" = "3" ]; then export PYTHON_MOD=3; fi && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y install \
+        python${PYTHON_MOD}-pip \
+        python${PYTHON_VERSION} && \
+    update-alternatives --install /usr/bin/python${PYTHON_MOD} python${PYTHON_MOD} /usr/bin/python${PYTHON_VERSION} 1 && \
+    update-alternatives --config python${PYTHON_MOD} && \
+    update-alternatives  --set python${PYTHON_MOD} /usr/bin/python${PYTHON_VERSION} && \
+    python${PYTHON_VERSION} -m pip install pip && \
+    pip${PYTHON_MOD} install --upgrade pip && \
+    pip${PYTHON_MOD} install -U setuptools && \
     apt-get -y install \
-        python3-lxml \
-        python3-six \
-        python3.7-dev \
-        python3.7-tk && \
+        python${PYTHON_MOD}-lxml \
+        python${PYTHON_MOD}-six \
+        python${PYTHON_VERSION}-dev \
+        python${PYTHON_VERSION}-tk && \
     rm -rf /var/lib/apt/lists/*
 
-ENV PYTHON_INCLUDE_DIR=/usr/include/python3.7
-ENV PYTHON_LIBS=/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu/libpython3.7.so
-ENV PYTHON_LIBRARY=/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu/libpython3.7.so
+ENV PYTHON_INCLUDE_DIR=/usr/include/python${PYTHON_VERSION}
+ENV PYTHON_LIBS=/usr/lib/python${PYTHON_VERSION}/config-${PYTHON_VERSION}m-x86_64-linux-gnu/libpython${PYTHON_VERSION}.so
+ENV PYTHON_LIBRARY=${PYTHON_LIBS}

@@ -3,6 +3,7 @@
 FROM mrtrix-builder as mrtrix
 
 ARG MRTRIX_VERSION
+
 ENV MRTRIX_VERSION=${MRTRIX_VERSION:-3.0_RC3}
 
 RUN apt-get update && apt-get -y install \
@@ -27,10 +28,12 @@ RUN git fetch --tags && \
 
 FROM mrtrix-base as mrtrix-install
 
-ARG MRTRIX_VERSION
-ENV MRTRIX_VERSION=${MRTRIX_VERSION:-3.0_RC3}
 ARG MRTRIX_INSTALL_PATH
+ARG MRTRIX_VERSION
+
 ENV MRTRIX_INSTALL_PATH=${MRTRIX_INSTALL_PATH:-/mrtrix3_install}
+ENV MRTRIX_VERSION=${MRTRIX_VERSION:-3.0_RC3}
+
 ENV PATH=${MRTRIX_INSTALL_PATH}/bin:$PATH
 
 RUN apt-get update && apt-get -y install \
