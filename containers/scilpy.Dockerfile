@@ -32,3 +32,7 @@ RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python3.7/site-packages/matplo
         wget \
         unzip && \
     apt-get -y autoremove
+
+WORKDIR /
+RUN touch VERSION && \
+    echo "Scilpy => ${SCILPY_VERSION}\n" >> VERSION

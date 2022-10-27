@@ -27,6 +27,8 @@ RUN git fetch --tags && \
 
 FROM mrtrix-base as mrtrix-install
 
+ARG MRTRIX_VERSION
+ENV MRTRIX_VERSION=${MRTRIX_VERSION:-3.0_RC3}
 ARG MRTRIX_INSTALL_PATH
 ENV MRTRIX_INSTALL_PATH=${MRTRIX_INSTALL_PATH:-/mrtrix3_install}
 ENV PATH=${MRTRIX_INSTALL_PATH}/bin:$PATH
@@ -39,4 +41,7 @@ RUN apt-get update && apt-get -y install \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
+WORKDIR /
 COPY --from=mrtrix /mrtrix3 ${MRTRIX_INSTALL_PATH}
+RUN touch VERSION && \
+    echo "Mrtrix => ${MRTRIX_VERSION}\n" >> VERSION

@@ -8,6 +8,10 @@ variable "base-build-image" {
     default = "ubuntu:18.04"
 }
 
+variable "base-python-image" {
+    default = "python:3.7.15-buster"
+}
+
 group "scilus" {
     targets = ["scilus"]
 }
@@ -46,7 +50,7 @@ target "scilpy" {
     dockerfile = "scilpy.Dockerfile"
     context = "./containers"
     contexts = {
-        scilpy-base = "docker-image://${base-install-image}"
+        scilpy-base = "docker-image://${base-python-image}"
     }
     output = ["type=image"]
 }
@@ -54,11 +58,28 @@ target "scilpy" {
 target "scilus-base" {
     inherits = ["dmriqcpy"]
     contexts = {
-        dmriqcpy-base = "target:fsl"
+        dmriqcpy-base = "target:scilus-vtk"
     }
     tags = ["docker.io/avcaron/scilus-base:dev"]
     cache-from = ["avcaron/scilus-base:dev"]
     pull = true
+}
+
+target "scilus-vtk" {
+    inherits = ["vtk"]
+    contexts = {
+        vtk-base = "target:scilus-python"
+    }
+    output = ["type=cacheonly"]
+}
+
+target "scilus-python" {
+    dockerfile = "scilus-python.Dockerfile"
+    context = "./containers"
+    contexts = {
+        python-base = "target:fsl"
+    }
+    output = ["type=cacheonly"]
 }
 
 target "dmriqcpy" {
@@ -97,18 +118,18 @@ target "ants" {
     context = "./containers"
     target = "ants-install"
     contexts = {
-        ants-base = "target:vtk"
+        ants-base = "docker-image://${base-install-image}"
         ants-builder = "target:cmake"
     }
     output = ["type=cacheonly"]
 }
 
 target "vtk" {
-    dockerfile = "vtk-offscreen-rendering.Dockerfile"
-    context = "./containers"
+    dockerfile = "vtk-omesa.Dockerfile"
+    context = "./containers/vtk-omesa.context/"
     target = "vtk-install"
     contexts = {
-        vtk-base = "docker-image://${base-install-image}"
+        vtk-base = "docker-image://${base-python-image}"
         vtk-builder = "target:cmake"
     }
     output = ["type=cacheonly"]

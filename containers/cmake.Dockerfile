@@ -27,3 +27,7 @@ RUN ./bootstrap && \
 
 WORKDIR /tmp
 RUN rm -rf cmake
+
+WORKDIR /
+RUN touch VERSION && \
+    echo "CMake => ${CMAKE_VERSION}\n" >> VERSION
