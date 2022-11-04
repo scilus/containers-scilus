@@ -1,5 +1,9 @@
 # docker-bake.hcl
 
+# ==============================================================================
+# BUILD VARIABLES
+# ==============================================================================
+
 variable "base-scilus-image" {
     default = "nvidia/cuda:9.2-runtime-ubuntu18.04"
 }
@@ -55,21 +59,69 @@ variable "blas-num-threads" {
     default = "1"
 }
 
+variable "scilpy-test-base" {
+    default = "scilpy"
+}
+
+variable "dmriqcpy-test-base" {
+    default = "dmriqcpy"
+}
+
+variable "vtk-base" {
+    default = "docker-image://${base-python-image}"
+}
+
+# ==============================================================================
+# DOCKER BUILDX BAKE TARGETS
+# ==============================================================================
+
 group "scilus" {
-    targets = ["scilus"]
+    targets = ["scilus", "scilus-test", "scilpy-test"]
 }
 
 group "scilus-base" {
-    targets = ["scilus-base"]
+    targets = ["scilus-base", "dmriqcpy-test", "vtk-test"]
 }
 
 group "scilpy" {
-    targets = ["scilpy"]
+    targets = ["scilpy", "scilpy-test", "vtk-test"]
 }
 
 group "dmriqcpy" {
-    targets = ["dmriqcpy"]
+    targets = ["dmriqcpy", "dmriqcpy-test", "vtk-test"]
 }
+
+# ==============================================================================
+# TEST TARGETS
+# ==============================================================================
+
+target "dmriqcpy-test" {
+    inherits = ["${dmriqcpy-test-base}"]
+    target = "dmriqcpy-test"
+    output = ["type=cacheonly"]
+}
+
+target "scilpy-test" {
+    inherits = ["${scilpy-test-base}"]
+    target = "scilpy-test"
+    output = ["type=cacheonly"]
+}
+
+target "scilus-test" {
+    inherits = ["scilus"]
+    target = "scilus-test"
+    output = ["type=cacheonly"]
+}
+
+target "vtk-test" {
+    inherits = ["vtk"]
+    target = "vtk-test"
+    output = ["type=cacheonly"]
+}
+
+# ==============================================================================
+# BUILD TARGETS
+# ==============================================================================
 
 target "scilus" {
     dockerfile = "scilus.Dockerfile"
@@ -81,7 +133,11 @@ target "scilus" {
     args = {
         ITK_NUM_THREADS = "${itk-num-threads}"
     }
+    tags = ["docker.io/avcaron/scilus:dev"]
+    cache-from = ["type=registry,ref=avcaron/scilus"]
+    cache-to = ["type=registry,ref=avcaron/scilus"]
     output = ["type=image"]
+    pull = true
 }
 
 target "scilus-scilpy" {
@@ -89,42 +145,23 @@ target "scilus-scilpy" {
     contexts = {
         scilpy-base = "target:scilus-base"
     }
-    output = ["type=cacheonly"]
-}
-
-target "scilpy" {
-    dockerfile = "scilpy.Dockerfile"
-    context = "./containers"
-    contexts = {
-        scilpy-base = "docker-image://${base-python-image}"
-    }
     args = {
+        PYTHON_VERSION = "${python-version}"
         SCILPY_VERSION = "${scilpy-version}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
+        PYTHON_PACKAGE_DIR = "dist-packages"
     }
-    tags = ["docker.io/avcaron/scilpy:dev"]
-    cache-from = ["type=registry,ref=avcaron/scilpy"]
-    cache-to = ["type=registry,ref=avcaron/scilpy"]
-    output = ["type=image"]
+    output = ["type=cacheonly"]
 }
 
 target "scilus-base" {
     inherits = ["dmriqcpy"]
     contexts = {
-        dmriqcpy-base = "target:scilus-vtk"
+        dmriqcpy-base = "target:vtk"
     }
     tags = ["docker.io/avcaron/scilus-base:dev"]
     cache-from = ["type=registry,ref=avcaron/scilus-base"]
     cache-to = ["type=registry,ref=avcaron/scilus-base"]
-    pull = true
-}
-
-target "scilus-vtk" {
-    inherits = ["vtk"]
-    contexts = {
-        vtk-base = "target:scilus-python"
-    }
-    output = ["type=cacheonly"]
 }
 
 target "scilus-python" {
@@ -139,9 +176,28 @@ target "scilus-python" {
     output = ["type=cacheonly"]
 }
 
+target "scilpy" {
+    dockerfile = "scilpy.Dockerfile"
+    context = "./containers/scilpy.context"
+    contexts = {
+        scilpy-base = "target:vtk"
+    }
+    args = {
+        PYTHON_VERSION = "${python-version}"
+        SCILPY_VERSION = "${scilpy-version}"
+        BLAS_NUM_THREADS = "${blas-num-threads}"
+        VTK_VERSION = "${vtk-version}"
+    }
+    tags = ["docker.io/avcaron/scilpy:dev"]
+    cache-from = ["type=registry,ref=avcaron/scilpy"]
+    cache-to = ["type=registry,ref=avcaron/scilpy"]
+    output = ["type=image"]
+    pull = true
+}
+
 target "dmriqcpy" {
     dockerfile = "dmriqcpy.Dockerfile"
-    context = "./containers"
+    context = "./containers/dmriqcpy.context"
     contexts = {
         dmriqcpy-base = "target:vtk"
     }
@@ -154,6 +210,7 @@ target "dmriqcpy" {
     cache-from = ["type=registry,ref=avcaron/dmriqcpy"]
     cache-to = ["type=registry,ref=avcaron/dmriqcpy"]
     output = ["type=image"]
+    pull = true
 }
 
 target "fsl" {
@@ -203,7 +260,7 @@ target "vtk" {
     context = "./containers/vtk-omesa.context/"
     target = "vtk-install"
     contexts = {
-        vtk-base = "docker-image://${base-python-image}"
+        vtk-base = "${vtk-base}"
         vtk-builder = "target:cmake"
     }
     args = {

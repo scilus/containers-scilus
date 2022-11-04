@@ -148,5 +148,10 @@ RUN touch VERSION && \
     echo "Mesa => ${MESA_VERSION}\n" >> VERSION && \
     echo "VTK => ${VTK_VERSION}\n" >> VERSION
 
-ADD test.py vtk_install_test.py
-RUN python3 vtk_install_test.py && rm vtk_install_test.py
+
+FROM vtk-install as vtk-test
+ADD tests/ /tests/
+
+WORKDIR /tests
+RUN python3 -m pip install pytest
+RUN python3 -m pytest

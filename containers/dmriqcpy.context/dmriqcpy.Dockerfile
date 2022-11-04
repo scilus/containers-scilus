@@ -32,3 +32,11 @@ RUN PYTHON_MAJOR=${VTK_PYTHON_VERSION%%.*} && \
 WORKDIR /
 RUN touch VERSION && \
     echo "dMRIqcpy => ${DMRIQCPY_VERSION}\n" >> VERSION
+
+
+FROM dmriqcpy as dmriqcpy-test
+ADD tests/ /tests/
+
+WORKDIR /tests
+RUN python3 -m pip install dipy pytest pytest_console_scripts
+RUN python3 -m pytest

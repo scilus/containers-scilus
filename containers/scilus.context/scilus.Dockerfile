@@ -12,5 +12,12 @@ ADD human-data_master_1d3abfb.tar.bz2 /human-data
 ADD requirements.txt.frozen /tmp/requirements.txt.frozen
 
 WORKDIR /tmp
-RUN python3 -m pip install -y -r requirements.txt.frozen && \
+RUN python3 -m pip install -r requirements.txt.frozen && \
     rm requirements.txt.frozen
+
+FROM scilus as scilus-test
+ADD tests/ /tests/
+
+WORKDIR /tests
+RUN python3 -m pip install pytest
+RUN python3 -m pytest
