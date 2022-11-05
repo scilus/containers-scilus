@@ -37,13 +37,14 @@ To achieve this two kind of Dockerfile definitions are allowed in the system:
     installed in the container and one performing tests
   - Building the container this way allow to limit the build requirements 
     installed into the container as much as possible and is thus highly 
-    recommanded
+    recommended
 
 ### Local files
 
 If a container requires local files other than the Dockerfile in its build 
 context, its recipe and files should be placed in its own directory inside the 
-`containers/` directory named `<name>.context`.
+`containers/` directory named `<name>.context`. For a target to use it as its 
+context, modify the `context` parameter to point to it.
 
 ___
 
@@ -69,16 +70,16 @@ repository. It is pieced in 3 sections:
 
 - At the top, all the `variables` are listed, such as dependencies versions, 
   global environment variables and paths that could be overwritten.
-- Then `groups` are listed. They are the principal targets, whose names should 
-  be used when calling `bake`. Thus, their name should also refer to a main 
-  container to publish.
+- Then `groups` are listed. They define a list of targets to build and its their 
+  names that are used when calling `bake`. Thus, their names should also refer 
+  to a main container to publish.
 - Finally, `targets` are defined. A target always refer to a single Dockerfile 
   or block. It can define arguments to pass to the dockerfile (used to customize 
   the build sequences), tags to push to or get cache from, amongst others.
 
 ### Versioning
 
-Versioning is made possible using the variable and the overwritting behavior of 
+Versioning is made possible using the variables and their overwritting behavior  
 when using multiple `.hcl` build files. For each of the containers of the Scilus 
 ecosystem exists a file in the `versioning/` directory, defining the versions of 
 the dependencies required to build it. Those variable can also be passed through 
@@ -95,7 +96,7 @@ are built using the system's target aren't published to it and instead only live
 in the local build cache. Some of those caches can be quite heavy and it can be 
 good to perform clean operation of the local docker build cache frequently. In 
 order to retain as much of it as possible, the cache of critical blocks of the 
-sequence is uploaded directly to dockerhub.
+sequence is uploaded directly to Dockerhub.
 
 The whole caching behavior can be turned off using the `bake` parameter `--no-cache`,
 but it disables both incoming and outcoming cache. To only affect one or the 
@@ -106,13 +107,9 @@ other cache locations, either local or remote. More information in the Buildkit
 
 In the same fashion, only some images get pushed to Dockerhub. This is done by 
 specifying the `tags` parameter of targets to push. Targets that are always 
-pushed have them directly. To add tags to targets that don't have them, or 
-overwritte the ones already defined, multiple dockfiles can be used. The 
-one placed after the main build definition redefines the build targets, only 
-modifying the `tags` parameter.
-
-
-Variables are used to define versions of the dependencies to install. When 
-calling `bake` with more than one `.hcl` file, variable overwritting is performed 
+pushed have them directly specified in the main recipe. To add tags to targets 
+that don't have them, or overwritte the ones already defined, multiple dockfiles 
+can be used. The one placed after the main build definition redefines the build 
+targets, only modifying the `tags` parameter.
 
 ___
