@@ -1,24 +1,41 @@
 
-Containers related files for SCILUS flows
-=========================================
-[![Build Docker and Singularity](https://github.com/scilus/containers-scilus/actions/workflows/main.yml/badge.svg)](https://github.com/scilus/containers-scilus/actions/workflows/main.yml)
-[![Release container](https://github.com/scilus/containers-scilus/actions/workflows/release.yml/badge.svg)](https://github.com/scilus/containers-scilus/actions/workflows/release.yml)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/scilus/containers-scilus)](https://github.com/scilus/containers-scilus/releases)
+Containers build system for the Scilus ecosystem
+================================================
+
+Build system for all docker containers of the Scilus ecosystem. The inventory 
+of containers is still being updated, here are the ones that are currently 
+available :
+
+- [Scilpy](https://github.com/scilus/scilpy)
+- [dmriQCpy](https://github.com/scilus/dmriqcpy)
+- Scilus : container to use with all Scilus flows
 
 Containers update
 -----------------
-When updating `Scilpy`, you will need to modify the SHA of the file, as well as
-the `SCILPY_VERSION` variable in `Dockerfile`.
 
-Docker
-------
-To build the docker use the following command:
+Container update is done via Github actions on the main repositories. Docker 
+images are available on [Dockerhub](https://hub.docker.com/u/scilus). 
+Singularity images light enough to be stored on Github can be found in 
+repositories releases. Follow this [link](container-update.md) for more 
+information on the update system.
 
-`sudo docker build -t docker_scilus .`
+Building containers
+-------------------
+
+To build an image, launch the following command at the root directory of the 
+repository :
+
+`docker buildx bake -f docker-bake.hcl -f versioning/<target>-versioning.hcl <target>`
+
+with a target in : `dmriqcpy`, `scilpy`, `scilus`. Follow this [link](docker-bake.md) 
+for more information on the build system.
 
 Singularity
 -----------
-The image for Singularity can be built using `singularity_scilus.def` with the command:
+
+The image for Singularity can be built using `singularity_scilus.def` with the 
+command:
+
 `sudo singularity build scilus_${SCILPY_VERSION}.img singularity_scilus.def`.
 
 Singularity container is built from the Docker stored on dockerhub.
