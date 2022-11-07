@@ -23,11 +23,12 @@ WORKDIR /
 RUN git clone https://github.com/MRtrix3/mrtrix3.git
 
 WORKDIR /mrtrix3
-RUN if [ "$MRTRIX_BUILD_NTHREADS" = "" ]; then export MRTRIX_BUILD_NTHREADS="$(nproc --all)"; fi && \
-    git fetch --tags && \
+RUN git fetch --tags && \
     git checkout tags/${MRTRIX_VERSION} -b ${MRTRIX_VERSION} && \
     ./configure -nogui -openmp && \
-    NUMBER_OF_PROCESSORS=${MRTRIX_BUILD_NTHREADS} ./build
+    [ -z "$MRTRIX_BUILD_NTHREADS" ] && \
+        { NUMBER_OF_PROCESSORS=${MRTRIX_BUILD_NTHREADS} ./build; } || \
+        { NUMBER_OF_PROCESSORS=$(nproc --all) ./build; }
 
 FROM mrtrix-base as mrtrix-install
 

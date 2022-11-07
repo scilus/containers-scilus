@@ -24,9 +24,10 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cm
     tar -xzf cmake-${CMAKE_VERSION}.tar.gz
 
 WORKDIR /tmp/cmake/cmake-${CMAKE_VERSION}
-RUN if [ "$CMAKE_BUILD_NTHREADS" = "" ]; then export CMAKE_BUILD_NTHREADS="$(nproc --all)"; fi && \
-    ./bootstrap && \
-    make -j ${CMAKE_BUILD_NTHREADS} && \
+RUN ./bootstrap && \
+    [ -z "$CMAKE_BUILD_NTHREADS" ] && \
+        { make -j ${CMAKE_BUILD_NTHREADS}; } || \
+        { make -j $(nproc --all); } && \
     make install
 
 WORKDIR /tmp

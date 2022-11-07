@@ -47,8 +47,7 @@ RUN wget https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.gz && \
     rm mesa-${MESA_VERSION}.tar.gz
 
 WORKDIR /mesa-${MESA_VERSION}
-RUN if [ "$MESA_BUILD_NTHREADS" = "" ]; then export MESA_BUILD_NTHREADS="$(nproc --all)"; fi && \
-    ./configure --prefix=${MESA_INSTALL_PATH} \
+RUN ./configure --prefix=${MESA_INSTALL_PATH} \
                 --enable-autotools \
                 --enable-gallium-llvm \
                 --enable-gallium-osmesa \
@@ -70,12 +69,13 @@ RUN if [ "$MESA_BUILD_NTHREADS" = "" ]; then export MESA_BUILD_NTHREADS="$(nproc
                 --with-egl-platforms= \
                 --with-gallium-drivers=swrast,swr \
                 --with-llvm-prefix=/usr/lib/llvm-7 && \
-    make -j ${MESA_BUILD_NTHREADS} && \
+    [ -z "$MESA_BUILD_NTHREADS" ] && \
+        { make -j ${MESA_BUILD_NTHREADS}; } || \
+        { make -j $(nproc --all); } && \
     make install
 
 WORKDIR ${VTK_BUILD_PATH}
-RUN if [ "$VTK_BUILD_NTHREADS" = "" ]; then export VTK_BUILD_NTHREADS="$(nproc --all)"; fi && \
-    wget https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz && \
+RUN wget https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz && \
     tar -xzf vtk-v${VTK_VERSION}.tar.gz && \
     rm vtk-v${VTK_VERSION}.tar.gz && \
     cmake -DCMAKE_BUILD_TYPE=Release \
@@ -101,7 +101,9 @@ RUN if [ "$VTK_BUILD_NTHREADS" = "" ]; then export VTK_BUILD_NTHREADS="$(nproc -
           -DPYTHON_INCLUDE_DIR=/usr/include/python${VTK_PYTHON_VERSION} \
           -DPYTHON_LIBRARY=/usr/lib/python${VTK_PYTHON_VERSION}/config-${VTK_PYTHON_VERSION}m-x86_64-linux-gnu/libpython${VTK_PYTHON_VERSION}.so \
           vtk-v${VTK_VERSION}/ && \
-    make -j ${VTK_BUILD_NTHREADS} && \
+    [ -z "$VTK_BUILD_NTHREADS" ] && \
+        { make -j ${VTK_BUILD_NTHREADS}; } || \
+        { make -j $(nproc --all); } && \
     make install
 
 ENV VTK_DIR=${VTK_INSTALL_PATH}
