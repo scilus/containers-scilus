@@ -44,8 +44,9 @@ docker buildx bake \
     <target>
 ```
 
-with a target in : `dmriqcpy`, `scilpy`, `scilus`. Follow this [link](docker-bake.md) 
-for more information on the build system.
+with a target in : `dmriqcpy`, `scilpy`, `scilus`. To limit the number of cpus 
+used by each build step, prepend the command by `BUILD_N_THREADS=<number of threads>`. 
+Follow this [link](docker-bake.md) for more information on the build system.
 
 To build images with nextflow in them, use the following command :
 

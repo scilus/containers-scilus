@@ -2,9 +2,11 @@
 
 FROM ants-builder as ants
 
+ARG ANTS_BUILD_NTHREADS
 ARG ANTS_INSTALL_PATH
 ARG ANTS_VERSION
 
+ENV ANTS_BUILD_NTHREADS=${ANTS_BUILD_NTHREADS:-""}
 ENV ANTS_INSTALL_PATH=${ANTS_INSTALL_PATH:-/ants}
 ENV ANTS_VERSION=${ANTS_VERSION:-2.3.4}
 
@@ -23,7 +25,8 @@ RUN git fetch --tags && \
     git checkout tags/v${ANTS_VERSION} -b v${ANTS_VERSION}
 
 WORKDIR /ants_build
-RUN cmake \
+RUN if [ "$ANTS_BUILD_NTHREADS" = "" ]; then export ANTS_BUILD_NTHREADS="$(nproc --all)"; fi && \
+    cmake \
     -DBUILD_SHARED_LIBS=OFF \
     -DUSE_VTK=OFF \
     -DSuperBuild_ANTS_USE_GIT_PROTOCOL=OFF \
@@ -32,7 +35,7 @@ RUN cmake \
     -DRUN_SHORT_TESTS=OFF \
     -DCMAKE_INSTALL_PREFIX=${ANTS_INSTALL_PATH} \
     ../ANTs && \
-    make -j $(nproc --all)
+    make -j ${ANTS_BUILD_NTHREADS}
 
 WORKDIR /ants_build/ANTS-build
 RUN make install

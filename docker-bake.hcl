@@ -80,6 +80,14 @@ variable "vtk-base" {
 }
 
 # ==============================================================================
+# GLOBAL BUILD VARIABLES
+# ==============================================================================
+
+variable "BUILD_N_THREADS" {
+    default = ""
+}
+
+# ==============================================================================
 # DOCKER BUILDX BAKE TARGETS
 # ==============================================================================
 
@@ -141,9 +149,7 @@ target "scilus-nextflow" {
         nextflow-base = "target:scilus"
     }
     tags = ["scilus:local-nextflow"]
-    cache-from = ["type=registry,ref=avcaron/scilus"]
     output = ["type=docker"]
-    pull = true
 }
 
 target "nextflow" {
@@ -270,6 +276,7 @@ target "mrtrix" {
         mrtrix-builder = "docker-image://${base-build-image}"
     }
     args = {
+        MRTRIX_BUILD_NTHREADS = "${BUILD_N_THREADS}"
         MRTRIX_VERSION = "${mrtrix-version}"
     }
     output = ["type=cacheonly"]
@@ -284,6 +291,7 @@ target "ants" {
         ants-builder = "target:cmake"
     }
     args = {
+        ANTS_BUILD_NTHREADS = "${BUILD_N_THREADS}"
         ANTS_VERSION = "${ants-version}"
     }
     output = ["type=cacheonly"]
@@ -298,7 +306,9 @@ target "vtk" {
         vtk-builder = "target:cmake"
     }
     args = {
+        MESA_BUILD_NTHREADS = "${BUILD_N_THREADS}"
         MESA_VERSION = "${mesa-version}"
+        VTK_BUILD_NTHREADS = "${BUILD_N_THREADS}"
         VTK_PYTHON_VERSION = "${python-version}"
         VTK_VERSION = "${vtk-version}"
     }
@@ -313,6 +323,7 @@ target "cmake" {
         cmake-builder = "docker-image://${base-build-image}"
     }
     args = {
+        CMAKE_BUILD_NTHREADS = "${BUILD_N_THREADS}"
         CMAKE_VERSION = "${cmake-version}"
     }
     output = ["type=cacheonly"]

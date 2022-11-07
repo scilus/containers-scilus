@@ -2,15 +2,19 @@
 
 FROM vtk-builder as vtk
 
+ARG MESA_BUILD_NTHREADS
 ARG MESA_INSTALL_PATH
 ARG MESA_VERSION
+ARG VTK_BUILD_NTHREADS
 ARG VTK_BUILD_PATH
 ARG VTK_INSTALL_PATH
 ARG VTK_PYTHON_VERSION
 ARG VTK_VERSION
 
+ENV MESA_BUILD_NTHREADS=${MESA_BUILD_NTHREADS:-""}
 ENV MESA_INSTALL_PATH=${MESA_INSTALL_PATH:-/mesa}
 ENV MESA_VERSION=${MESA_VERSION:-19.0.8}
+ENV VTK_BUILD_NTHREADS=${VTK_BUILD_NTHREADS:-""}
 ENV VTK_BUILD_PATH=${VTK_BUILD_PATH:-/vtk_build}
 ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 ENV VTK_PYTHON_VERSION=${VTK_PYTHON_VERSION:-3.7}
@@ -43,7 +47,8 @@ RUN wget https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.gz && \
     rm mesa-${MESA_VERSION}.tar.gz
 
 WORKDIR /mesa-${MESA_VERSION}
-RUN ./configure --prefix=${MESA_INSTALL_PATH} \
+RUN if [ "$MESA_BUILD_NTHREADS" = "" ]; then export MESA_BUILD_NTHREADS="$(nproc --all)"; fi && \
+    ./configure --prefix=${MESA_INSTALL_PATH} \
                 --enable-autotools \
                 --enable-gallium-llvm \
                 --enable-gallium-osmesa \
@@ -65,11 +70,12 @@ RUN ./configure --prefix=${MESA_INSTALL_PATH} \
                 --with-egl-platforms= \
                 --with-gallium-drivers=swrast,swr \
                 --with-llvm-prefix=/usr/lib/llvm-7 && \
-    make -j $(nproc --all) && \
+    make -j ${MESA_BUILD_NTHREADS} && \
     make install
 
 WORKDIR ${VTK_BUILD_PATH}
-RUN wget https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz && \
+RUN if [ "$VTK_BUILD_NTHREADS" = "" ]; then export VTK_BUILD_NTHREADS="$(nproc --all)"; fi && \
+    wget https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz && \
     tar -xzf vtk-v${VTK_VERSION}.tar.gz && \
     rm vtk-v${VTK_VERSION}.tar.gz && \
     cmake -DCMAKE_BUILD_TYPE=Release \
@@ -95,7 +101,7 @@ RUN wget https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK
           -DPYTHON_INCLUDE_DIR=/usr/include/python${VTK_PYTHON_VERSION} \
           -DPYTHON_LIBRARY=/usr/lib/python${VTK_PYTHON_VERSION}/config-${VTK_PYTHON_VERSION}m-x86_64-linux-gnu/libpython${VTK_PYTHON_VERSION}.so \
           vtk-v${VTK_VERSION}/ && \
-    make -j $(nproc --all) && \
+    make -j ${VTK_BUILD_NTHREADS} && \
     make install
 
 ENV VTK_DIR=${VTK_INSTALL_PATH}

@@ -2,8 +2,10 @@
 
 FROM mrtrix-builder as mrtrix
 
+ARG MRTRIX_BUILD_NTHREADS
 ARG MRTRIX_VERSION
 
+ENV MRTRIX_BUILD_NTHREADS=${MRTRIX_BUILD_NTHREADS:-""}
 ENV MRTRIX_VERSION=${MRTRIX_VERSION:-3.0_RC3}
 
 RUN apt-get update && apt-get -y install \
@@ -21,10 +23,11 @@ WORKDIR /
 RUN git clone https://github.com/MRtrix3/mrtrix3.git
 
 WORKDIR /mrtrix3
-RUN git fetch --tags && \
+RUN if [ "$MRTRIX_BUILD_NTHREADS" = "" ]; then export MRTRIX_BUILD_NTHREADS="$(nproc --all)"; fi && \
+    git fetch --tags && \
     git checkout tags/${MRTRIX_VERSION} -b ${MRTRIX_VERSION} && \
     ./configure -nogui -openmp && \
-    NUMBER_OF_PROCESSORS=$(nproc --all) ./build
+    NUMBER_OF_PROCESSORS=${MRTRIX_BUILD_NTHREADS} ./build
 
 FROM mrtrix-base as mrtrix-install
 

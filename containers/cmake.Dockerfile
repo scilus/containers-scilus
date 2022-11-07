@@ -2,8 +2,10 @@
 
 FROM cmake-builder AS cmake
 
+ARG CMAKE_BUILD_NTHREADS
 ARG CMAKE_VERSION
 
+ENV CMAKE_BUILD_NTHREADS=${CMAKE_BUILD_NTHREADS:-""}
 ENV CMAKE_VERSION=${CMAKE_VERSION:-3.16.3}
 
 RUN apt-get update && \
@@ -22,8 +24,9 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cm
     tar -xzf cmake-${CMAKE_VERSION}.tar.gz
 
 WORKDIR /tmp/cmake/cmake-${CMAKE_VERSION}
-RUN ./bootstrap && \
-    make -j $(nproc --all) && \
+RUN if [ "$CMAKE_BUILD_NTHREADS" = "" ]; then export CMAKE_BUILD_NTHREADS="$(nproc --all)"; fi && \
+    ./bootstrap && \
+    make -j ${CMAKE_BUILD_NTHREADS} && \
     make install
 
 WORKDIR /tmp
