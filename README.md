@@ -22,6 +22,14 @@ information on the update system.
 Building containers
 -------------------
 
+On the first use of the build system on a specific envrionment, run the 
+following command :
+
+`docker buildx create --use`
+
+It will create a new builder instance (an image and a container will be added to 
+your docker local repository) that enables caching features used by the system.
+
 To build an image, launch the following command at the root directory of the 
 repository :
 

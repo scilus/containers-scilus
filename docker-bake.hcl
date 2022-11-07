@@ -133,10 +133,9 @@ target "scilus" {
     args = {
         ITK_NUM_THREADS = "${itk-num-threads}"
     }
-    tags = ["docker.io/avcaron/scilus:dev"]
+    tags = ["scilus:local"]
     cache-from = ["type=registry,ref=avcaron/scilus"]
-    cache-to = ["type=registry,ref=avcaron/scilus"]
-    output = ["type=image"]
+    output = ["type=docker"]
     pull = true
 }
 
@@ -159,9 +158,8 @@ target "scilus-base" {
     contexts = {
         dmriqcpy-base = "target:vtk"
     }
-    tags = ["docker.io/avcaron/scilus-base:dev"]
+    tags = ["docker.io/avcaron/scilus-base:local"]
     cache-from = ["type=registry,ref=avcaron/scilus-base"]
-    cache-to = ["type=registry,ref=avcaron/scilus-base"]
 }
 
 target "scilus-python" {
@@ -188,10 +186,9 @@ target "scilpy" {
         BLAS_NUM_THREADS = "${blas-num-threads}"
         VTK_VERSION = "${vtk-version}"
     }
-    tags = ["docker.io/avcaron/scilpy:dev"]
+    tags = ["scilpy:local"]
     cache-from = ["type=registry,ref=avcaron/scilpy"]
-    cache-to = ["type=registry,ref=avcaron/scilpy"]
-    output = ["type=image"]
+    output = ["type=docker"]
     pull = true
 }
 
@@ -206,10 +203,9 @@ target "dmriqcpy" {
         PYTHON_VERSION = "${python-version}"
         VTK_VERSION = "${vtk-version}"
     }
-    tags = ["docker.io/avcaron/dmriqcpy:dev"]
+    tags = ["dmriqcpy:local"]
     cache-from = ["type=registry,ref=avcaron/dmriqcpy"]
-    cache-to = ["type=registry,ref=avcaron/dmriqcpy"]
-    output = ["type=image"]
+    output = ["type=docker"]
     pull = true
 }
 
