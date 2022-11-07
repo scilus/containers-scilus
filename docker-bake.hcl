@@ -51,6 +51,14 @@ variable "python-version" {
     default = "3.7"
 }
 
+variable "nextflow-version" {
+    default = "21.04.3"
+}
+
+variable "java-version" {
+    default = "11"
+}
+
 variable "itk-num-threads" {
     default = "8"
 }
@@ -74,6 +82,10 @@ variable "vtk-base" {
 # ==============================================================================
 # DOCKER BUILDX BAKE TARGETS
 # ==============================================================================
+
+group "scilus-nextflow" {
+    targets = ["scilus-nextflow", "scilus-test", "scilpy-test"]
+}
 
 group "scilus" {
     targets = ["scilus", "scilus-test", "scilpy-test"]
@@ -120,6 +132,32 @@ target "vtk-test" {
 }
 
 # ==============================================================================
+# NEXTFLOW TARGETS
+# ==============================================================================
+
+target "scilus-nextflow" {
+    inherits = ["nextflow"]
+    contexts = {
+        nextflow-base = "target:scilus"
+    }
+    tags = ["scilus:local+nextflow"]
+    cache-from = ["type=registry,ref=avcaron/scilus"]
+    output = ["type=docker"]
+    pull = true
+}
+
+target "nextflow" {
+    dockerfile = "nextflow.Dockerfile"
+    context = "./containers"
+    target = "nextflow"
+    args = {
+        NEXTFLOW_VERSION = "${nextflow-version}"
+        JAVA_VERSION = "${java-version}"
+    }
+    output = ["type=cacheonly"]
+}
+
+# ==============================================================================
 # BUILD TARGETS
 # ==============================================================================
 
@@ -158,7 +196,7 @@ target "scilus-base" {
     contexts = {
         dmriqcpy-base = "target:vtk"
     }
-    tags = ["docker.io/avcaron/scilus-base:local"]
+    tags = ["scilus-base:local"]
     cache-from = ["type=registry,ref=avcaron/scilus-base"]
 }
 

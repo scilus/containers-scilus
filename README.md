@@ -10,6 +10,8 @@ available :
 - [dmriQCpy](https://github.com/scilus/dmriqcpy)
 - Scilus : container to use with all Scilus flows
 
+___
+
 Containers update
 -----------------
 
@@ -18,6 +20,8 @@ images are available on [Dockerhub](https://hub.docker.com/u/scilus).
 Singularity images light enough to be stored on Github can be found in 
 repositories releases. Follow this [link](container-update.md) for more 
 information on the update system.
+
+___
 
 Building containers
 -------------------
@@ -33,10 +37,31 @@ your docker local repository) that enables caching features used by the system.
 To build an image, launch the following command at the root directory of the 
 repository :
 
-`docker buildx bake -f docker-bake.hcl -f versioning/<target>-versioning.hcl <target>`
+```
+docker buildx bake \
+    -f docker-bake.hcl \
+    -f versioning/<target>-versioning.hcl \
+    <target>
+```
 
 with a target in : `dmriqcpy`, `scilpy`, `scilus`. Follow this [link](docker-bake.md) 
 for more information on the build system.
+
+To build images with nextflow in them, use the following command :
+
+```
+docker buildx bake \
+    -f docker-bake.hcl \
+    -f versioning/nextflow-versioning.hcl \
+    -f versioning/<target>-versioning.hcl \
+    <target>-nextflow
+```
+
+Only some target are available to be built with Nextflow, here is the list :
+
+- `scilus`
+
+___
 
 Singularity
 -----------
@@ -58,3 +83,5 @@ Kurtzer GM, Sochat V, Bauer MW (2017)
 Singularity: Scientific containers for mobility of compute.
 PLoS ONE 12(5): e0177459. https://doi.org/10.1371/journal.pone.0177459
 ```
+
+___

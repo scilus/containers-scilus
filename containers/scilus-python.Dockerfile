@@ -7,6 +7,7 @@ ARG PYTHON_VERSION
 ENV PYTHON_PACKAGE_DIR=${PYTHON_PACKAGE_DIR:-dist-packages}
 ENV PYTHON_VERSION=${PYTHON_VERSION:-3.7}
 
+WORKDIR /
 RUN export PYTHON_MAJOR=${PYTHON_VERSION%%.*} && \
     if [ "$PYTHON_MAJOR" = "3" ]; then export PYTHON_MOD=3; fi && \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
@@ -28,3 +29,7 @@ RUN export PYTHON_MAJOR=${PYTHON_VERSION%%.*} && \
 ENV PYTHON_INCLUDE_DIR=/usr/include/python${PYTHON_VERSION}
 ENV PYTHON_LIBS=/usr/lib/python${PYTHON_VERSION}/config-${PYTHON_VERSION}m-x86_64-linux-gnu/libpython${PYTHON_VERSION}.so
 ENV PYTHON_LIBRARY=${PYTHON_LIBS}
+
+WORKDIR /
+RUN touch VERSION && \
+    echo "Python => ${PYTHON_VERSION}\n" >> VERSION
