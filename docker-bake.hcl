@@ -140,7 +140,7 @@ target "scilus-nextflow" {
     contexts = {
         nextflow-base = "target:scilus"
     }
-    tags = ["scilus:local+nextflow"]
+    tags = ["scilus:local-nextflow"]
     cache-from = ["type=registry,ref=avcaron/scilus"]
     output = ["type=docker"]
     pull = true
