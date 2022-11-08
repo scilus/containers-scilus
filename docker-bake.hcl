@@ -180,7 +180,7 @@ target "scilus" {
 target "scilus-base" {
     inherits = ["dmriqcpy-base"]
     contexts = {
-        dmriqcpy-base = "target:vtk"
+        dmriqcpy-base = "target:scilus-vtk"
     }
     tags = ["scilus-base:local"]
     cache-from = ["type=registry,ref=avcaron/scilus-base"]
@@ -215,8 +215,8 @@ target "scilus-scilpy" {
 target "scilus-vtk" {
     inherits = ["vtk"]
     contexts = {
-        vtk-base = "target"
-        vtk-builder = "target:scilus-python"
+        vtk-base = "target:scilus-python"
+        vtk-builder = "target:cmake"
     }
     cache-from = ["type=registry,ref=avcaron/build-cache:scilus-vtk"]
 }
