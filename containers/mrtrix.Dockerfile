@@ -43,6 +43,7 @@ ENV PATH=${MRTRIX_INSTALL_PATH}/bin:$PATH
 RUN apt-get update && apt-get -y install \
     libeigen3-dev \
     libfftw3-dev \
+    libomp-dev \
     libpng-dev \
     libtiff5-dev \
     zlib1g-dev \
