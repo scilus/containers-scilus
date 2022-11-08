@@ -8,7 +8,8 @@ ENV PYTHON_PACKAGE_DIR=${PYTHON_PACKAGE_DIR:-dist-packages}
 ENV PYTHON_VERSION=${PYTHON_VERSION:-3.7}
 
 WORKDIR /
-RUN export PYTHON_MAJOR=${PYTHON_VERSION%%.*} && \
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    export PYTHON_MAJOR=${PYTHON_VERSION%%.*} && \
     if [ "$PYTHON_MAJOR" = "3" ]; then export PYTHON_MOD=3; fi && \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
         python${PYTHON_MOD}-pip \

@@ -16,8 +16,8 @@ ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 
 WORKDIR /
-RUN apt-get update && \
-    apt-get install -y \
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    apt-get update && apt-get install -y \
         libblas-dev \
         libfreetype6-dev \
         liblapack-dev \

@@ -21,10 +21,10 @@ ENV VTK_PYTHON_VERSION=${VTK_PYTHON_VERSION:-3.7}
 ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 
 WORKDIR /
-RUN if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
     mkdir ${MESA_INSTALL_PATH} ${VTK_INSTALL_PATH} ${VTK_BUILD_PATH} && \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
         build-essential \
         gcc \
         git \
@@ -140,10 +140,10 @@ ENV PYTHONPATH=${PYTHONPATH}:${VTKPYTHONPATH}
 
 WORKDIR /
 RUN mkdir -p ${MESA_INSTALL_PATH}
-COPY --from=vtk ${MESA_INSTALL_PATH} ${MESA_INSTALL_PATH}
-COPY --from=vtk ${VTK_INSTALL_PATH} ${VTK_INSTALL_PATH}
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y install \
+COPY --from=vtk --link ${MESA_INSTALL_PATH} ${MESA_INSTALL_PATH}
+COPY --from=vtk --link ${VTK_INSTALL_PATH} ${VTK_INSTALL_PATH}
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
         llvm-7-runtime \
         libopenmpi-dev && \
     rm -rf /var/lib/apt/lists/*

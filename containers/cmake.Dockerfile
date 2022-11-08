@@ -8,8 +8,8 @@ ARG CMAKE_VERSION
 ENV CMAKE_BUILD_NTHREADS=${CMAKE_BUILD_NTHREADS:-""}
 ENV CMAKE_VERSION=${CMAKE_VERSION:-3.16.3}
 
-RUN apt-get update && \
-    apt-get -y install \
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    apt-get update && apt-get -y install \
         build-essential \
         libssl-dev \
         linux-headers-generic \

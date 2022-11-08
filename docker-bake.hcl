@@ -149,6 +149,7 @@ target "scilus-nextflow" {
         nextflow-base = "target:scilus"
     }
     tags = ["scilus:local-nextflow"]
+    cache-from = ["type=registry,ref=avcaron/build-cache:scilus-nextflow"]
     output = ["type=docker"]
 }
 
@@ -184,7 +185,7 @@ target "scilus" {
 }
 
 target "scilus-scilpy" {
-    inherits = ["scilpy"]
+    inherits = ["scilpy-base"]
     contexts = {
         scilpy-base = "target:scilus-base"
     }
@@ -194,11 +195,12 @@ target "scilus-scilpy" {
         BLAS_NUM_THREADS = "${blas-num-threads}"
         PYTHON_PACKAGE_DIR = "dist-packages"
     }
+    cache-from = ["type=registry,ref=avcaron/build-cache:scilus-scilpy"]
     output = ["type=cacheonly"]
 }
 
 target "scilus-base" {
-    inherits = ["dmriqcpy"]
+    inherits = ["dmriqcpy-base"]
     contexts = {
         dmriqcpy-base = "target:vtk"
     }
@@ -215,10 +217,19 @@ target "scilus-python" {
     args = {
         PYTHON_VERSION = "${python-version}"
     }
+    cache-from = ["type=registry,ref=avcaron/build-cache:scilus-python"]
     output = ["type=cacheonly"]
 }
 
 target "scilpy" {
+    inherits = ["scilpy-base"]
+    tags = ["scilpy:local"]
+    cache-from = ["type=registry,ref=avcaron/scilpy"]
+    output = ["type=docker"]
+    pull = true
+}
+
+target "scilpy-base" {
     dockerfile = "scilpy.Dockerfile"
     context = "./containers/scilpy.context"
     contexts = {
@@ -230,13 +241,17 @@ target "scilpy" {
         BLAS_NUM_THREADS = "${blas-num-threads}"
         VTK_VERSION = "${vtk-version}"
     }
-    tags = ["scilpy:local"]
-    cache-from = ["type=registry,ref=avcaron/scilpy"]
+    output = ["type=cacheonly"]
+}
+
+target "dmriqcpy" {
+    tags = ["dmriqcpy:local"]
+    cache-from = ["type=registry,ref=avcaron/dmriqcpy"]
     output = ["type=docker"]
     pull = true
 }
 
-target "dmriqcpy" {
+target "dmriqcpy-base" {
     dockerfile = "dmriqcpy.Dockerfile"
     context = "./containers/dmriqcpy.context"
     contexts = {
@@ -247,10 +262,7 @@ target "dmriqcpy" {
         PYTHON_VERSION = "${python-version}"
         VTK_VERSION = "${vtk-version}"
     }
-    tags = ["dmriqcpy:local"]
-    cache-from = ["type=registry,ref=avcaron/dmriqcpy"]
-    output = ["type=docker"]
-    pull = true
+    output = ["type=cacheonly"]
 }
 
 target "fsl" {
@@ -264,6 +276,7 @@ target "fsl" {
     args = {
         FSL_VERSION = "${fsl-version}"
     }
+    cache-from = ["type=registry,ref=avcaron/build-cache:fsl"]
     output = ["type=cacheonly"]
 }
 
@@ -279,6 +292,7 @@ target "mrtrix" {
         MRTRIX_BUILD_NTHREADS = "${BUILD_N_THREADS}"
         MRTRIX_VERSION = "${mrtrix-version}"
     }
+    cache-from = ["type=registry,ref=avcaron/build-cache:mrtrix"]
     output = ["type=cacheonly"]
 }
 
@@ -294,6 +308,7 @@ target "ants" {
         ANTS_BUILD_NTHREADS = "${BUILD_N_THREADS}"
         ANTS_VERSION = "${ants-version}"
     }
+    cache-from = ["type=registry,ref=avcaron/build-cache:ants"]
     output = ["type=cacheonly"]
 }
 
@@ -312,6 +327,7 @@ target "vtk" {
         VTK_PYTHON_VERSION = "${python-version}"
         VTK_VERSION = "${vtk-version}"
     }
+    cache-from = ["type=registry,ref=avcaron/build-cache:vtk"]
     output = ["type=cacheonly"]
 }
 
@@ -326,5 +342,6 @@ target "cmake" {
         CMAKE_BUILD_NTHREADS = "${BUILD_N_THREADS}"
         CMAKE_VERSION = "${cmake-version}"
     }
+    cache-from = ["type=registry,ref=avcaron/build-cache:cmake"]
     output = ["type=cacheonly"]
 }

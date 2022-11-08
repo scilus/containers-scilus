@@ -8,15 +8,16 @@ ARG MRTRIX_VERSION
 ENV MRTRIX_BUILD_NTHREADS=${MRTRIX_BUILD_NTHREADS:-""}
 ENV MRTRIX_VERSION=${MRTRIX_VERSION:-3.0_RC3}
 
-RUN apt-get update && apt-get -y install \
-    build-essential \
-    clang \
-    git \
-    libeigen3-dev \
-    libfftw3-dev \
-    libpng-dev \
-    libtiff5-dev \
-    zlib1g-dev \
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    apt-get update && apt-get -y install \
+        build-essential \
+        clang \
+        git \
+        libeigen3-dev \
+        libfftw3-dev \
+        libpng-dev \
+        libtiff5-dev \
+        zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
@@ -40,16 +41,17 @@ ENV MRTRIX_VERSION=${MRTRIX_VERSION:-3.0_RC3}
 
 ENV PATH=${MRTRIX_INSTALL_PATH}/bin:$PATH
 
-RUN apt-get update && apt-get -y install \
-    libeigen3-dev \
-    libfftw3-dev \
-    libomp-dev \
-    libpng-dev \
-    libtiff5-dev \
-    zlib1g-dev \
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    apt-get update && apt-get -y install \
+        libeigen3-dev \
+        libfftw3-dev \
+        libomp-dev \
+        libpng-dev \
+        libtiff5-dev \
+        zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
-COPY --from=mrtrix /mrtrix3 ${MRTRIX_INSTALL_PATH}
+COPY --from=mrtrix --link /mrtrix3 ${MRTRIX_INSTALL_PATH}
 RUN touch VERSION && \
     echo "Mrtrix => ${MRTRIX_VERSION}\n" >> VERSION

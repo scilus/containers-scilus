@@ -8,8 +8,8 @@ ARG FSL_VERSION
 ENV FSL_INSTALL_PATH=${FSL_INSTALL_PATH:-/fsl}
 ENV FSL_VERSION=${FSL_VERSION:-6.0.5.2}
 
-RUN apt-get update && \
-    apt-get -y install \
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    apt-get update && apt-get -y install \
         python \
         wget \
     && rm -rf /var/lib/apt/lists/*
@@ -55,9 +55,9 @@ ENV PATH=${FSLDIR}/bin:$PATH
 ENV POSSUMDIR=${FSLDIR}
 
 WORKDIR /
-COPY --from=fsl ${FSL_INSTALL_PATH} ${FSL_INSTALL_PATH}
-RUN apt-get update && \
-    apt-get -y install \
+COPY --from=fsl --link ${FSL_INSTALL_PATH} ${FSL_INSTALL_PATH}
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    apt-get update && apt-get -y install \
         libopenmpi-dev \
     && rm -rf /var/lib/apt/lists/*
 

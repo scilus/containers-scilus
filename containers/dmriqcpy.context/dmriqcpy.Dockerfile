@@ -14,8 +14,8 @@ ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 
 WORKDIR /
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y install \
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
         git && \
     rm -rf /var/lib/apt/lists/* && \
     python${PYTHON_VERSION} -m pip install \

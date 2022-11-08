@@ -7,7 +7,8 @@ ENV NEXTFLOW_VERSION=${NEXTFLOW_VERSION:-21.04.3}
 ENV JAVA_VERSION=${JAVA_VERSION:-11}
 
 WORKDIR /
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
         openjdk-${JAVA_VERSION}-jre \
         wget && \
     rm -rf /var/lib/apt/lists/* && \

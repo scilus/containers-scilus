@@ -10,8 +10,8 @@ ENV ANTS_BUILD_NTHREADS=${ANTS_BUILD_NTHREADS:-""}
 ENV ANTS_INSTALL_PATH=${ANTS_INSTALL_PATH:-/ants}
 ENV ANTS_VERSION=${ANTS_VERSION:-2.3.4}
 
-RUN apt-get update && \
-    apt-get -y install \
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    apt-get update && apt-get -y install \
         git \
         zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
@@ -53,9 +53,9 @@ ENV ANTSPATH=${ANTS_INSTALL_PATH}/bin/
 ENV PATH=$PATH:$ANTSPATH
 
 WORKDIR /
-COPY --from=ants ${ANTS_INSTALL_PATH} ${ANTS_INSTALL_PATH}
-RUN apt-get update && \
-    apt-get -y install \
+COPY --from=ants --link ${ANTS_INSTALL_PATH} ${ANTS_INSTALL_PATH}
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    apt-get update && apt-get -y install \
         zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
 
