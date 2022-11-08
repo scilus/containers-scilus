@@ -114,24 +114,28 @@ group "dmriqcpy" {
 target "dmriqcpy-test" {
     inherits = ["${dmriqcpy-test-base}"]
     target = "dmriqcpy-test"
+    cache-from = ["type=registry,ref=avcaron/build-cache:dmriqcpy-test"]
     output = ["type=cacheonly"]
 }
 
 target "scilpy-test" {
     inherits = ["${scilpy-test-base}"]
     target = "scilpy-test"
+    cache-from = ["type=registry,ref=avcaron/build-cache:scilpy-test"]
     output = ["type=cacheonly"]
 }
 
 target "scilus-test" {
     inherits = ["scilus"]
     target = "scilus-test"
+    cache-from = ["type=registry,ref=avcaron/build-cache:scilus-test"]
     output = ["type=cacheonly"]
 }
 
 target "vtk-test" {
     inherits = ["vtk"]
     target = "vtk-test"
+    cache-from = ["type=registry,ref=avcaron/build-cache:vtk-test"]
     output = ["type=cacheonly"]
 }
 
