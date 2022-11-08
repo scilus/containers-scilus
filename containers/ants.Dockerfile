@@ -25,15 +25,14 @@ RUN git fetch --tags && \
     git checkout tags/v${ANTS_VERSION} -b v${ANTS_VERSION}
 
 WORKDIR /ants_build
-RUN cmake \
-    -DBUILD_SHARED_LIBS=OFF \
-    -DUSE_VTK=OFF \
-    -DSuperBuild_ANTS_USE_GIT_PROTOCOL=OFF \
-    -DBUILD_TESTING=OFF \
-    -DRUN_LONG_TESTS=OFF \
-    -DRUN_SHORT_TESTS=OFF \
-    -DCMAKE_INSTALL_PREFIX=${ANTS_INSTALL_PATH} \
-    ../ANTs && \
+RUN cmake -DBUILD_SHARED_LIBS=OFF \
+          -DUSE_VTK=OFF \
+          -DSuperBuild_ANTS_USE_GIT_PROTOCOL=OFF \
+          -DBUILD_TESTING=OFF \
+          -DRUN_LONG_TESTS=OFF \
+          -DRUN_SHORT_TESTS=OFF \
+          -DCMAKE_INSTALL_PREFIX=${ANTS_INSTALL_PATH} \
+          ../ANTs && \
     [ -z "$ANTS_BUILD_NTHREADS" ] && \
         { make -j ${ANTS_BUILD_NTHREADS}; } || \
         { make -j $(nproc --all); }

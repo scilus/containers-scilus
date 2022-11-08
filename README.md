@@ -44,9 +44,8 @@ docker buildx bake \
     <target>
 ```
 
-with a target in : `dmriqcpy`, `scilpy`, `scilus`. To limit the number of cpus 
-used by each build step, prepend the command by `BUILD_N_THREADS=<number of threads>`. 
-Follow this [link](docker-bake.md) for more information on the build system.
+with a target in : `dmriqcpy`, `scilpy`, `scilus`. Follow this 
+[link](docker-bake.md) for more information on the build system.
 
 To build images with nextflow in them, use the following command :
 
@@ -61,6 +60,16 @@ docker buildx bake \
 Only some target are available to be built with Nextflow, here is the list :
 
 - `scilus`
+
+To limit the number of cpus used by each build step, prepend the command by 
+`BUILD_N_THREADS=<number of threads>`. When building the full `scilus` image 
+stack, there will be at one moment at least 3 big libraries building 
+simultaneously. Limiting the number of cpus for each of them to the third 
+available can prevent the build machine from freezing. However, nothing can be 
+done to limit the usage in RAM of the current builder instance. To do so, the 
+[Kubernetes](https://docs.docker.com/build/building/drivers/kubernetes/) builder 
+instance must be used (easy on Windows using Docker-Desktop, harder to install 
+on Linux OSes).
 
 ___
 

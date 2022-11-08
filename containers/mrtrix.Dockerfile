@@ -25,8 +25,9 @@ RUN git clone https://github.com/MRtrix3/mrtrix3.git
 
 WORKDIR /mrtrix3
 RUN git fetch --tags && \
-    git checkout tags/${MRTRIX_VERSION} -b ${MRTRIX_VERSION} && \
-    ./configure -nogui -openmp && \
+    git checkout tags/${MRTRIX_VERSION} -b ${MRTRIX_VERSION}
+
+RUN ./configure -nogui -openmp && \
     [ -z "$MRTRIX_BUILD_NTHREADS" ] && \
         { NUMBER_OF_PROCESSORS=${MRTRIX_BUILD_NTHREADS} ./build; } || \
         { NUMBER_OF_PROCESSORS=$(nproc --all) ./build; }

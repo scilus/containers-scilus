@@ -75,10 +75,6 @@ variable "dmriqcpy-test-base" {
     default = "dmriqcpy"
 }
 
-variable "vtk-base" {
-    default = "docker-image://${base-python-image}"
-}
-
 # ==============================================================================
 # GLOBAL BUILD VARIABLES
 # ==============================================================================
@@ -153,20 +149,17 @@ target "scilus-nextflow" {
     output = ["type=docker"]
 }
 
-target "nextflow" {
-    dockerfile = "nextflow.Dockerfile"
-    context = "./containers"
-    target = "nextflow"
-    args = {
-        NEXTFLOW_VERSION = "${nextflow-version}"
-        JAVA_VERSION = "${java-version}"
-    }
-    output = ["type=cacheonly"]
-}
+# ==============================================================================
+# CONTAINERS TARGETS
+# ==============================================================================
 
-# ==============================================================================
-# BUILD TARGETS
-# ==============================================================================
+target "scilpy" {
+    inherits = ["scilpy-base"]
+    tags = ["scilpy:local"]
+    cache-from = ["type=registry,ref=avcaron/scilpy"]
+    output = ["type=docker"]
+    pull = true
+}
 
 target "scilus" {
     dockerfile = "scilus.Dockerfile"
@@ -184,6 +177,27 @@ target "scilus" {
     pull = true
 }
 
+target "scilus-base" {
+    inherits = ["dmriqcpy-base"]
+    contexts = {
+        dmriqcpy-base = "target:vtk"
+    }
+    tags = ["scilus-base:local"]
+    cache-from = ["type=registry,ref=avcaron/scilus-base"]
+}
+
+target "dmriqcpy" {
+    inherits = ["dmriqcpy-base"]
+    tags = ["dmriqcpy:local"]
+    cache-from = ["type=registry,ref=avcaron/dmriqcpy"]
+    output = ["type=docker"]
+    pull = true
+}
+
+# ==============================================================================
+# SPECIALIZED BUILD TARGETS
+# ==============================================================================
+
 target "scilus-scilpy" {
     inherits = ["scilpy-base"]
     contexts = {
@@ -196,16 +210,30 @@ target "scilus-scilpy" {
         PYTHON_PACKAGE_DIR = "dist-packages"
     }
     cache-from = ["type=registry,ref=avcaron/build-cache:scilus-scilpy"]
-    output = ["type=cacheonly"]
 }
 
-target "scilus-base" {
-    inherits = ["dmriqcpy-base"]
+target "scilus-vtk" {
+    inherits = ["vtk"]
     contexts = {
-        dmriqcpy-base = "target:vtk"
+        vtk-base = "target"
+        vtk-builder = "target:scilus-python"
     }
-    tags = ["scilus-base:local"]
-    cache-from = ["type=registry,ref=avcaron/scilus-base"]
+    cache-from = ["type=registry,ref=avcaron/build-cache:scilus-vtk"]
+}
+
+# ==============================================================================
+# BUILD TARGETS
+# ==============================================================================
+
+target "nextflow" {
+    dockerfile = "nextflow.Dockerfile"
+    context = "./containers"
+    target = "nextflow"
+    args = {
+        NEXTFLOW_VERSION = "${nextflow-version}"
+        JAVA_VERSION = "${java-version}"
+    }
+    output = ["type=cacheonly"]
 }
 
 target "scilus-python" {
@@ -221,14 +249,6 @@ target "scilus-python" {
     output = ["type=cacheonly"]
 }
 
-target "scilpy" {
-    inherits = ["scilpy-base"]
-    tags = ["scilpy:local"]
-    cache-from = ["type=registry,ref=avcaron/scilpy"]
-    output = ["type=docker"]
-    pull = true
-}
-
 target "scilpy-base" {
     dockerfile = "scilpy.Dockerfile"
     context = "./containers/scilpy.context"
@@ -242,13 +262,6 @@ target "scilpy-base" {
         VTK_VERSION = "${vtk-version}"
     }
     output = ["type=cacheonly"]
-}
-
-target "dmriqcpy" {
-    tags = ["dmriqcpy:local"]
-    cache-from = ["type=registry,ref=avcaron/dmriqcpy"]
-    output = ["type=docker"]
-    pull = true
 }
 
 target "dmriqcpy-base" {
@@ -317,7 +330,7 @@ target "vtk" {
     context = "./containers/vtk-omesa.context/"
     target = "vtk-install"
     contexts = {
-        vtk-base = "${vtk-base}"
+        vtk-base = "docker-image://${base-python-image}"
         vtk-builder = "target:cmake"
     }
     args = {

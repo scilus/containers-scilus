@@ -8,6 +8,7 @@ ARG FSL_VERSION
 ENV FSL_INSTALL_PATH=${FSL_INSTALL_PATH:-/fsl}
 ENV FSL_VERSION=${FSL_VERSION:-6.0.5.2}
 
+WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
         python \
@@ -15,9 +16,11 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /tmp/fsl_sources
+
 WORKDIR /tmp/fsl_sources
-RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py && \
-    python fslinstaller.py \
+RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py
+
+RUN python fslinstaller.py \
         -d ${FSL_INSTALL_PATH} \
         -V ${FSL_VERSION} \
         -D && \

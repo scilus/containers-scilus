@@ -46,6 +46,11 @@ RUN wget https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.gz && \
     tar -xzf mesa-${MESA_VERSION}.tar.gz && \
     rm mesa-${MESA_VERSION}.tar.gz
 
+WORKDIR ${VTK_BUILD_PATH}
+RUN wget https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz && \
+    tar -xzf vtk-v${VTK_VERSION}.tar.gz && \
+    rm vtk-v${VTK_VERSION}.tar.gz
+
 WORKDIR /mesa-${MESA_VERSION}
 RUN ./configure --prefix=${MESA_INSTALL_PATH} \
                 --enable-autotools \
@@ -75,10 +80,7 @@ RUN ./configure --prefix=${MESA_INSTALL_PATH} \
     make install
 
 WORKDIR ${VTK_BUILD_PATH}
-RUN wget https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz && \
-    tar -xzf vtk-v${VTK_VERSION}.tar.gz && \
-    rm vtk-v${VTK_VERSION}.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release \
+RUN cmake -DCMAKE_BUILD_TYPE=Release \
           -DBUILD_TESTING=OFF \
           -DBUILD_DOCUMENTATION=OFF \
           -DBUILD_EXAMPLES=OFF \

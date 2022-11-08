@@ -11,8 +11,9 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
         openjdk-${JAVA_VERSION}-jre \
         wget && \
-    rm -rf /var/lib/apt/lists/* && \
-    wget -qO- https://github.com/nextflow-io/nextflow/releases/download/v${NEXTFLOW_VERSION}/nextflow | bash && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN wget -qO- https://github.com/nextflow-io/nextflow/releases/download/v${NEXTFLOW_VERSION}/nextflow | bash && \
     chmod +x nextflow && \
     mv nextflow /usr/bin/nextflow && \
     apt-get -y remove \
