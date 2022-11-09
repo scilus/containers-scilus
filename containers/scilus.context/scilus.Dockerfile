@@ -22,7 +22,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     && rm -rf /var/lib/apt/lists/*
 
 FROM scilus as scilus-test
-ADD --link tests/ /tests/
+ADD tests/ /tests/
 
 WORKDIR /tests
 RUN python3 -m pip install pytest

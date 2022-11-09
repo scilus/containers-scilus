@@ -160,7 +160,7 @@ RUN touch VERSION && \
 
 
 FROM vtk-install as vtk-test
-ADD --link tests/ /tests/
+ADD tests/ /tests/
 
 WORKDIR /tests
 RUN python3 -m pip install pytest
