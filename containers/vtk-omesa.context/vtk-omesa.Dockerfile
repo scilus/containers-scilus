@@ -75,8 +75,8 @@ RUN ./configure --prefix=${MESA_INSTALL_PATH} \
                 --with-gallium-drivers=swrast,swr \
                 --with-llvm-prefix=/usr/lib/llvm-7 && \
     [ -z "$MESA_BUILD_NTHREADS" ] && \
-        { make -j ${MESA_BUILD_NTHREADS}; } || \
-        { make -j $(nproc --all); } && \
+        { make -j $(nproc --all); } || \
+        { make -j ${MESA_BUILD_NTHREADS}; } && \
     make install
 
 WORKDIR ${VTK_BUILD_PATH}
@@ -104,8 +104,8 @@ RUN cmake -DCMAKE_BUILD_TYPE=Release \
           -DPYTHON_LIBRARY=/usr/lib/python${VTK_PYTHON_VERSION}/config-${VTK_PYTHON_VERSION}m-x86_64-linux-gnu/libpython${VTK_PYTHON_VERSION}.so \
           vtk-v${VTK_VERSION}/ && \
     [ -z "$VTK_BUILD_NTHREADS" ] && \
-        { make -j ${VTK_BUILD_NTHREADS}; } || \
-        { make -j $(nproc --all); } && \
+        { make -j $(nproc --all); } || \
+        { make -j ${VTK_BUILD_NTHREADS}; } && \
     make install
 
 ENV VTK_DIR=${VTK_INSTALL_PATH}
@@ -115,7 +115,7 @@ ENV LD_LIBRARY_PATH=${VTK_DIR}/lib:${MESA_INSTALL_PATH}/lib:$LD_LIBRARY_PATH
 ENV PYTHONPATH=${PYTHONPATH}:${VTKPYTHONPATH}
 
 WORKDIR ${VTK_INSTALL_PATH}/lib/python${VTK_PYTHON_VERSION}/site-packages
-ADD setup.py setup.py
+ADD --link setup.py setup.py
 RUN python${VTK_PYTHON_VERSION} setup.py bdist_wheel && \
     mv dist/vtk-${VTK_VERSION}-py${VTK_PYTHON_VERSION%%.*}-none-any.whl ${VTK_INSTALL_PATH}/vtk-${VTK_VERSION}-py${VTK_PYTHON_VERSION%%.*}-none-any.whl && \
     rm -rf build dist setup.py vtk.egg-info __pycache__
@@ -160,7 +160,7 @@ RUN touch VERSION && \
 
 
 FROM vtk-install as vtk-test
-ADD tests/ /tests/
+ADD --link tests/ /tests/
 
 WORKDIR /tests
 RUN python3 -m pip install pytest

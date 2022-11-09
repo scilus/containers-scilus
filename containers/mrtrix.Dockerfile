@@ -29,8 +29,8 @@ RUN git fetch --tags && \
 
 RUN ./configure -nogui -openmp && \
     [ -z "$MRTRIX_BUILD_NTHREADS" ] && \
-        { NUMBER_OF_PROCESSORS=${MRTRIX_BUILD_NTHREADS} ./build; } || \
-        { NUMBER_OF_PROCESSORS=$(nproc --all) ./build; }
+        { NUMBER_OF_PROCESSORS=$(nproc --all) ./build; } || \
+        { NUMBER_OF_PROCESSORS=${MRTRIX_BUILD_NTHREADS} ./build; }
 
 FROM mrtrix-base as mrtrix-install
 

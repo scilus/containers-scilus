@@ -36,7 +36,7 @@ RUN touch VERSION && \
 
 
 FROM dmriqcpy as dmriqcpy-test
-ADD tests/ /tests/
+ADD --link tests/ /tests/
 
 WORKDIR /tests
 RUN python3 -m pip install dipy pytest pytest_console_scripts

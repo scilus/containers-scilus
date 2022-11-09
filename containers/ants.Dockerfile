@@ -34,8 +34,8 @@ RUN cmake -DBUILD_SHARED_LIBS=OFF \
           -DCMAKE_INSTALL_PREFIX=${ANTS_INSTALL_PATH} \
           ../ANTs && \
     [ -z "$ANTS_BUILD_NTHREADS" ] && \
-        { make -j ${ANTS_BUILD_NTHREADS}; } || \
-        { make -j $(nproc --all); }
+        { make -j $(nproc --all); } || \
+        { make -j ${ANTS_BUILD_NTHREADS}; }
 
 WORKDIR /ants_build/ANTS-build
 RUN make install

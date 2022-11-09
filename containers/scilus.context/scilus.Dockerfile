@@ -9,8 +9,8 @@ ENV OPENBLAS_NUM_THREADS=${OPENBLAS_NUM_THREADS:-1}
 
 ENV LC_ALL=C
 
-ADD human-data_master_1d3abfb.tar.bz2 /human-data
-ADD requirements.txt.frozen /tmp/requirements.txt.frozen
+ADD --link human-data_master_1d3abfb.tar.bz2 /human-data
+ADD --link requirements.txt.frozen /tmp/requirements.txt.frozen
 
 WORKDIR /tmp
 RUN python3 -m pip install -r requirements.txt.frozen && \
@@ -22,7 +22,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     && rm -rf /var/lib/apt/lists/*
 
 FROM scilus as scilus-test
-ADD tests/ /tests/
+ADD --link tests/ /tests/
 
 WORKDIR /tests
 RUN python3 -m pip install pytest

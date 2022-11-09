@@ -52,7 +52,7 @@ RUN touch VERSION && \
 
 
 FROM scilpy as scilpy-test
-ADD tests/ /tests/
+ADD --link tests/ /tests/
 
 WORKDIR /tests
 RUN python3 -m pytest

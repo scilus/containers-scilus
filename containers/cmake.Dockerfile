@@ -26,8 +26,8 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cm
 WORKDIR /tmp/cmake/cmake-${CMAKE_VERSION}
 RUN ./bootstrap && \
     [ -z "$CMAKE_BUILD_NTHREADS" ] && \
-        { make -j ${CMAKE_BUILD_NTHREADS}; } || \
-        { make -j $(nproc --all); } && \
+        { make -j $(nproc --all); } || \
+        { make -j ${CMAKE_BUILD_NTHREADS}; } && \
     make install
 
 WORKDIR /tmp
