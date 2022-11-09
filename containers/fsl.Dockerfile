@@ -61,7 +61,8 @@ WORKDIR /
 COPY --from=fsl --link ${FSL_INSTALL_PATH} ${FSL_INSTALL_PATH}
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
-        libopenmpi-dev \
+    dc \
+    libopenmpi-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN touch VERSION && \
