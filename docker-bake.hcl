@@ -75,12 +75,8 @@ variable "dmriqcpy-test-base" {
     default = "dmriqcpy"
 }
 
-# ==============================================================================
-# GLOBAL BUILD VARIABLES
-# ==============================================================================
-
-variable "BUILD_N_THREADS" {
-    default = ""
+variable "vtk-test-base" {
+    default = "vtk"
 }
 
 # ==============================================================================
@@ -114,28 +110,24 @@ group "dmriqcpy" {
 target "dmriqcpy-test" {
     inherits = ["${dmriqcpy-test-base}"]
     target = "dmriqcpy-test"
-    cache-from = ["type=registry,ref=avcaron/build-cache:dmriqcpy-test"]
     output = ["type=cacheonly"]
 }
 
 target "scilpy-test" {
     inherits = ["${scilpy-test-base}"]
     target = "scilpy-test"
-    cache-from = ["type=registry,ref=avcaron/build-cache:scilpy-test"]
     output = ["type=cacheonly"]
 }
 
 target "scilus-test" {
     inherits = ["scilus"]
     target = "scilus-test"
-    cache-from = ["type=registry,ref=avcaron/build-cache:scilus-test"]
     output = ["type=cacheonly"]
 }
 
 target "vtk-test" {
-    inherits = ["vtk"]
+    inherits = ["${vtk-test-base}"]
     target = "vtk-test"
-    cache-from = ["type=registry,ref=avcaron/build-cache:vtk-test"]
     output = ["type=cacheonly"]
 }
 
@@ -306,7 +298,7 @@ target "mrtrix" {
         mrtrix-builder = "docker-image://${base-build-image}"
     }
     args = {
-        MRTRIX_BUILD_NTHREADS = "${BUILD_N_THREADS}"
+        MRTRIX_BUILD_NTHREADS = "6"
         MRTRIX_VERSION = "${mrtrix-version}"
     }
     cache-from = ["type=registry,ref=avcaron/build-cache:mrtrix"]
@@ -322,7 +314,7 @@ target "ants" {
         ants-builder = "target:cmake"
     }
     args = {
-        ANTS_BUILD_NTHREADS = "${BUILD_N_THREADS}"
+        ANTS_BUILD_NTHREADS = "6"
         ANTS_VERSION = "${ants-version}"
     }
     cache-from = ["type=registry,ref=avcaron/build-cache:ants"]
@@ -338,9 +330,9 @@ target "vtk" {
         vtk-builder = "target:cmake"
     }
     args = {
-        MESA_BUILD_NTHREADS = "${BUILD_N_THREADS}"
+        MESA_BUILD_NTHREADS = "6"
         MESA_VERSION = "${mesa-version}"
-        VTK_BUILD_NTHREADS = "${BUILD_N_THREADS}"
+        VTK_BUILD_NTHREADS = "6"
         VTK_PYTHON_VERSION = "${python-version}"
         VTK_VERSION = "${vtk-version}"
     }
@@ -356,7 +348,7 @@ target "cmake" {
         cmake-builder = "docker-image://${base-build-image}"
     }
     args = {
-        CMAKE_BUILD_NTHREADS = "${BUILD_N_THREADS}"
+        CMAKE_BUILD_NTHREADS = "6"
         CMAKE_VERSION = "${cmake-version}"
     }
     cache-from = ["type=registry,ref=avcaron/build-cache:cmake"]

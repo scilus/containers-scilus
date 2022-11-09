@@ -13,7 +13,7 @@ nilearn==0.6.2
 numpy==1.21.5
 Pillow==9.0.1
 bids-validator==1.6.0
-pybids==0.15.5
+pybids==0.10.2
 pyparsing==2.2.2
 python-dateutil==2.7.5
 pytz==2018.4

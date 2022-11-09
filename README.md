@@ -61,15 +61,25 @@ Only some target are available to be built with Nextflow, here is the list :
 
 - `scilus`
 
-To limit the number of cpus used by each build step, prepend the command by 
-`BUILD_N_THREADS=<number of threads>`. When building the full `scilus` image 
-stack, there will be at one moment at least 3 big libraries building 
-simultaneously. Limiting the number of cpus for each of them to the third 
-available can prevent the build machine from freezing. However, nothing can be 
-done to limit the usage in RAM of the current builder instance. To do so, the 
-[Kubernetes](https://docs.docker.com/build/building/drivers/kubernetes/) builder 
-instance must be used (easy on Windows using Docker-Desktop, harder to install 
-on Linux OSes).
+___
+
+Building the `scilus` container
+-------------------------------
+
+When building the full `scilus` image stack, there will be at one moment at 
+least 3 big libraries building simultaneously. Limiting the number of cpus for 
+each of them to the third available can prevent the build machine from freezing. 
+Nothing can be done on our side for now without heavily impacting the cache 
+system and thus all building blocks have been locked to use only 6 CPU threads 
+at most. When building from scratch, we highly recommend using a machine with at 
+least 8 CPU cores. Note also that nothing can be done to limit the usage in RAM 
+of the current builder instance.
+
+Improvments in resources management are possible using 
+[Kubernetes](https://docs.docker.com/build/building/drivers/kubernetes/) 
+as builder for buildx. When it gets fully documented, and its deployment on 
+linux machine is easy enough (right now, it is a walk in the park on Windows 
+using Docker-Desktop and a real hassle on Linux OSes).
 
 ___
 
