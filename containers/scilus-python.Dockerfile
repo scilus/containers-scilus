@@ -27,7 +27,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         python${PYTHON_VERSION}-tk && \
     rm -rf /var/lib/apt/lists/*
 
-ENV PYTHON_INCLUDE_DIR=/usr/include/python${PYTHON_VERSION}
+ENV PYTHON_INCLUDE_DIR=/usr/include/python${PYTHON_VERSION}:$PYTHON_INCLUDE_DIR
 ENV PYTHON_LIBS=/usr/lib/python${PYTHON_VERSION}/config-${PYTHON_VERSION}m-x86_64-linux-gnu/libpython${PYTHON_VERSION}.so
 ENV PYTHON_LIBRARY=${PYTHON_LIBS}
 
