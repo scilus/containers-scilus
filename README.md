@@ -39,8 +39,8 @@ repository :
 
 ```
 docker buildx bake \
-    -f docker-bake.hcl \
     -f versioning/<target>-versioning.hcl \
+    -f docker-bake.hcl \
     <target>
 ```
 
@@ -51,15 +51,39 @@ To build images with nextflow in them, use the following command :
 
 ```
 docker buildx bake \
-    -f docker-bake.hcl \
     -f versioning/nextflow-versioning.hcl \
     -f versioning/<target>-versioning.hcl \
+    -f docker-bake.hcl \
     <target>-nextflow
 ```
 
 Only some target are available to be built with Nextflow, here is the list :
 
 - `scilus`
+
+___
+
+Versioning containers
+---------------------
+
+- Scilus
+
+    The `scilus` container, which is used for all Nextflow worflows, needs to be 
+    thouroughly versioned for validation purposes. We do not validate for all 
+    sub-dependencies that are included in the container, nor do we validate the 
+    version of dependencies acquired via means such as `apt-get`.
+
+    Versions of the dependencies of interest are specified in a file at the root 
+    of the image named `VERSION`. Other dependencies may have been installed in 
+    the image in `apt-get` or `pip`, which can both be inspected if needs be. 
+    For `python` dependencies, please make note that the interpreter to be 
+    targeted is located in `/usr/bin`. To list packages installed in the image, 
+    assuming the python version inside it being `<py_version>`, execute the 
+    command :
+
+    ```
+    python<py_version> -m pip list
+    ```
 
 ___
 

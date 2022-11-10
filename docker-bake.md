@@ -58,10 +58,10 @@ container recipes. A `.hcl` file can contain 3 types of objects : `variables`,
 
 ### Building with multiple files
 
-When a bake call is performed with multiple files, 
-variables in a file get overwritten by their redefinitions in subsequent files. 
-Groups and targets defined in multiple files are merged together. Their 
-parameters are overwritten following the same logic than for variables.
+When a bake call is performed with multiple files, variables in a file get 
+overwritten by their redefinitions in previous files. Groups and targets defined 
+in multiple files are merged together. Their parameters are overwritten 
+following the same logic than for variables.
 
 ### Main recipe
 
