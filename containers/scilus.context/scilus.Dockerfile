@@ -24,6 +24,7 @@ RUN python3 -m pip install -r requirements.frozen && \
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
     bc \
+    nvidia-cuda-toolkit \
     && rm -rf /var/lib/apt/lists/*
 
 FROM scilus as scilus-test
