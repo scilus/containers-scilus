@@ -83,12 +83,68 @@ variable "vtk-test-base" {
     default = "vtk"
 }
 
+variable "tractoflow-version" {
+    default = "2.3.0"
+}
+
+variable "dmriqc-flow-version" {
+    default = "0.1.0"
+}
+
+variable "extractor-flow-version" {
+    default = "master"
+}
+
+variable "rbx-flow-version" {
+    default = "1.1.0"
+}
+
+variable "tractometry-flow-version" {
+    default = "1.0.0"
+}
+
+variable "register-flow-version" {
+    default = "master"
+}
+
+variable "disconets-flow-version" {
+    default = "0.1.0-rc1"
+}
+
+variable "freesurfer-flow-version" {
+    default = "master"
+}
+
+variable "disconnect-flow-version" {
+    default = "master"
+}
+
+variable "freewater-flow-version" {
+    default = "1.0.0"
+}
+
+variable "noddi-flow-version" {
+    default = "1.0.0"
+}
+
+variable "convert-set-flow-version" {
+    default = "master"
+}
+
+variable "registration-flow-version" {
+    default = "1.0.0"
+}
+
+variable "bst-flow-version" {
+    default = "1.0.0-rc1"
+}
+
 # ==============================================================================
 # DOCKER BUILDX BAKE TARGETS
 # ==============================================================================
 
 group "scilus-nextflow" {
-    targets = ["scilus-nextflow", "scilus-test", "scilpy-test"]
+    targets = ["scilus-flows", "scilus-test", "scilpy-test"]
 }
 
 group "scilus" {
@@ -139,14 +195,42 @@ target "vtk-test" {
 # NEXTFLOW TARGETS
 # ==============================================================================
 
+target "scilus-flows" {
+    dockerfile = "scilus-flows.Dockerfile"
+    context = "./containers/"
+    target = "scilus"
+    contexts = {
+        flow-base = "target:nextflow"
+    }
+    args = {
+        TRACTOFLOW_VERSION = "${tractoflow-version}"
+        DMRIQCFLOW_VERSION = "${dmriqc-flow-version}"
+        EXTRACTORFLOW_VERSION = "${extractor-flow-version}"
+        RBXFLOW_VERSION = "${rbx-flow-version}"
+        TRACTOMETRYFLOW_VERSION = "${tractometry-flow-version}"
+        REGISTERFLOW_VERSION = "${register-flow-version}"
+        DISCONETSFLOW_VERSION = "${disconets-flow-version}"
+        FREESURFERFLOW_VERSION = "${freesurfer-flow-version}"
+        DISCONNECTFLOW_VERSION = "${disconnect-flow-version}"
+        FREEWATERFLOW_VERSION = "${freewater-flow-version}"
+        NODDIFLOW_VERSION = "${noddi-flow-version}"
+        CONVERTSETFLOW_VERSION = "${convert-set-flow-version}"
+        REGISTRATIONFLOW_VERSION = "${registration-flow-version}"
+        BSTFLOW_VERSION = "${bst-flow-version}"
+    }
+    tags = ["scilus-flows:local"]
+    cache-from = ["type=registry,ref=avcaron/build-cache:scilus-flows"]
+    output = ["type=docker"]
+    pull = true
+}
+
 target "scilus-nextflow" {
     inherits = ["nextflow"]
     contexts = {
         nextflow-base = "target:scilus"
     }
-    tags = ["scilus:local-nextflow"]
     cache-from = ["type=registry,ref=avcaron/build-cache:scilus-nextflow"]
-    output = ["type=docker"]
+    output = ["type=cacheonly"]
 }
 
 # ==============================================================================

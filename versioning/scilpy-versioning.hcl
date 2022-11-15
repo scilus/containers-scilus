@@ -2,7 +2,7 @@
 
 base-python-image="python:3.7.15-buster"
 
-scilpy-version="master"
+scilpy-version="1.4.0-rc1"
 python-version="3.7"
 mesa-version="19.0.8"
 vtk-version="8.2.0"
