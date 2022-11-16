@@ -44,22 +44,38 @@ docker buildx bake \
     <target>
 ```
 
-with a target in : `dmriqcpy`, `scilpy`, `scilus`. Follow this 
-[link](docker-bake.md) for more information on the build system.
+with a target in : `dmriqcpy`, `scilpy`, `scilus`, `scilus-nextflow`. Follow 
+this [link](docker-bake.md) for more information on the build system.
 
-To build images with nextflow in them, use the following command :
+___
 
-```
-docker buildx bake \
-    -f versioning/nextflow-versioning.hcl \
-    -f versioning/<target>-versioning.hcl \
-    -f docker-bake.hcl \
-    <target>-nextflow
-```
+`scilus-nextflow` container
+---------------------------
 
-Only some target are available to be built with Nextflow, here is the list :
+The `scilus-nextflow` container comes pre-packaged with the popular Nextflow 
+pipelines developed in the Scilus ecosystem. Here is the list of available 
+pipelines in the container :
 
-- `scilus`
+- [Tractoflow](https://github.com/scilus/tractoflow)
+- [DMRIqc-flow](https://github.com/scilus/dmriqc_flow)
+- [Extractor-flow](https://github.com/scilus/extractor_flow)
+- [RBX-flow](https://github.com/scilus/rbx_flow)
+- [Tractometry-flow](https://github.com/scilus/tractometry_flow)
+- [Register-flow](https://github.com/scilus/register_flow)
+- [Disconets-flow](https://github.com/scilus/disconets_flow)
+- [Freewater-flow](https://github.com/scilus/freewater_flow)
+- [NODDI-flow](https://github.com/scilus/noddi_flow)
+- [BST-flow](https://github.com/scilus/bst_flow)
+
+They can either be called using their `install location` (in 
+`/scilus_flows/<pipeline name>/main.nf`) or via their predefined `alias` (the 
+name of the pipeline listed above, with dashes, in lowercase). For example,
+
+`docker run <scilus-flows image> tractoflow <args>`
+
+is equivalent to 
+
+`docker run <scilus-flows image> nextflow run /scilus_flows/tractoflow/main.nf <args>`
 
 ___
 
