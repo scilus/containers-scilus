@@ -2,7 +2,6 @@
 
 base-scilus-image="nvidia/cuda:9.2-runtime-ubuntu18.04"
 base-build-image="ubuntu:18.04"
-base-python-image="python:3.7.15-buster"
 
 ants-version="2.3.4"
 cmake-version="3.16.3"

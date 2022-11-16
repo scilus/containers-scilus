@@ -3,19 +3,19 @@
 BUILD_N_THREADS="6"
 
 target "scilus" {
-    cache-to = ["type=registry,mode=max,ref=avcaron/scilus"]
+    cache-to = ["type=registry,mode=max,ref=avcaron/build-cache:scilus"]
 }
 
 target "scilus-base" {
-    cache-to = ["type=registry,mode=max,ref=avcaron/scilus-base"]
+    cache-to = ["type=registry,mode=max,ref=avcaron/build-cache:scilus-base"]
 }
 
 target "scilpy" {
-    cache-to = ["type=registry,mode=max,ref=avcaron/scilpy"]
+    cache-to = ["type=registry,mode=max,ref=avcaron/build-cache:scilpy"]
 }
 
 target "dmriqcpy" {
-    cache-to = ["type=registry,mode=max,ref=avcaron/dmriqcpy"]
+    cache-to = ["type=registry,mode=max,ref=avcaron/build-cache:dmriqcpy"]
 }
 
 target "cmake" {
@@ -52,4 +52,12 @@ target "scilus-nextflow" {
 
 target "scilus-vtk" {
     cache-to = ["type=registry,mode=max,ref=avcaron/build-cache:scilus-vtk"]
+}
+
+target "scilus-flows" {
+    cache-to = ["type=registry,mode=max,ref=avcaron/build-cache:scilus-flows"]
+}
+
+target "scilus-nextflow" {
+    cache-to = ["type=registry,mode=max,ref=avcaron/build-cache:scilus-nextflow"]
 }
