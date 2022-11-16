@@ -91,18 +91,26 @@ RUN apt-get -y remove \
     apt-get -y autoremove
 
 WORKDIR /usr/bin
-RUN <<EOT cat >> flow-aliases.sh
-tractoflow() { nextflow run /scilus_flows/tractoflow/main.nf $@ }
-dmriqc-flow() { nextflow run /scilus_flows/dmriqc_flow/main.nf $@ }
-extractor-flow() { nextflow run /scilus_flows/exxtractor_flow/main.nf $@ }
-rbx-flow() { nextflow run /scilus_flows/rbx_flow/main.nf $@ }
-tractometry-flow() { nextflow run /scilus_flows/tractometry_flow/main.nf $@ }
-register-flow() { nextflow run /scilus_flows/register_flow/main.nf $@ }
-disconets-flow() { nextflow run /scilus_flows/disconets_flow/main.nf $@ }
-freewater-flow() { nextflow run /scilus_flows/freewater_flow/main.nf $@ }
-noddi-flow() { nextflow run /scilus_flows/noddi_flow/main.nf $@ }
-bst-flow() { nextflow run /scilus_flows/bst_flow/main.nf $@ }
-EOT
+RUN echo "#!/bin/bash\nnextflow run /scilus_flows/tractoflow/main.nf \$@" >> tractoflow && \
+    echo "#!/bin/bash\nnextflow run /scilus_flows/dmriqc_flow/main.nf \$@" >> dmriqc-flow && \
+    echo "#!/bin/bash\nnextflow run /scilus_flows/extractor_flow/main.nf \$@" >> extractor-flow && \
+    echo "#!/bin/bash\nnextflow run /scilus_flows/rbx_flow/main.nf \$@" >> rbx-flow && \
+    echo "#!/bin/bash\nnextflow run /scilus_flows/tractometry_flow/main.nf \$@" >> tractometry-flow && \
+    echo "#!/bin/bash\nnextflow run /scilus_flows/register_flow/main.nf \$@" >> register-flow && \
+    echo "#!/bin/bash\nnextflow run /scilus_flows/disconets_flow/main.nf \$@" >> disconets-flow && \
+    echo "#!/bin/bash\nnextflow run /scilus_flows/freewater_flow/main.nf \$@" >> freewater-flow && \
+    echo "#!/bin/bash\nnextflow run /scilus_flows/noddi_flow/main.nf \$@" >> noddi-flow && \
+    echo "#!/bin/bash\nnextflow run /scilus_flows/bst_flow/main.nf \$@" >> bst-flow && \
+    chmod +x tractoflow \
+             dmriqc-flow \
+             extractor-flow \
+             rbx-flow \
+             tractometry-flow \
+             register-flow \
+             disconets-flow \
+             freewater-flow \
+             noddi-flow \
+             bst-flow
 
 WORKDIR /
 RUN touch VERSION && \
