@@ -104,7 +104,7 @@ variable "tractometry-flow-version" {
 }
 
 variable "register-flow-version" {
-    default = "master"
+    default = "main"
 }
 
 variable "disconets-flow-version" {
@@ -128,7 +128,7 @@ variable "noddi-flow-version" {
 }
 
 variable "convert-set-flow-version" {
-    default = "master"
+    default = "main"
 }
 
 variable "registration-flow-version" {
@@ -198,9 +198,9 @@ target "vtk-test" {
 target "scilus-flows" {
     dockerfile = "scilus-flows.Dockerfile"
     context = "./containers/"
-    target = "scilus"
+    target = "scilus-flows"
     contexts = {
-        flow-base = "target:nextflow"
+        flow-base = "target:scilus-nextflow"
     }
     args = {
         TRACTOFLOW_VERSION = "${tractoflow-version}"
