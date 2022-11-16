@@ -258,7 +258,7 @@ target "scilus" {
         SCILPY_VERSION = "${scilpy-version}"
     }
     tags = ["scilus:local"]
-    cache-from = ["type=registry,ref=avcaron/scilus"]
+    cache-from = ["type=registry,ref=avcaron/build-cache:scilus"]
     output = ["type=docker"]
     pull = true
 }
@@ -269,13 +269,13 @@ target "scilus-base" {
         dmriqcpy-base = "target:scilus-vtk"
     }
     tags = ["scilus-base:local"]
-    cache-from = ["type=registry,ref=avcaron/scilus-base"]
+    cache-from = ["type=registry,ref=avcaron/build-cache:scilus-base"]
 }
 
 target "dmriqcpy" {
     inherits = ["dmriqcpy-base"]
     tags = ["dmriqcpy:local"]
-    cache-from = ["type=registry,ref=avcaron/dmriqcpy"]
+    cache-from = ["type=registry,ref=avcaron/build-cache:dmriqcpy"]
     output = ["type=docker"]
     pull = true
 }
