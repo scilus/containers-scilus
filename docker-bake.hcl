@@ -111,27 +111,11 @@ variable "disconets-flow-version" {
     default = "0.1.0-rc1"
 }
 
-variable "freesurfer-flow-version" {
-    default = "master"
-}
-
-variable "disconnect-flow-version" {
-    default = "master"
-}
-
 variable "freewater-flow-version" {
     default = "1.0.0"
 }
 
 variable "noddi-flow-version" {
-    default = "1.0.0"
-}
-
-variable "convert-set-flow-version" {
-    default = "main"
-}
-
-variable "registration-flow-version" {
     default = "1.0.0"
 }
 
@@ -197,7 +181,7 @@ target "vtk-test" {
 
 target "scilus-flows" {
     dockerfile = "scilus-flows.Dockerfile"
-    context = "./containers/"
+    context = "./containers/scilus-flows.context"
     target = "scilus-flows"
     contexts = {
         flow-base = "target:scilus-nextflow"
@@ -210,12 +194,8 @@ target "scilus-flows" {
         TRACTOMETRYFLOW_VERSION = "${tractometry-flow-version}"
         REGISTERFLOW_VERSION = "${register-flow-version}"
         DISCONETSFLOW_VERSION = "${disconets-flow-version}"
-        FREESURFERFLOW_VERSION = "${freesurfer-flow-version}"
-        DISCONNECTFLOW_VERSION = "${disconnect-flow-version}"
         FREEWATERFLOW_VERSION = "${freewater-flow-version}"
         NODDIFLOW_VERSION = "${noddi-flow-version}"
-        CONVERTSETFLOW_VERSION = "${convert-set-flow-version}"
-        REGISTRATIONFLOW_VERSION = "${registration-flow-version}"
         BSTFLOW_VERSION = "${bst-flow-version}"
     }
     tags = ["scilus-flows:local"]
