@@ -1,0 +1,258 @@
+name: Build container
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: target to build (see README)
+        required: true
+        type: string
+      tag-prefix:
+        description: prefix to prepend to the published image tag
+        required: false
+        type: string
+      tag-suffix:
+        description: suffix to append to the published image tag
+        required: false
+        type: string
+      scilpy-version:
+        description: scilpy version (release or branch name)
+        required: false
+        type: string
+      dmriqcpy-version:
+        description: dmriqcpy version (release or branch name)
+        required: false
+        type: string
+      python-version:
+        description: python version (format X.X, must be available through base OS default ppa, see REAMDE)
+        required: false
+        type: string
+      vtk-version:
+        description: vtk version, from kitwake repository (format X.X.X)
+        required: false
+        type: string
+      mesa-version:
+        description: mesa version, from mesa3d.org (format X.X.X)
+        required: false
+        type: string
+      nextflow-version:
+        description: nextflow version (format X.X.X)
+        required: false
+        type: string
+      java-version:
+        description: java runtime version (format X)
+        required: false
+        type: string
+      base-python-image:
+        description: base python image to get from dockerhub
+        required: false
+        type: string
+      tractoflow-version:
+        description: tractoflow version (release or branch name)
+        required: false
+        type: string
+      dmriqc-flow-version:
+        description: dmriqc-flow version (release or branch name)
+        required: false
+        type: string
+      extractor-flow-version:
+        description: extractor-flow version (release or branch name)
+        required: false
+        type: string
+      rbx-flow-version:
+        description: rbx-flow version (release or branch name)
+        required: false
+        type: string
+      tractometry-flow-version:
+        description: tractometry-flow version (release or branch name)
+        required: false
+        type: string
+      register-flow-version:
+        description: register-flow version (release or branch name)
+        required: false
+        type: string
+      disconets-flow-version:
+        description: disconets-flow version (release or branch name)
+        required: false
+        type: string
+      freewater-flow-version:
+        description: freewater-flow version (release or branch name)
+        required: false
+        type: string
+      noddi-flow-version:
+        description: noddi-flow version (release or branch name)
+        required: false
+        type: string
+      bst-flow-version:
+        description: bst-flow version (release or branch name)
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      target:
+        required: true
+        type: string
+      tag-prefix:
+        required: false
+        type: string
+      tag-suffix:
+        required: false
+        type: string
+      scilpy-version:
+        required: false
+        type: string
+      dmriqcpy-version:
+        required: false
+        type: string
+      python-version:
+        required: false
+        type: string
+      vtk-version:
+        required: false
+        type: string
+      mesa-version:
+        required: false
+        type: string
+      nextflow-version:
+        required: false
+        type: string
+      java-version:
+        required: false
+        type: string
+      base-python-image:
+        required: false
+        type: string
+      tractoflow-version:
+        required: false
+        type: string
+      dmriqc-flow-version:
+        required: false
+        type: string
+      extractor-flow-version:
+        required: false
+        type: string
+      rbx-flow-version:
+        required: false
+        type: string
+      tractometry-flow-version:
+        required: false
+        type: string
+      register-flow-version:
+        required: false
+        type: string
+      disconets-flow-version:
+        required: false
+        type: string
+      freewater-flow-version:
+        required: false
+        type: string
+      noddi-flow-version:
+        required: false
+        type: string
+      bst-flow-version:
+        required: false
+        type: string
+    secrets:
+      docker-repository:
+        description: 'Image repository on dockerhub to which to push'
+        required: true
+      docker-token:
+        description: 'Access token for dockerhub push'
+        required: true
+
+jobs:
+  build-container:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Validate input parameters
+        run: |
+          if [ "$target" = "scilus-base" ]
+          then
+            echo "::error file=docker-builder.yml,line=116,title=scilus-base build::Github builder does not support building scilus-base for now"
+          fi
+      -
+        name: Resolve versioning from workflow inputs
+        id: local-versioning
+        run: |
+          [ -z "${{ inputs.scilpy-version }}" ]            || echo "scilpy-version=\"${{ inputs.scilpy-version }}\""                       >> local-versioning.hcl
+          [ -z "${{ inputs.dmriqcpy-version }}" ]          || echo "dmriqcpy-version=\"${{ inputs.dmriqcpy-version }}\""                   >> local-versioning.hcl
+          [ -z "${{ inputs.python-version }}" ]            || echo "python-version=\"${{ inputs.python-version }}\""                       >> local-versioning.hcl
+          [ -z "${{ inputs.vtk-version }}" ]               || echo "vtk-version=\"${{ inputs.vtk-version }}\""                             >> local-versioning.hcl
+          [ -z "${{ inputs.mesa-version }}" ]              || echo "mesa-version=\"${{ inputs.mesa-version }}\""                           >> local-versioning.hcl
+          [ -z "${{ inputs.nextflow-version }}" ]          || echo "nextflow-version=\"${{ inputs.nextflow-version }}\""                   >> local-versioning.hcl
+          [ -z "${{ inputs.java-version }}" ]              || echo "java-version=\"${{ inputs.java-version }}\""                           >> local-versioning.hcl
+          [ -z "${{ inputs.base-python-image }}" ]         || echo "base-python-image=\"${{ inputs.base-python-image }}\""                 >> local-versioning.hcl
+          [ -z "${{ inputs.tractoflow-version }}" ]        || echo "tractoflow-version=\"${{ inputs.tractoflow-version }}\""               >> local-versioning.hcl
+          [ -z "${{ inputs.dmriqc-flow-version }}" ]       || echo "dmriqc-flow-version=\"${{ inputs.dmriqc-flow-version }}\""             >> local-versioning.hcl
+          [ -z "${{ inputs.extractor-flow-version }}" ]    || echo "extractor-flow-version=\"${{ inputs.extractor-flow-version }}\""       >> local-versioning.hcl
+          [ -z "${{ inputs.rbx-flow-version }}" ]          || echo "rbx-flow-version=\"${{ inputs.rbx-flow-version }}\""                   >> local-versioning.hcl
+          [ -z "${{ inputs.tractometry-flow-version }}" ]  || echo "tractometry-flow-version=\"${{ inputs.tractometry-flow-version }}\""   >> local-versioning.hcl
+          [ -z "${{ inputs.register-flow-version }}" ]     || echo "register-flow-version=\"${{ inputs.register-flow-version }}\""         >> local-versioning.hcl
+          [ -z "${{ inputs.disconets-flow-version }}" ]    || echo "disconets-flow-version=\"${{ inputs.disconets-flow-version }}\""       >> local-versioning.hcl
+          [ -z "${{ inputs.freewater-flow-version }}" ]    || echo "freewater-flow-version=\"${{ inputs.freewater-flow-version }}\""       >> local-versioning.hcl
+          [ -z "${{ inputs.noddi-flow-version }}" ]        || echo "noddi-flow-version=\"${{ inputs.noddi-flow-version }}\""               >> local-versioning.hcl
+          [ -z "${{ inputs.bst-flow-version }}" ]          || echo "bst-flow-version=\"${{ inputs.bst-flow-version }}\""                   >> local-versioning.hcl
+          echo "::set-output name=bake-file::$(pwd)/local-versioning.hcl"
+      -
+        name: Bind dockerhub image cache
+        id: dockerhub-cache
+        run: |
+          cat <<EOT >> cache-bindings.hcl
+          target "scilus"          { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus"]          }
+          target "scilus-base"     { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-base"]     }
+          target "scilpy"          { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilpy"]          }
+          target "dmriqcpy"        { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:dmriqcpy"]        }
+          target "vtk"             { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:vtk"]             }
+          target "scilus-python"   { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-python"]   }
+          target "scilus-scilpy"   { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-scilpy"]   }
+          target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-nextflow"] }
+          target "scilus-vtk"      { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-vtk"]      }
+          target "scilus-flows"    { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-flows"]    }
+          target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-nextflow"] }
+          EOT
+          echo "::set-output name=bake-file::$(pwd)/cache-bindings.hcl"
+      -
+        name: Checkout caller repository
+        uses: actions/checkout@v3
+      -
+        name: Generate image tags
+        id: release-tagging
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ secrets.docker-repository }}/${{ inputs.target }}
+          flavor: |
+            prefix=${{ inputs.tag-prefix }}
+            suffix=${{ inputs.tag-suffix }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=ref,event=branch
+            type=ref,event=tag
+          bake-target: ${{ inputs.target }}
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.docker-repository }}
+          password: ${{ secrets.docker-token }}
+      - 
+        name: Checkout build system
+        uses: actions/checkout@v2
+        with:
+          repository: scilus/containers-scilus
+      -
+        name: Build container
+        uses: docker/bake-action@v2.3.0
+        with:
+          files: |
+            ${{ steps.release-tagging.outputs.bake-file }}
+            ${{ steps.dockerhub-cache.outputs.bake-file }}
+            ${{ steps.local-versioning.outputs.bake-file }}
+            ./versioning/${{ inputs.target }}-versioning.hcl
+            ./docker-bake.hcl
+          pull: true
+          push: true
