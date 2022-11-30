@@ -6,6 +6,15 @@ on:
       target:
         description: target to build (see README)
         required: true
+        type: choice
+        options:
+        - scilus
+        - scilpy
+        - dmriqcpy
+        - scilus-flows 
+      tag:
+        description: tag to create for the image built
+        required: true
         type: string
       scilpy-version:
         description: scilpy version (release or branch name)
@@ -34,6 +43,9 @@ on:
   workflow_call:
     inputs:
       target:
+        required: true
+        type: string
+      tag:
         required: true
         type: string
       scilpy-version:
@@ -85,10 +97,10 @@ on:
         required: false
         type: string
     secrets:
-      docker-repository:
+      DOCKER_USERNAME:
         description: 'Image repository on dockerhub to which to push'
         required: true
-      docker-token:
+      DOCKER_PASSWORD:
         description: 'Access token for dockerhub push'
         required: true
 
@@ -99,9 +111,9 @@ jobs:
       -
         name: Validate input parameters
         run: |
-          if [ "$target" = "scilus-base" ]
+          if [ "${{ inputs.target }}" = "scilus-base" ]
           then
-            echo "::error file=docker-builder.yml,line=116,title=scilus-base build::Github builder does not support building scilus-base for now"
+            echo "::error file=docker-builder.yml,line=109,title=scilus-base build::Github builder does not support building scilus-base for now"
           fi
       -
         name: Resolve versioning from workflow inputs
@@ -129,34 +141,22 @@ jobs:
         id: dockerhub-cache
         run: |
           cat <<EOT >> cache-bindings.hcl
-          target "scilus"          { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus"]          }
-          target "scilus-base"     { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-base"]     }
-          target "scilpy"          { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilpy"]          }
-          target "dmriqcpy"        { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:dmriqcpy"]        }
-          target "vtk"             { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:vtk"]             }
-          target "scilus-python"   { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-python"]   }
-          target "scilus-scilpy"   { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-scilpy"]   }
-          target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-nextflow"] }
-          target "scilus-vtk"      { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-vtk"]      }
-          target "scilus-flows"    { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-flows"]    }
-          target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.docker-repository }}/build-cache:scilus-nextflow"] }
+          target "scilus"          { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus"]          }
+          target "scilus-base"     { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-base"]     }
+          target "scilpy"          { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilpy"]          }
+          target "dmriqcpy"        { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:dmriqcpy"]        }
+          target "vtk"             { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:vtk"]             }
+          target "scilus-python"   { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-python"]   }
+          target "scilus-scilpy"   { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-scilpy"]   }
+          target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-nextflow"] }
+          target "scilus-vtk"      { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-vtk"]      }
+          target "scilus-flows"    { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-flows"]    }
+          target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-nextflow"] }
           EOT
           echo "::set-output name=bake-file::$(pwd)/cache-bindings.hcl"
       -
         name: Checkout caller repository
         uses: actions/checkout@v3
-      -
-        name: Generate image tags
-        id: release-tagging
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ secrets.docker-repository }}/${{ inputs.target }}
-          tags: |
-            type=semver,pattern={{version}}
-            type=ref,event=branch
-            type=ref,event=tag
-          bake-target: ${{ inputs.target }}
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -164,8 +164,8 @@ jobs:
         name: Login to DockerHub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.docker-repository }}
-          password: ${{ secrets.docker-token }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
       - 
         name: Checkout build system
         uses: actions/checkout@v2
@@ -176,10 +176,11 @@ jobs:
         uses: docker/bake-action@v2.3.0
         with:
           files: |
-            ${{ steps.release-tagging.outputs.bake-file }}
             ${{ steps.dockerhub-cache.outputs.bake-file }}
             ${{ steps.local-versioning.outputs.bake-file }}
             ./versioning/${{ inputs.target }}-versioning.hcl
             ./docker-bake.hcl
+          set: |
+            target.${{ inputs.target }}.tags=["scilus/${{ inputs.target }}:${{ inputs.tag }}"]
           pull: true
           push: true
