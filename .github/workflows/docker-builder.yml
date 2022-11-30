@@ -7,14 +7,6 @@ on:
         description: target to build (see README)
         required: true
         type: string
-      tag-prefix:
-        description: prefix to prepend to the published image tag
-        required: false
-        type: string
-      tag-suffix:
-        description: suffix to append to the published image tag
-        required: false
-        type: string
       scilpy-version:
         description: scilpy version (release or branch name)
         required: false
@@ -31,60 +23,12 @@ on:
         description: vtk version, from kitwake repository (format X.X.X)
         required: false
         type: string
-      mesa-version:
-        description: mesa version, from mesa3d.org (format X.X.X)
-        required: false
-        type: string
       nextflow-version:
         description: nextflow version (format X.X.X)
         required: false
         type: string
-      java-version:
-        description: java runtime version (format X)
-        required: false
-        type: string
       base-python-image:
         description: base python image to get from dockerhub
-        required: false
-        type: string
-      tractoflow-version:
-        description: tractoflow version (release or branch name)
-        required: false
-        type: string
-      dmriqc-flow-version:
-        description: dmriqc-flow version (release or branch name)
-        required: false
-        type: string
-      extractor-flow-version:
-        description: extractor-flow version (release or branch name)
-        required: false
-        type: string
-      rbx-flow-version:
-        description: rbx-flow version (release or branch name)
-        required: false
-        type: string
-      tractometry-flow-version:
-        description: tractometry-flow version (release or branch name)
-        required: false
-        type: string
-      register-flow-version:
-        description: register-flow version (release or branch name)
-        required: false
-        type: string
-      disconets-flow-version:
-        description: disconets-flow version (release or branch name)
-        required: false
-        type: string
-      freewater-flow-version:
-        description: freewater-flow version (release or branch name)
-        required: false
-        type: string
-      noddi-flow-version:
-        description: noddi-flow version (release or branch name)
-        required: false
-        type: string
-      bst-flow-version:
-        description: bst-flow version (release or branch name)
         required: false
         type: string
   workflow_call:
@@ -179,9 +123,7 @@ jobs:
           [ -z "${{ inputs.dmriqcpy-version }}" ]          || echo "dmriqcpy-version=\"${{ inputs.dmriqcpy-version }}\""                   >> local-versioning.hcl
           [ -z "${{ inputs.python-version }}" ]            || echo "python-version=\"${{ inputs.python-version }}\""                       >> local-versioning.hcl
           [ -z "${{ inputs.vtk-version }}" ]               || echo "vtk-version=\"${{ inputs.vtk-version }}\""                             >> local-versioning.hcl
-          [ -z "${{ inputs.mesa-version }}" ]              || echo "mesa-version=\"${{ inputs.mesa-version }}\""                           >> local-versioning.hcl
           [ -z "${{ inputs.nextflow-version }}" ]          || echo "nextflow-version=\"${{ inputs.nextflow-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.java-version }}" ]              || echo "java-version=\"${{ inputs.java-version }}\""                           >> local-versioning.hcl
           [ -z "${{ inputs.base-python-image }}" ]         || echo "base-python-image=\"${{ inputs.base-python-image }}\""                 >> local-versioning.hcl
           [ -z "${{ inputs.tractoflow-version }}" ]        || echo "tractoflow-version=\"${{ inputs.tractoflow-version }}\""               >> local-versioning.hcl
           [ -z "${{ inputs.dmriqc-flow-version }}" ]       || echo "dmriqc-flow-version=\"${{ inputs.dmriqc-flow-version }}\""             >> local-versioning.hcl
@@ -222,9 +164,6 @@ jobs:
         with:
           images: |
             ${{ secrets.docker-repository }}/${{ inputs.target }}
-          flavor: |
-            prefix=${{ inputs.tag-prefix }}
-            suffix=${{ inputs.tag-suffix }}
           tags: |
             type=semver,pattern={{version}}
             type=ref,event=branch
