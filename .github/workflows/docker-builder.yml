@@ -36,12 +36,6 @@ on:
       target:
         required: true
         type: string
-      tag-prefix:
-        required: false
-        type: string
-      tag-suffix:
-        required: false
-        type: string
       scilpy-version:
         required: false
         type: string
@@ -54,13 +48,7 @@ on:
       vtk-version:
         required: false
         type: string
-      mesa-version:
-        required: false
-        type: string
       nextflow-version:
-        required: false
-        type: string
-      java-version:
         required: false
         type: string
       base-python-image:
