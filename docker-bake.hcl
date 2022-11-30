@@ -127,7 +127,7 @@ variable "bst-flow-version" {
 # DOCKER BUILDX BAKE TARGETS
 # ==============================================================================
 
-group "scilus-nextflow" {
+group "scilus-flows" {
     targets = ["scilus-flows", "scilus-test", "scilpy-test"]
 }
 
