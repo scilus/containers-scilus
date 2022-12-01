@@ -156,13 +156,15 @@ target "dmriqcpy-test" {
     target = "dmriqcpy-test"
     output = ["type=cacheonly"]
     cache-to = []
+    tags = []
 }
 
 target "scilpy-test" {
-    inherits = ["target:${scilpy-test-base}"]
+    inherits = ["${scilpy-test-base}"]
     target = "scilpy-test"
     output = ["type=cacheonly"]
     cache-to = []
+    tags = []
 }
 
 target "scilus-test" {
@@ -170,6 +172,7 @@ target "scilus-test" {
     target = "scilus-test"
     output = ["type=cacheonly"]
     cache-to = []
+    tags = []
 }
 
 target "vtk-test" {
@@ -177,6 +180,7 @@ target "vtk-test" {
     target = "vtk-test"
     output = ["type=cacheonly"]
     cache-to = []
+    tags = []
 }
 
 # ==============================================================================
