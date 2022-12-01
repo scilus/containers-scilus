@@ -155,24 +155,28 @@ target "dmriqcpy-test" {
     inherits = ["${dmriqcpy-test-base}"]
     target = "dmriqcpy-test"
     output = ["type=cacheonly"]
+    cache-to = []
 }
 
 target "scilpy-test" {
-    inherits = ["${scilpy-test-base}"]
+    inherits = ["target:${scilpy-test-base}"]
     target = "scilpy-test"
     output = ["type=cacheonly"]
+    cache-to = []
 }
 
 target "scilus-test" {
     inherits = ["scilus"]
     target = "scilus-test"
     output = ["type=cacheonly"]
+    cache-to = []
 }
 
 target "vtk-test" {
     inherits = ["${vtk-test-base}"]
     target = "vtk-test"
     output = ["type=cacheonly"]
+    cache-to = []
 }
 
 # ==============================================================================
