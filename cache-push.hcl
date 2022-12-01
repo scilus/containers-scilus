@@ -51,13 +51,13 @@ target "scilus-nextflow" {
 }
 
 target "scilus-vtk" {
-    cache-to = ["type=registry,mode=max,ref=scilus/build-cache:scilus-vtk"]
+    cache-to = ["type=registry,mode=max,ref=avcaron/build-cache:scilus-vtk"]
 }
 
 target "scilus-flows" {
-    cache-to = ["type=registry,mode=max,ref=scilus/build-cache:scilus-flows"]
+    cache-to = ["type=registry,mode=max,ref=avcaron/build-cache:scilus-flows"]
 }
 
 target "scilus-nextflow" {
-    cache-to = ["type=registry,mode=max,ref=scilus/build-cache:scilus-nextflow"]
+    cache-to = ["type=registry,mode=max,ref=avcaron/build-cache:scilus-nextflow"]
 }
