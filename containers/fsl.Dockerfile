@@ -12,6 +12,7 @@ WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
         python \
+        wget \
         git \
     && rm -rf /var/lib/apt/lists/*
 
