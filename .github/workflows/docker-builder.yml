@@ -115,6 +115,12 @@ jobs:
           then
             echo "::error file=docker-builder.yml,line=109,title=scilus-base build::Github builder does not support building scilus-base for now"
           fi
+      - 
+        name: Checkout build system
+        uses: actions/checkout@v2
+        with:
+          repository: AlexVCaron/containers-scilus
+          ref: develop
       -
         name: Resolve versioning from workflow inputs
         id: local-versioning
@@ -171,12 +177,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - 
-        name: Checkout build system
-        uses: actions/checkout@v2
-        with:
-          repository: AlexVCaron/containers-scilus
-          ref: develop
       -
         name: Build container
         uses: docker/bake-action@v2.3.0
