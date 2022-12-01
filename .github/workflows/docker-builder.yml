@@ -176,6 +176,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: avcaron/containers-scilus
+          ref: develop
       -
         name: Build container
         uses: docker/bake-action@v2.3.0
