@@ -228,7 +228,7 @@ target "scilus-nextflow" {
 target "scilpy" {
     inherits = ["scilpy-base"]
     tags = ["scilpy:local"]
-    cache-from = ["type=registry,ref=avcaronscilpy"]
+    cache-from = ["type=registry,ref=avcaron/build-cache:scilpy"]
     output = ["type=docker"]
     pull = true
 }
