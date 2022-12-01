@@ -175,7 +175,7 @@ jobs:
         name: Checkout build system
         uses: actions/checkout@v2
         with:
-          repository: scilus/containers-scilus
+          repository: avcaron/containers-scilus
       -
         name: Build container
         uses: docker/bake-action@v2.3.0
@@ -186,6 +186,6 @@ jobs:
             ./versioning/${{ inputs.target }}-versioning.hcl
             ./docker-bake.hcl
           set: |
-            target.${{ inputs.target }}.tags=[scilus/${{ inputs.target }}:${{ inputs.tag }}]
+            target.${{ inputs.target }}.tags=[avcaron/${{ inputs.target }}:${{ inputs.tag }}]
           pull: true
           push: true
