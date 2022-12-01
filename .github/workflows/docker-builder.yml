@@ -188,6 +188,6 @@ jobs:
             ./versioning/${{ inputs.target }}-versioning.hcl
             ./docker-bake.hcl
           set: |
-            target.${{ inputs.target }}.tags=[avcaron/${{ inputs.target }}:${{ inputs.tag }}]
+            ${{ inputs.target }}.tags=[avcaron/${{ inputs.target }}:${{ inputs.tag }}]
           pull: true
           push: true
