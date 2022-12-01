@@ -193,6 +193,7 @@ jobs:
             ./docker-bake.hcl
           set: |
             ${{ inputs.target }}.tags=avcaron/${{ inputs.target }}:${{ inputs.tag }}
+            ${{ inputs.target }}.output=type=registry
           push: true
       -
         name: Upload bake definition
