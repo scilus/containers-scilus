@@ -136,7 +136,7 @@ jobs:
           [ -z "${{ inputs.freewater-flow-version }}" ]    || echo "freewater-flow-version=\"${{ inputs.freewater-flow-version }}\""       >> local-versioning.hcl
           [ -z "${{ inputs.noddi-flow-version }}" ]        || echo "noddi-flow-version=\"${{ inputs.noddi-flow-version }}\""               >> local-versioning.hcl
           [ -z "${{ inputs.bst-flow-version }}" ]          || echo "bst-flow-version=\"${{ inputs.bst-flow-version }}\""                   >> local-versioning.hcl
-          echo "bake-file=$(pwd)/local-versioning.hcl" >> $GITHUB_OUTPUT
+          echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
       -
         name: Bind dockerhub image cache
         id: dockerhub-cache
@@ -154,7 +154,7 @@ jobs:
           target "scilus-flows"    { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-flows"]    }
           target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-nextflow"] }
           EOT
-          echo "bake-file=$(pwd)/cache-bindings.hcl" >> $GITHUB_OUTPUT
+          echo "bake-file=$PWD/cache-bindings.hcl" >> $GITHUB_OUTPUT
       -
         name: Upload versioning and caching hcl as artifacts
         uses: actions/upload-artifact@v3.1.1
