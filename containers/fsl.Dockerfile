@@ -12,14 +12,16 @@ WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
         python \
-        wget \
+        git \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /tmp/fsl_sources
 
-WORKDIR /tmp/fsl_sources
-RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py
+WORKDIR /tmp
+RUN git clone https://git.fmrib.ox.ac.uk/fsl/installer.git && \
+    mv installer/fslinstaller.py fsl_sources/fslinstaller.py
 
+WORKDIR /tmp/fsl_sources
 RUN python fslinstaller.py \
         -d ${FSL_INSTALL_PATH} \
         -V ${FSL_VERSION} && \
