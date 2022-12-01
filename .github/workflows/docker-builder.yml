@@ -180,6 +180,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Build container
+        id: container-build
         uses: docker/bake-action@v2.3.0
         with:
           files: |
@@ -191,3 +192,10 @@ jobs:
             ${{ inputs.target }}.tags=[avcaron/${{ inputs.target }}:${{ inputs.tag }}]
           pull: true
           push: true
+      -
+        name: Upload bake definition
+        uses: actions/upload-artifact@v3.1.1
+        with:
+          name: Baking artifacts
+          path: |
+            ${{ steps.container-build.outputs.metadata }}
