@@ -57,7 +57,3 @@ target "scilus-vtk" {
 target "scilus-flows" {
     cache-to = ["type=registry,mode=max,ref=avcaron/build-cache:scilus-flows"]
 }
-
-target "scilus-nextflow" {
-    cache-to = ["type=registry,mode=max,ref=avcaron/build-cache:scilus-nextflow"]
-}

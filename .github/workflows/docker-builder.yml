@@ -158,7 +158,6 @@ jobs:
           target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-nextflow"] }
           target "scilus-vtk"      { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-vtk"]      }
           target "scilus-flows"    { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-flows"]    }
-          target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-nextflow"] }
           EOT
           echo "bake-file=$PWD/cache-bindings.hcl" >> $GITHUB_OUTPUT
       -
@@ -192,7 +191,6 @@ jobs:
             ./docker-bake.hcl
           set: |
             ${{ inputs.target }}.tags=avcaron/${{ inputs.target }}:${{ inputs.tag }}
-          pull: true
           push: true
       -
         name: Upload bake definition
