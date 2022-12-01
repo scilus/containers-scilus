@@ -175,7 +175,7 @@ jobs:
         name: Checkout build system
         uses: actions/checkout@v2
         with:
-          repository: avcaron/containers-scilus
+          repository: AlexVCaron/containers-scilus
           ref: develop
       -
         name: Build container
