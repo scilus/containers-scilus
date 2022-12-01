@@ -287,7 +287,17 @@ target "scilus-scilpy" {
 }
 
 target "scilus-vtk" {
-    inherits = ["vtk"]
+    dockerfile = "vtk-omesa.Dockerfile"
+    context = "./containers/vtk-omesa.context/"
+    target = "vtk-install"
+    args = {
+        MESA_BUILD_NTHREADS = "6"
+        MESA_VERSION = "${mesa-version}"
+        VTK_BUILD_NTHREADS = "6"
+        VTK_PYTHON_VERSION = "${python-version}"
+        VTK_VERSION = "${vtk-version}"
+    }
+    output = ["type=cacheonly"]
     contexts = {
         vtk-base = "target:scilus-python"
         vtk-builder = "target:cmake"
