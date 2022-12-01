@@ -141,12 +141,12 @@ jobs:
           [ -z "${{ inputs.freewater-flow-version }}" ]    || echo "freewater-flow-version=\"${{ inputs.freewater-flow-version }}\""       >> local-versioning.hcl
           [ -z "${{ inputs.noddi-flow-version }}" ]        || echo "noddi-flow-version=\"${{ inputs.noddi-flow-version }}\""               >> local-versioning.hcl
           [ -z "${{ inputs.bst-flow-version }}" ]          || echo "bst-flow-version=\"${{ inputs.bst-flow-version }}\""                   >> local-versioning.hcl
-          echo "::set-output name=bake-file::$(pwd)/local-versioning.hcl"
+          echo "bake-file=$(pwd)/local-versioning.hcl" >> $GITHUB_OUTPUT
       -
         name: Bind dockerhub image cache
         id: dockerhub-cache
         run: |
-          cat <<EOT >> cache-bindings.hcl
+          cat > cache-bindings.hcl << EOF
           target "scilus"          { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus"]          }
           target "scilus-base"     { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-base"]     }
           target "scilpy"          { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilpy"]          }
@@ -158,8 +158,8 @@ jobs:
           target "scilus-vtk"      { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-vtk"]      }
           target "scilus-flows"    { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-flows"]    }
           target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-nextflow"] }
-          EOT
-          echo "::set-output name=bake-file::$(pwd)/cache-bindings.hcl"
+          EOF
+          echo "bake-file=$(pwd)/cache-bindings.hcl" >> $GITHUB_OUTPUT
       -
         name: Upload versioning and caching hcl as artifacts
         uses: actions/upload-artifact@v3.1.1
