@@ -183,6 +183,8 @@ jobs:
         id: container-build
         uses: docker/bake-action@v2.3.0
         with:
+          targets: |
+            ${{ inputs.target }}
           files: |
             ${{ steps.dockerhub-cache.outputs.bake-file }}
             ${{ steps.local-versioning.outputs.bake-file }}
