@@ -152,35 +152,39 @@ group "dmriqcpy" {
 # ==============================================================================
 
 target "dmriqcpy-test" {
-    inherits = ["${dmriqcpy-test-base}"]
+    context = "./containers/dmriqcpy.context"
+    contexts = {
+        dmriqcpy = "target:${dmriqcpy-test-base}"
+    }
     target = "dmriqcpy-test"
     output = ["type=cacheonly"]
-    cache-to = []
-    tags = []
 }
 
 target "scilpy-test" {
-    inherits = ["${scilpy-test-base}"]
+    context = "./containers/scilpy.context"
+    contexts = {
+        scilpy = "target:${scilpy-test-base}"
+    }
     target = "scilpy-test"
     output = ["type=cacheonly"]
-    cache-to = []
-    tags = []
 }
 
 target "scilus-test" {
-    inherits = ["scilus"]
+    context = "./containers/scilus.context"
+    contexts = {
+        scilus = "target:scilus"
+    }
     target = "scilus-test"
     output = ["type=cacheonly"]
-    cache-to = []
-    tags = []
 }
 
 target "vtk-test" {
-    inherits = ["${vtk-test-base}"]
+    context = "./containers/scilus.context"
+    contexts = {
+        vtk-install = "target:${vtk-test-base}"
+    }
     target = "vtk-test"
     output = ["type=cacheonly"]
-    cache-to = []
-    tags = []
 }
 
 # ==============================================================================
