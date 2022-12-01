@@ -32,7 +32,7 @@ RUN wget https://github.com/scilus/scilpy/archive/${SCILPY_VERSION}.zip && \
     rm ${SCILPY_VERSION}.zip
 
 WORKDIR /scilpy
-RUN python${PYTHON_VERSION} -m pip install -e . && \
+RUN SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install -e . && \
     python${PYTHON_VERSION} -m pip cache purge
 
 WORKDIR ${VTK_INSTALL_PATH}
