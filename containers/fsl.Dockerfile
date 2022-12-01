@@ -22,8 +22,7 @@ RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py
 
 RUN python fslinstaller.py \
         -d ${FSL_INSTALL_PATH} \
-        -V ${FSL_VERSION} \
-        -D && \
+        -V ${FSL_VERSION} && \
     rm -rf ${FSL_INSTALL_PATH}/src \
            ${FSL_INSTALL_PATH}/data \
            ${FSL_INSTALL_PATH}/build \
