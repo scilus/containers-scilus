@@ -153,6 +153,7 @@ group "dmriqcpy" {
 
 target "dmriqcpy-test" {
     context = "./containers/dmriqcpy.context"
+    dockerfile = "dmriqcpy.Dockerfile"
     contexts = {
         dmriqcpy = "target:${dmriqcpy-test-base}"
     }
@@ -162,6 +163,7 @@ target "dmriqcpy-test" {
 
 target "scilpy-test" {
     context = "./containers/scilpy.context"
+    dockerfile = "scilpy.Dockerfile"
     contexts = {
         scilpy = "target:${scilpy-test-base}"
     }
@@ -171,6 +173,7 @@ target "scilpy-test" {
 
 target "scilus-test" {
     context = "./containers/scilus.context"
+    dockerfile = "scilus.Dockerfile"
     contexts = {
         scilus = "target:scilus"
     }
@@ -180,6 +183,7 @@ target "scilus-test" {
 
 target "vtk-test" {
     context = "./containers/scilus.context"
+    dockerfile = "vtk.Dockerfile"
     contexts = {
         vtk-install = "target:${vtk-test-base}"
     }
