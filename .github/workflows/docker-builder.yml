@@ -180,11 +180,6 @@ jobs:
         with:
           version: v0.9.1
       -
-        name: Set up containerd
-        uses: crazy-max/ghaction-setup-containerd@v2
-        with:
-          version: v1.6.9
-      -
         name: Build container
         id: container-build
         uses: docker/bake-action@v2.3.0
