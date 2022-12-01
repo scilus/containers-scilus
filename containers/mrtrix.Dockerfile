@@ -54,5 +54,5 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
 
 WORKDIR /
 COPY --from=mrtrix --link /mrtrix3 ${MRTRIX_INSTALL_PATH}
-RUN touch VERSION && \
+RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Mrtrix => ${MRTRIX_VERSION}\n" >> VERSION

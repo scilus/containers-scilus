@@ -66,5 +66,5 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     libopenmpi-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN touch VERSION && \
+RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "FSL => ${FSL_VERSION}\n" >> VERSION

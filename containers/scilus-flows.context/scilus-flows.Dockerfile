@@ -113,7 +113,7 @@ RUN echo "#!/bin/bash\nnextflow run /scilus_flows/tractoflow/main.nf \$@" >> tra
              bst-flow
 
 WORKDIR /
-RUN touch VERSION && \
+RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Tractoflow => ${TRACTOFLOW_VERSION}\n" >> VERSION && \
     echo "Dmriqc-flow => ${DMRIQCFLOW_VERSION}\n" >> VERSION && \
     echo "Extractor-flow => ${EXTRACTORFLOW_VERSION}\n" >> VERSION && \
