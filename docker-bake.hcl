@@ -183,7 +183,7 @@ target "scilus-test" {
 
 target "vtk-test" {
     context = "./containers/scilus.context"
-    dockerfile = "vtk.Dockerfile"
+    dockerfile = "vtk-omesa.Dockerfile"
     contexts = {
         vtk-install = "target:${vtk-test-base}"
     }
