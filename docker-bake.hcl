@@ -185,6 +185,7 @@ target "vtk-test" {
     context = "./containers/vtk-omesa.context"
     dockerfile = "vtk-omesa.Dockerfile"
     contexts = {
+        vtk-builder = "target:cmake"
         vtk-install = "target:${vtk-test-base}"
     }
     target = "vtk-test"
