@@ -194,7 +194,7 @@ jobs:
             ./versioning/${{ inputs.target }}-versioning.hcl
             ./docker-bake.hcl
           set: |
-            ${{ inputs.target }}.tags=avcaron/${{ inputs.target }}:${{ inputs.tag }}
+            ${{ inputs.target }}.tags=scilus/${{ inputs.target }}:${{ inputs.tag }}
             ${{ inputs.target }}.output=type=registry
           push: true
       -
