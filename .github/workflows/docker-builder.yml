@@ -219,6 +219,7 @@ jobs:
             ./versioning/${{ inputs.target }}-versioning.hcl
             ./docker-bake.hcl
           set: ${{ steps.dockerhub-tags.outputs.tags-string }}
+          pull: true
           push: true
       -
         name: Save output container metadata to file
