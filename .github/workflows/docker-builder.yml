@@ -178,7 +178,7 @@ jobs:
           echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:${{ inputs.tag }}" >> tag-publishing
           [ "${{ inputs.update-latest }}" == "true" ] && echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:latest" >> tag-publishing
           echo "tags-file=$PWD/tag-publishing" >> $GITHUB_OUTPUT
-          echo "tags-string=\"$(cat $PWD/tag-publishing)\"" >> $GITHUB_OUTPUT
+          echo "tags-string=$(cat $PWD/tag-publishing)" >> $GITHUB_OUTPUT
       -
         name: Upload versioning and caching hcl as artifacts
         uses: actions/upload-artifact@v3.1.1
