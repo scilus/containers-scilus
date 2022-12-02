@@ -221,9 +221,15 @@ jobs:
           set: ${{ steps.dockerhub-tags.outputs.tags-string }}
           push: true
       -
+        name: Save output container metadata to file
+        id: container-metadata
+        run: |
+          echo "${{ steps.container-build.outputs.metadata }}" >> container-metadata.json
+          echo "metadata=$PWD/container-metadata.json" >> $GITHUB_OUTPUT
+      -
         name: Upload bake definition
         uses: actions/upload-artifact@v3.1.1
         with:
           name: Baking artifacts
           path: |
-            ${{ steps.container-build.outputs.metadata }}
+            ${{ steps.container-metadata.outputs.metadata }}
