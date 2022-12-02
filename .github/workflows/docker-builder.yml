@@ -16,6 +16,11 @@ on:
         description: tag to create for the image built
         required: true
         type: string
+      update-latest:
+        description: also push the latest tag in addition to the current one
+        required: false
+        type: boolean
+        default: false
       scilpy-version:
         description: scilpy version (release or branch name)
         required: false
@@ -48,6 +53,10 @@ on:
       tag:
         required: true
         type: string
+      update-latest:
+        required: false
+        type: boolean
+        default: false
       scilpy-version:
         required: false
         type: string
@@ -161,6 +170,16 @@ jobs:
           EOT
           echo "bake-file=$PWD/cache-bindings.hcl" >> $GITHUB_OUTPUT
       -
+        name: Set output image tags and registry to publish to
+        id: dockerhub-tags
+        run: |
+          touch tag-publishing.json
+          echo -n "[${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:${{ inputs.tag }}," >> tag-publishing.json
+          [ "${{ inputs.update-latest }}" == "true" ] && echo -n "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:latest," >> tag-publishing.json
+          echo -n "${{ inputs.target }}.output=type=registry]" >> tag-publishing.json
+          echo "tags-file=$PWD/tag-publishing.json" >> $GITHUB_OUTPUT
+          echo "tags-string=$(cat $PWD/tag-publishing.json)"
+      -
         name: Upload versioning and caching hcl as artifacts
         uses: actions/upload-artifact@v3.1.1
         with:
@@ -168,6 +187,7 @@ jobs:
           path: |
             ${{ steps.dockerhub-cache.outputs.bake-file }}
             ${{ steps.local-versioning.outputs.bake-file }}
+            ${{ steps.dockerhub-tags.outputs.tags-file }}
       -
         name: Login to DockerHub
         uses: docker/login-action@v2
@@ -193,9 +213,7 @@ jobs:
             ${{ steps.local-versioning.outputs.bake-file }}
             ./versioning/${{ inputs.target }}-versioning.hcl
             ./docker-bake.hcl
-          set: |
-            ${{ inputs.target }}.tags=scilus/${{ inputs.target }}:${{ inputs.tag }}
-            ${{ inputs.target }}.output=type=registry
+          set: ${{ fromJson(steps.dockerhub-tags.outputs.tags-string) }}
           push: true
       -
         name: Upload bake definition
