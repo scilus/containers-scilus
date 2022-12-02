@@ -174,9 +174,9 @@ jobs:
         id: dockerhub-tags
         run: |
           touch tag-publishing.json
-          echo -n "[${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:${{ inputs.tag }}," >> tag-publishing.json
-          [ "${{ inputs.update-latest }}" == "true" ] && echo -n "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:latest," >> tag-publishing.json
-          echo -n "${{ inputs.target }}.output=type=registry]" >> tag-publishing.json
+          echo -n "[\"${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:${{ inputs.tag }}\"," >> tag-publishing.json
+          [ "${{ inputs.update-latest }}" == "true" ] && echo -n "\"${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:latest\"," >> tag-publishing.json
+          echo -n "\"${{ inputs.target }}.output=type=registry\"]" >> tag-publishing.json
           echo "tags-file=$PWD/tag-publishing.json" >> $GITHUB_OUTPUT
           echo "tags-string=$(cat $PWD/tag-publishing.json)" >> $GITHUB_OUTPUT
       -
