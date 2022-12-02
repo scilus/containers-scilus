@@ -31,7 +31,7 @@ RUN PYTHON_MAJOR=${VTK_PYTHON_VERSION%%.*} && \
     python${PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}-py${PYTHON_MAJOR}-none-any.whl
 
 WORKDIR /
-RUN touch VERSION && \
+RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "dMRIqcpy => ${DMRIQCPY_VERSION}\n" >> VERSION
 
 

@@ -152,25 +152,42 @@ group "dmriqcpy" {
 # ==============================================================================
 
 target "dmriqcpy-test" {
-    inherits = ["${dmriqcpy-test-base}"]
+    context = "./containers/dmriqcpy.context"
+    dockerfile = "dmriqcpy.Dockerfile"
+    contexts = {
+        dmriqcpy = "target:${dmriqcpy-test-base}"
+    }
     target = "dmriqcpy-test"
     output = ["type=cacheonly"]
 }
 
 target "scilpy-test" {
-    inherits = ["${scilpy-test-base}"]
+    context = "./containers/scilpy.context"
+    dockerfile = "scilpy.Dockerfile"
+    contexts = {
+        scilpy = "target:${scilpy-test-base}"
+    }
     target = "scilpy-test"
     output = ["type=cacheonly"]
 }
 
 target "scilus-test" {
-    inherits = ["scilus"]
+    context = "./containers/scilus.context"
+    dockerfile = "scilus.Dockerfile"
+    contexts = {
+        scilus = "target:scilus"
+    }
     target = "scilus-test"
     output = ["type=cacheonly"]
 }
 
 target "vtk-test" {
-    inherits = ["${vtk-test-base}"]
+    context = "./containers/vtk-omesa.context"
+    dockerfile = "vtk-omesa.Dockerfile"
+    contexts = {
+        vtk-builder = "target:cmake"
+        vtk-install = "target:${vtk-test-base}"
+    }
     target = "vtk-test"
     output = ["type=cacheonly"]
 }
@@ -220,7 +237,7 @@ target "scilus-nextflow" {
 target "scilpy" {
     inherits = ["scilpy-base"]
     tags = ["scilpy:local"]
-    cache-from = ["type=registry,ref=scilus/scilpy"]
+    cache-from = ["type=registry,ref=scilus/build-cache:scilpy"]
     output = ["type=docker"]
     pull = true
 }
@@ -279,7 +296,17 @@ target "scilus-scilpy" {
 }
 
 target "scilus-vtk" {
-    inherits = ["vtk"]
+    dockerfile = "vtk-omesa.Dockerfile"
+    context = "./containers/vtk-omesa.context/"
+    target = "vtk-install"
+    args = {
+        MESA_BUILD_NTHREADS = "6"
+        MESA_VERSION = "${mesa-version}"
+        VTK_BUILD_NTHREADS = "6"
+        VTK_PYTHON_VERSION = "${python-version}"
+        VTK_VERSION = "${vtk-version}"
+    }
+    output = ["type=cacheonly"]
     contexts = {
         vtk-base = "target:scilus-python"
         vtk-builder = "target:cmake"

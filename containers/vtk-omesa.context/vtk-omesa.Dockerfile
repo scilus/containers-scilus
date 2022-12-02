@@ -154,7 +154,7 @@ WORKDIR ${VTK_INSTALL_PATH}
 RUN python${VTK_PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}-py${VTK_PYTHON_VERSION%%.*}-none-any.whl
 
 WORKDIR /
-RUN touch VERSION && \
+RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Mesa => ${MESA_VERSION}\n" >> VERSION && \
     echo "VTK => ${VTK_VERSION}\n" >> VERSION
 

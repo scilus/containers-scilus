@@ -16,6 +16,11 @@ on:
         description: tag to create for the image built
         required: true
         type: string
+      update-latest:
+        description: also push the latest tag in addition to the current one
+        required: false
+        type: boolean
+        default: false
       scilpy-version:
         description: scilpy version (release or branch name)
         required: false
@@ -48,6 +53,10 @@ on:
       tag:
         required: true
         type: string
+      update-latest:
+        required: false
+        type: boolean
+        default: false
       scilpy-version:
         required: false
         type: string
@@ -116,9 +125,16 @@ jobs:
             echo "::error file=docker-builder.yml,line=109,title=scilus-base build::Github builder does not support building scilus-base for now"
           fi
       -
+        name: Checkout build system
+        uses: actions/checkout@v2
+        with:
+          repository: AlexVCaron/containers-scilus
+          ref: develop
+      -
         name: Resolve versioning from workflow inputs
         id: local-versioning
         run: |
+          touch local-versioning.hcl
           [ -z "${{ inputs.scilpy-version }}" ]            || echo "scilpy-version=\"${{ inputs.scilpy-version }}\""                       >> local-versioning.hcl
           [ -z "${{ inputs.dmriqcpy-version }}" ]          || echo "dmriqcpy-version=\"${{ inputs.dmriqcpy-version }}\""                   >> local-versioning.hcl
           [ -z "${{ inputs.python-version }}" ]            || echo "python-version=\"${{ inputs.python-version }}\""                       >> local-versioning.hcl
@@ -135,7 +151,7 @@ jobs:
           [ -z "${{ inputs.freewater-flow-version }}" ]    || echo "freewater-flow-version=\"${{ inputs.freewater-flow-version }}\""       >> local-versioning.hcl
           [ -z "${{ inputs.noddi-flow-version }}" ]        || echo "noddi-flow-version=\"${{ inputs.noddi-flow-version }}\""               >> local-versioning.hcl
           [ -z "${{ inputs.bst-flow-version }}" ]          || echo "bst-flow-version=\"${{ inputs.bst-flow-version }}\""                   >> local-versioning.hcl
-          echo "::set-output name=bake-file::$(pwd)/local-versioning.hcl"
+          echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
       -
         name: Bind dockerhub image cache
         id: dockerhub-cache
@@ -151,33 +167,70 @@ jobs:
           target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-nextflow"] }
           target "scilus-vtk"      { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-vtk"]      }
           target "scilus-flows"    { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-flows"]    }
-          target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-nextflow"] }
           EOT
-          echo "::set-output name=bake-file::$(pwd)/cache-bindings.hcl"
+          echo "bake-file=$PWD/cache-bindings.hcl" >> $GITHUB_OUTPUT
       -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        name: Set output image tags and registry to publish to
+        id: dockerhub-tags
+        run: |
+          touch tag-publishing
+          echo "${{ inputs.target }}.output=type=registry" >> tag-publishing
+          echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:${{ inputs.tag }}" >> tag-publishing
+          [ "${{ inputs.update-latest }}" == "true" ] && echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:latest" >> tag-publishing
+          DELIM="$(echo $RANDOM | base64 | head -c 3; echo)"
+          echo "tags-file=$PWD/tag-publishing" >> $GITHUB_OUTPUT
+          echo "tags-string<<$DELIM" >> $GITHUB_OUTPUT
+          echo "$(cat $PWD/tag-publishing)" >> $GITHUB_OUTPUT
+          echo "$DELIM" >> $GITHUB_OUTPUT
+          echo "git-output=$GITHUB_OUTPUT" >> $GITHUB_OUTPUT
+      -
+        name: Upload versioning and caching hcl as artifacts
+        uses: actions/upload-artifact@v3.1.1
+        with:
+          name: HCL artifacts
+          path: |
+            ${{ steps.dockerhub-cache.outputs.bake-file }}
+            ${{ steps.local-versioning.outputs.bake-file }}
+            ${{ steps.dockerhub-tags.outputs.tags-file }}
+            ${{ steps.dockerhub-tags.outputs.git-output }}
       -
         name: Login to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - 
-        name: Checkout build system
-        uses: actions/checkout@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
         with:
-          repository: scilus/containers-scilus
+          version: v0.9.1
+          driver-opts: |
+            image=moby/buildkit:v0.10.6
       -
         name: Build container
+        id: container-build
         uses: docker/bake-action@v2.3.0
         with:
+          targets: |
+            ${{ inputs.target }}
           files: |
             ${{ steps.dockerhub-cache.outputs.bake-file }}
             ${{ steps.local-versioning.outputs.bake-file }}
             ./versioning/${{ inputs.target }}-versioning.hcl
             ./docker-bake.hcl
-          set: |
-            target.${{ inputs.target }}.tags=["scilus/${{ inputs.target }}:${{ inputs.tag }}"]
+          set: ${{ steps.dockerhub-tags.outputs.tags-string }}
           pull: true
           push: true
+      -
+        name: Save output container metadata to file
+        id: container-metadata
+        run: |
+          echo "${{ steps.container-build.outputs.metadata }}" >> container-metadata.json
+          echo "metadata=$PWD/container-metadata.json" >> $GITHUB_OUTPUT
+      -
+        name: Upload bake definition
+        uses: actions/upload-artifact@v3.1.1
+        with:
+          name: Baking artifacts
+          path: |
+            ${{ steps.container-metadata.outputs.metadata }}

@@ -32,5 +32,5 @@ ENV PYTHON_LIBS=/usr/lib/python${PYTHON_VERSION}/config-${PYTHON_VERSION}m-x86_6
 ENV PYTHON_LIBRARY=${PYTHON_LIBS}
 
 WORKDIR /
-RUN touch VERSION && \
+RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Python => ${PYTHON_VERSION}\n" >> VERSION

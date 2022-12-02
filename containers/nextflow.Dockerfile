@@ -23,6 +23,6 @@ RUN wget -qO- https://github.com/nextflow-io/nextflow/releases/download/v${NEXTF
     apt-get -y autoremove
 
 WORKDIR /
-RUN touch VERSION && \
+RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Nextflow => ${NEXTFLOW_VERSION}\n" >> VERSION && \
     echo "Java => ${JAVA_VERSION}\n" >> VERSION
