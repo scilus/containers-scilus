@@ -179,7 +179,7 @@ jobs:
           [ "${{ inputs.update-latest }}" == "true" ] && echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:latest" >> tag-publishing
           echo "tags-file=$PWD/tag-publishing" >> $GITHUB_OUTPUT
           echo "tags-string=$(cat $PWD/tag-publishing)" >> $GITHUB_OUTPUT
-          echo "$GITHUB_OUTPUT"
+          echo "git-output=$GITHUB_OUTPUT" >> $GITHUB_OUTPUT
       -
         name: Upload versioning and caching hcl as artifacts
         uses: actions/upload-artifact@v3.1.1
@@ -189,6 +189,7 @@ jobs:
             ${{ steps.dockerhub-cache.outputs.bake-file }}
             ${{ steps.local-versioning.outputs.bake-file }}
             ${{ steps.dockerhub-tags.outputs.tags-file }}
+            ${{ steps.dockerhub-tags.outputs.git-output }}
       -
         name: Login to DockerHub
         uses: docker/login-action@v2
