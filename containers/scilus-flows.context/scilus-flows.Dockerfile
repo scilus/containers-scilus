@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM flow-base as scilus-flows
+FROM --platform=$TARGETPLATFORM flow-base as scilus-flows
 
 ARG TRACTOFLOW_VERSION
 ARG DMRIQCFLOW_VERSION

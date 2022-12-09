@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM nextflow-base as nextflow
+FROM --platform=$TARGETPLATFORM nextflow-base as nextflow
 
 ARG NEXTFLOW_VERSION
 ARG JAVA_VERSION

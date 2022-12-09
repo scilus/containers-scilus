@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM scilus-base as scilus
+FROM --platform=$TARGETPLATFORM scilus-base as scilus
 
 LABEL maintainer=SCIL
 
@@ -29,7 +29,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     nvidia-cuda-toolkit \
     && rm -rf /var/lib/apt/lists/*
 
-FROM scilus as scilus-test
+FROM --platform=$TARGETPLATFORM scilus as scilus-test
 ADD tests/ /tests/
 
 WORKDIR /tests

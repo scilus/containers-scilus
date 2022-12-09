@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM vtk-builder as vtk
+FROM --platform=$BUILDPLATFORM vtk-builder as vtk
 
 ARG MESA_BUILD_NTHREADS
 ARG MESA_INSTALL_PATH
@@ -148,7 +148,7 @@ ENV VTKPYTHONPATH=${VTK_DIR}/lib/python${VTK_PYTHON_VERSION}/site-packages:${VTK
 ENV LD_LIBRARY_PATH=${VTK_DIR}/lib:$LD_LIBRARY_PATH
 ENV PYTHONPATH=${PYTHONPATH}:${VTKPYTHONPATH}
 
-FROM vtk-base as vtk-install
+FROM --platform=$TARGETPLATFORM vtk-base as vtk-install
 
 ARG MESA_INSTALL_PATH
 ARG MESA_VERSION
@@ -187,7 +187,7 @@ RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "VTK => ${VTK_VERSION}\n" >> VERSION
 
 
-FROM vtk-install as vtk-test
+FROM --platform=$TARGETPLATFORM vtk-install as vtk-test
 ADD tests/ /tests/
 
 WORKDIR /tests

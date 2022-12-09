@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM fsl-builder as fsl
+FROM --platform=$BUILDPLATFORM fsl-builder as fsl
 
 ARG FSL_INSTALL_PATH
 ARG FSL_VERSION
@@ -41,7 +41,7 @@ RUN python fslinstaller.py \
            ${FSL_INSTALL_PATH}/config \
            ${FSL_INSTALL_PATH}/fslpython
 
-FROM fsl-base AS fsl-install
+FROM --platform=$TARGETPLATFORM fsl-base AS fsl-install
 
 ARG FSL_INSTALL_PATH
 ARG FSL_VERSION

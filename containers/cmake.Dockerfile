@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM cmake-builder AS cmake
+FROM --platform=$BUILDPLATFORM cmake-builder AS cmake
 
 ARG CMAKE_BUILD_NTHREADS
 ARG CMAKE_VERSION

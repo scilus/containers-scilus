@@ -209,6 +209,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
+        name: Set up QEMU for multi-platform builds
+        uses: docker/setup-qemu-action@v2
+      -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
@@ -226,6 +229,7 @@ jobs:
             ${{ steps.dockerhub-cache.outputs.bake-file }}
             ${{ steps.local-versioning.outputs.bake-file }}
             ./versioning/${{ inputs.target }}-versioning.hcl
+            ./release-platforms.hcl
             ./docker-bake.hcl
           set: ${{ steps.dockerhub-tags.outputs.tags-string }}
           pull: true

@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM python-base AS scilus-python
+FROM --platform=$TARGETPLATFORM python-base AS scilus-python
 
 ARG PYTHON_VERSION
 

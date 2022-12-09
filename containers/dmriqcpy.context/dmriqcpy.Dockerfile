@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM dmriqcpy-base as dmriqcpy
+FROM --platform=$TARGETPLATFORM dmriqcpy-base as dmriqcpy
 
 LABEL maintainer=SCIL
 
@@ -34,7 +34,7 @@ RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "dMRIqcpy => ${DMRIQCPY_VERSION}\n" >> VERSION
 
 
-FROM dmriqcpy as dmriqcpy-test
+FROM --platform=$TARGETPLATFORM dmriqcpy as dmriqcpy-test
 ADD tests/ /tests/
 
 WORKDIR /tests

@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM ants-builder as ants
+FROM --platform=$BUILDPLATFORM ants-builder as ants
 
 ARG ANTS_BUILD_NTHREADS
 ARG ANTS_INSTALL_PATH
@@ -40,7 +40,7 @@ RUN cmake -DBUILD_SHARED_LIBS=OFF \
 WORKDIR /ants_build/ANTS-build
 RUN make install
 
-FROM ants-base as ants-install
+FROM --platform=$TARGETPLATFORM ants-base as ants-install
 
 ARG ANTS_INSTALL_PATH
 ARG ANTS_VERSION

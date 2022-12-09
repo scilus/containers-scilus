@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM mrtrix-builder as mrtrix
+FROM --platform=$BUILDPLATFORM mrtrix-builder as mrtrix
 
 ARG MRTRIX_BUILD_NTHREADS
 ARG MRTRIX_VERSION
@@ -34,7 +34,7 @@ RUN ./configure -nogui -openmp && \
         { NUMBER_OF_PROCESSORS=$(nproc --all) ./build; } || \
         { NUMBER_OF_PROCESSORS=${MRTRIX_BUILD_NTHREADS} ./build; }
 
-FROM mrtrix-base as mrtrix-install
+FROM --platform=$TARGETPLATFORM mrtrix-base as mrtrix-install
 
 ARG MRTRIX_INSTALL_PATH
 ARG MRTRIX_VERSION

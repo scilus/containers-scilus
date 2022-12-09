@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM scilpy-base as scilpy
+FROM --platform=$TARGETPLATFORM scilpy-base as scilpy
 
 LABEL maintainer=SCIL
 
@@ -50,7 +50,7 @@ RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Scilpy => ${SCILPY_VERSION}\n" >> VERSION
 
 
-FROM scilpy as scilpy-test
+FROM --platform=$TARGETPLATFORM scilpy as scilpy-test
 ADD tests/ /tests/
 
 WORKDIR /tests
