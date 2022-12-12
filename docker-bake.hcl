@@ -152,6 +152,7 @@ group "dmriqcpy" {
 # ==============================================================================
 
 target "dmriqcpy-test" {
+    inherits = ["build-platforms"]
     context = "./containers/dmriqcpy.context"
     dockerfile = "dmriqcpy.Dockerfile"
     contexts = {
@@ -162,6 +163,7 @@ target "dmriqcpy-test" {
 }
 
 target "scilpy-test" {
+    inherits = ["build-platforms"]
     context = "./containers/scilpy.context"
     dockerfile = "scilpy.Dockerfile"
     contexts = {
@@ -172,6 +174,7 @@ target "scilpy-test" {
 }
 
 target "scilus-test" {
+    inherits = ["build-platforms"]
     context = "./containers/scilus.context"
     dockerfile = "scilus.Dockerfile"
     contexts = {
@@ -182,6 +185,7 @@ target "scilus-test" {
 }
 
 target "vtk-test" {
+    inherits = ["build-platforms"]
     context = "./containers/vtk-omesa.context"
     dockerfile = "vtk-omesa.Dockerfile"
     contexts = {
@@ -197,6 +201,7 @@ target "vtk-test" {
 # ==============================================================================
 
 target "scilus-flows" {
+    inherits = ["build-platforms"]
     dockerfile = "scilus-flows.Dockerfile"
     context = "./containers/scilus-flows.context"
     target = "scilus-flows"
@@ -243,6 +248,7 @@ target "scilpy" {
 }
 
 target "scilus" {
+    inherits = ["build-platforms"]
     dockerfile = "scilus.Dockerfile"
     context = "./containers/scilus.context/"
     target = "scilus"
@@ -296,6 +302,7 @@ target "scilus-scilpy" {
 }
 
 target "scilus-vtk" {
+    inherits = ["build-platforms"]
     dockerfile = "vtk-omesa.Dockerfile"
     context = "./containers/vtk-omesa.context/"
     target = "vtk-install"
@@ -319,6 +326,7 @@ target "scilus-vtk" {
 # ==============================================================================
 
 target "nextflow" {
+    inherits = ["build-platforms"]
     dockerfile = "nextflow.Dockerfile"
     context = "./containers"
     target = "nextflow"
@@ -330,6 +338,7 @@ target "nextflow" {
 }
 
 target "scilus-python" {
+    inherits = ["build-platforms"]
     dockerfile = "scilus-python.Dockerfile"
     context = "./containers"
     contexts = {
@@ -343,6 +352,7 @@ target "scilus-python" {
 }
 
 target "scilpy-base" {
+    inherits = ["build-platforms"]
     dockerfile = "scilpy.Dockerfile"
     context = "./containers/scilpy.context"
     contexts = {
@@ -358,6 +368,7 @@ target "scilpy-base" {
 }
 
 target "dmriqcpy-base" {
+    inherits = ["build-platforms"]
     dockerfile = "dmriqcpy.Dockerfile"
     context = "./containers/dmriqcpy.context"
     contexts = {
@@ -372,6 +383,7 @@ target "dmriqcpy-base" {
 }
 
 target "fsl" {
+    inherits = ["build-platforms"]
     dockerfile = "fsl.Dockerfile"
     context = "./containers"
     target = "fsl-install"
@@ -387,6 +399,7 @@ target "fsl" {
 }
 
 target "mrtrix" {
+    inherits = ["build-platforms"]
     dockerfile = "mrtrix.Dockerfile"
     context = "./containers"
     target = "mrtrix-install"
@@ -403,6 +416,7 @@ target "mrtrix" {
 }
 
 target "ants" {
+    inherits = ["build-platforms"]
     dockerfile = "ants.Dockerfile"
     context = "./containers"
     target = "ants-install"
@@ -419,6 +433,7 @@ target "ants" {
 }
 
 target "vtk" {
+    inherits = ["build-platforms"]
     dockerfile = "vtk-omesa.Dockerfile"
     context = "./containers/vtk-omesa.context/"
     target = "vtk-install"
@@ -438,6 +453,7 @@ target "vtk" {
 }
 
 target "cmake" {
+    inherits = ["build-platforms"]
     dockerfile = "cmake.Dockerfile"
     context = "./containers"
     target = "cmake"
@@ -450,4 +466,8 @@ target "cmake" {
     }
     cache-from = ["type=registry,ref=scilus/build-cache:cmake"]
     output = ["type=cacheonly"]
+}
+
+target "build-platforms" {
+    platforms = ["linux/amd64"]
 }
