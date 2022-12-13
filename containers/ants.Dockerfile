@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM --platform=$BUILDPLATFORM ants-builder as ants
+FROM --platform=$TARGETPLATFORM ants-builder as ants
 
 ARG ANTS_BUILD_NTHREADS
 ARG ANTS_INSTALL_PATH

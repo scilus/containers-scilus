@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM --platform=$BUILDPLATFORM vtk-builder as vtk
+FROM --platform=$TARGETPLATFORM vtk-builder as vtk
 
 ARG MESA_BUILD_NTHREADS
 ARG MESA_INSTALL_PATH
@@ -19,6 +19,8 @@ ENV VTK_BUILD_PATH=${VTK_BUILD_PATH:-/vtk_build}
 ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 ENV VTK_PYTHON_VERSION=${VTK_PYTHON_VERSION:-3.10}
 ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
+
+RUN echo "$TARGETPLATFORM" && cd kaka
 
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \

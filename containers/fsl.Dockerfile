@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM --platform=$BUILDPLATFORM fsl-builder as fsl
+FROM --platform=$TARGETPLATFORM fsl-builder as fsl
 
 ARG FSL_INSTALL_PATH
 ARG FSL_VERSION

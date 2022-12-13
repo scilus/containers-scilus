@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM --platform=$BUILDPLATFORM mrtrix-builder as mrtrix
+FROM --platform=$TARGETPLATFORM mrtrix-builder as mrtrix
 
 ARG MRTRIX_BUILD_NTHREADS
 ARG MRTRIX_VERSION
