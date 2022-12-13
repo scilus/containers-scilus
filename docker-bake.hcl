@@ -123,6 +123,15 @@ variable "bst-flow-version" {
     default = "1.0.0-rc1"
 }
 
+variable "PLATFORMS" {
+    default = "linux/amd64"
+}
+
+function "is_multiarch" {
+    params = []
+    result = greaterthan(length(split(",", "${PLATFORMS}")), 1)
+}
+
 # ==============================================================================
 # DOCKER BUILDX BAKE TARGETS
 # ==============================================================================
@@ -222,7 +231,7 @@ target "scilus-flows" {
     }
     tags = ["scilus-flows:local"]
     cache-from = ["type=registry,ref=scilus/build-cache:scilus-flows"]
-    output = ["type=docker"]
+    output = [is_multiarch() ? "type=docker" : "type=cacheonly"]
     pull = true
 }
 
@@ -243,7 +252,7 @@ target "scilpy" {
     inherits = ["scilpy-base"]
     tags = ["scilpy:local"]
     cache-from = ["type=registry,ref=scilus/build-cache:scilpy"]
-    output = ["type=docker"]
+    output = [is_multiarch() ? "type=docker" : "type=cacheonly"]
     pull = true
 }
 
@@ -262,7 +271,7 @@ target "scilus" {
     }
     tags = ["scilus:local"]
     cache-from = ["type=registry,ref=scilus/build-cache:scilus"]
-    output = ["type=docker"]
+    output = [is_multiarch() ? "type=docker" : "type=cacheonly"]
     pull = true
 }
 
@@ -279,7 +288,7 @@ target "dmriqcpy" {
     inherits = ["dmriqcpy-base"]
     tags = ["dmriqcpy:local"]
     cache-from = ["type=registry,ref=scilus/build-cache:dmriqcpy"]
-    output = ["type=docker"]
+    output = [is_multiarch() ? "type=docker" : "type=cacheonly"]
     pull = true
 }
 
@@ -469,5 +478,5 @@ target "cmake" {
 }
 
 target "build-platforms" {
-    platforms = ["linux/amd64"]
+    platforms = split(",", "${PLATFORMS}")
 }
