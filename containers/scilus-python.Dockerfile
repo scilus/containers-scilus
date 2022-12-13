@@ -28,8 +28,9 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         python${PYTHON_VERSION}-tk && \
     rm -rf /var/lib/apt/lists/*
 
+RUN export ARCHITECTURE="$(uname -m)"
 ENV PYTHON_INCLUDE_DIR=/usr/include/python${PYTHON_VERSION}:$PYTHON_INCLUDE_DIR
-ENV PYTHON_LIBS=/usr/lib/python${PYTHON_VERSION}/config-${PYTHON_VERSION}m-$(uname -m)-linux-gnu/libpython${PYTHON_VERSION}.so
+ENV PYTHON_LIBS=/usr/lib/python${PYTHON_VERSION}/config-${PYTHON_VERSION}m-${ARCHITECTURE}-linux-gnu/libpython${PYTHON_VERSION}.so
 ENV PYTHON_LIBRARY=${PYTHON_LIBS}
 
 WORKDIR /
