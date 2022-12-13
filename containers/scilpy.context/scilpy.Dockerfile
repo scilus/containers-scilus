@@ -53,5 +53,9 @@ RUN ( [ -f "VERSION" ] || touch VERSION ) && \
 FROM --platform=$TARGETPLATFORM scilpy as scilpy-test
 ADD tests/ /tests/
 
+ARG PYTHON_VERSION
+
+ENV PYTHON_VERSION=${PYTHON_VERSION:-3.7}
+
 WORKDIR /tests
-RUN python3 -m pytest
+RUN python${PYTHON_VERSION} -m pytest

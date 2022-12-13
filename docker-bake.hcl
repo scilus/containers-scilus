@@ -167,6 +167,9 @@ target "dmriqcpy-test" {
     contexts = {
         dmriqcpy = "target:${dmriqcpy-test-base}"
     }
+    args = {
+        PYTHON_VERSION = "${python-version}"
+    }
     target = "dmriqcpy-test"
     output = ["type=cacheonly"]
 }
@@ -177,6 +180,9 @@ target "scilpy-test" {
     dockerfile = "scilpy.Dockerfile"
     contexts = {
         scilpy = "target:${scilpy-test-base}"
+    }
+    args = {
+        PYTHON_VERSION = "${python-version}"
     }
     target = "scilpy-test"
     output = ["type=cacheonly"]
@@ -189,6 +195,9 @@ target "scilus-test" {
     contexts = {
         scilus = "target:scilus"
     }
+    args = {
+        PYTHON_VERSION = "${python-version}"
+    }
     target = "scilus-test"
     output = ["type=cacheonly"]
 }
@@ -200,6 +209,9 @@ target "vtk-test" {
     contexts = {
         vtk-builder = "target:cmake"
         vtk-install = "target:${vtk-test-base}"
+    }
+    args = {
+        VTK_PYTHON_VERSION = "${python-version}"
     }
     target = "vtk-test"
     output = ["type=cacheonly"]
@@ -267,6 +279,7 @@ target "scilus" {
     args = {
         FROZEN_REQUIREMENTS = "${scilpy-requirements}"
         ITK_NUM_THREADS = "${itk-num-threads}"
+        PYTHON_VERSION = "${python-version}"
         SCILPY_VERSION = "${scilpy-version}"
     }
     tags = ["scilus:local"]

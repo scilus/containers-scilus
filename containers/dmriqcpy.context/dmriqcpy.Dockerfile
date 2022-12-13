@@ -37,6 +37,10 @@ RUN ( [ -f "VERSION" ] || touch VERSION ) && \
 FROM --platform=$TARGETPLATFORM dmriqcpy as dmriqcpy-test
 ADD tests/ /tests/
 
+ARG PYTHON_VERSION
+
+ENV PYTHON_VERSION=${PYTHON_VERSION:-3.7}
+
 WORKDIR /tests
-RUN python3 -m pip install dipy pytest pytest_console_scripts
-RUN python3 -m pytest --script-launch-mode=subprocess
+RUN python${PYTHON_VERSION} -m pip install --no-cache-dir numpy nibabel pytest pytest_console_scripts
+RUN python${PYTHON_VERSION} -m pytest --script-launch-mode=subprocess

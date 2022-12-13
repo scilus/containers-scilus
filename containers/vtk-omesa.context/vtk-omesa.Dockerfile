@@ -190,6 +190,10 @@ RUN ( [ -f "VERSION" ] || touch VERSION ) && \
 FROM --platform=$TARGETPLATFORM vtk-install as vtk-test
 ADD tests/ /tests/
 
+ARG VTK_PYTHON_VERSION
+
+ENV VTK_PYTHON_VERSION=${VTK_PYTHON_VERSION:-3.7}
+
 WORKDIR /tests
-RUN python3 -m pip install --no-cache-dir pytest
-RUN python3 -m pytest
+RUN python${VTK_PYTHON_VERSION} -m pip install --no-cache-dir pytest
+RUN python${VTK_PYTHON_VERSION} -m pytest
