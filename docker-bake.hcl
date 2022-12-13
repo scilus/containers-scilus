@@ -129,7 +129,7 @@ variable "PLATFORMS" {
 
 function "is_multiarch" {
     params = []
-    result = greaterthan(length(split(",", "${PLATFORMS}")), 1)
+    result = greaterthan(1, length(split(",", "${PLATFORMS}")))
 }
 
 # ==============================================================================
