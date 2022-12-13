@@ -17,7 +17,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     update-alternatives --install /usr/bin/python${PYTHON_MOD} python${PYTHON_MOD} /usr/bin/python${PYTHON_VERSION} 1 && \
     update-alternatives --config python${PYTHON_MOD} && \
     update-alternatives  --set python${PYTHON_MOD} /usr/bin/python${PYTHON_VERSION} && \
-    python${PYTHON_VERSION} -m pip install pip && \
+    python${PYTHON_VERSION} -m pip install --no-cache-dir pip && \
     pip${PYTHON_MOD} install --upgrade pip && \
     pip${PYTHON_MOD} install -U setuptools && \
     DEBIAN_FRONTEND=noninteractive apt-get -y install \

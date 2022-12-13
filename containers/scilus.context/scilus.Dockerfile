@@ -20,7 +20,7 @@ ADD human-data_master_1d3abfb.tar.bz2 /human-data
 ADD ${FROZEN_REQUIREMENTS} /tmp/requirements.frozen
 
 WORKDIR /tmp
-RUN python3 -m pip install -r requirements.frozen && \
+RUN python3 -m pip install --no-cache-dir -r requirements.frozen && \
     rm requirements.frozen
 
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
@@ -33,5 +33,5 @@ FROM --platform=$TARGETPLATFORM scilus as scilus-test
 ADD tests/ /tests/
 
 WORKDIR /tests
-RUN python3 -m pip install pytest
+RUN python3 -m pip install --no-cache-dir pytest
 RUN python3 -m pytest

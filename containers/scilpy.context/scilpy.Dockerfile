@@ -35,7 +35,7 @@ RUN unzip scilpy.zip && \
     rm scilpy.zip
 
 WORKDIR /scilpy
-RUN SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install -e . && \
+RUN SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install --no-cache-dir -e . && \
     python${PYTHON_VERSION} -m pip cache purge
 
 RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/${PYTHON_PACKAGE_DIR}/matplotlib/mpl-data/matplotlibrc && \

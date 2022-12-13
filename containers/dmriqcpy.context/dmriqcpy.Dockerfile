@@ -22,7 +22,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         git && \
     rm -rf /var/lib/apt/lists/*
 
-RUN python${PYTHON_VERSION} -m pip install \
+RUN python${PYTHON_VERSION} -m pip install --no-cache-dir \
         git+https://github.com/scilus/dmriqcpy.git@${DMRIQCPY_VERSION} && \
     python${PYTHON_VERSION} -m pip cache purge && \
     sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/${PYTHON_PACKAGE_DIR}/matplotlib/mpl-data/matplotlibrc && \

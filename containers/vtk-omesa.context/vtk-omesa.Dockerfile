@@ -179,7 +179,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${VTK_INSTALL_PATH}
-RUN which python${VTK_PYTHON_VERSION} && python${VTK_PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
+RUN python${VTK_PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
@@ -191,5 +191,5 @@ FROM --platform=$TARGETPLATFORM vtk-install as vtk-test
 ADD tests/ /tests/
 
 WORKDIR /tests
-RUN python3 -m pip install pytest
+RUN python3 -m pip install --no-cache-dir pytest
 RUN python3 -m pytest
