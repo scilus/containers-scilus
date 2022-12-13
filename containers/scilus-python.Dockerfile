@@ -23,6 +23,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     DEBIAN_FRONTEND=noninteractive apt-get -y install \
         python${PYTHON_MOD}-lxml \
         python${PYTHON_MOD}-six \
+        python${PYTHON_MOD}-packaging \
         python${PYTHON_VERSION}-dev \
         python${PYTHON_VERSION}-tk && \
     rm -rf /var/lib/apt/lists/*
