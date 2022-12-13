@@ -137,11 +137,11 @@ function "is_multiarch" {
 # ==============================================================================
 
 group "scilus-flows" {
-    targets = ["scilus-flows", "scilus-test", "scilpy-test"]
+    targets = ["scilus-flows", "scilus-test", "scilpy-test", "dmriqcpy-test", "vtk-test"]
 }
 
 group "scilus" {
-    targets = ["scilus", "scilus-test", "scilpy-test"]
+    targets = ["scilus", "scilus-test", "scilpy-test", "dmriqcpy-test", "vtk-test"]
 }
 
 group "scilus-base" {
