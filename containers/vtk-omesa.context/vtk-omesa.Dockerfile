@@ -194,8 +194,6 @@ ARG VTK_PYTHON_VERSION
 
 ENV VTK_PYTHON_VERSION=${VTK_PYTHON_VERSION:-3.7}
 
-WORKDIR /
-RUN ls /usr/lib/python${VTK_PYTHON_VERSION} && cd kaka
 WORKDIR /tests
 RUN python${VTK_PYTHON_VERSION} -m pip install --no-cache-dir pytest
 RUN python${VTK_PYTHON_VERSION} -m pytest
