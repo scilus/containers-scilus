@@ -5,7 +5,7 @@ FROM python-base AS scilus-python
 ARG PYTHON_VERSION
 
 ENV PYTHON_PACKAGE_DIR=${PYTHON_PACKAGE_DIR:-dist-packages}
-ENV PYTHON_VERSION=${PYTHON_VERSION:-3.7}
+ENV PYTHON_VERSION=${PYTHON_VERSION:-3.10}
 
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \

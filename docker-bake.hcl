@@ -13,7 +13,7 @@ variable "base-build-image" {
 }
 
 variable "base-python-image" {
-    default = "python:3.7.15-buster"
+    default = "python:3.10-bullseye"
 }
 
 variable "ants-version" {
@@ -48,7 +48,7 @@ variable "vtk-version" {
 }
 
 variable "python-version" {
-    default = "3.7"
+    default = "3.10"
 }
 
 variable "nextflow-version" {

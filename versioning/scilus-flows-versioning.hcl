@@ -12,7 +12,7 @@ scilpy-version="1.4.0"
 scilpy-requirements="requirements.1.4.0.frozen"
 mesa-version="19.0.8"
 vtk-version="8.2.0"
-python-version="3.7"
+python-version="3.10"
 
 dmriqcpy-test-base="scilus-base"
 scilpy-test-base="scilus-scilpy"
