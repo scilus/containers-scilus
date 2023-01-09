@@ -1,6 +1,6 @@
 # dmriqcpy-versioning.hcl
 
-base-build-image="ubuntu:18.04"
+base-build-image="ubuntu:22.04"
 base-python-image="python:3.10-bullseye"
 
 cmake-version="3.16.3"
