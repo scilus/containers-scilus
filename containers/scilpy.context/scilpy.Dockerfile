@@ -30,7 +30,7 @@ ADD https://github.com/scilus/scilpy/archive/${SCILPY_VERSION}.zip scilpy.zip
 RUN unzip scilpy.zip && \
     ZIP_NAME=$(echo ${SCILPY_VERSION} | tr / _) && \
     mv scilpy-${ZIP_NAME} scilpy && \
-    rm ${ZIP_NAME}.zip
+    rm scilpy.zip
 
 WORKDIR /scilpy
 RUN SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install -e . && \
