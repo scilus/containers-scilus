@@ -15,8 +15,10 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         git \
         libeigen3-dev \
         libfftw3-dev \
+        libomp-dev \
         libpng-dev \
         libtiff5-dev \
+        python-is-python3 \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
