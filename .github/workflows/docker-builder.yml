@@ -128,7 +128,7 @@ jobs:
         name: Checkout build system
         uses: actions/checkout@v2
         with:
-          repository: AlexVCaron/containers-scilus
+          repository: scilus/containers-scilus
           ref: develop
       -
         name: Resolve versioning from workflow inputs
