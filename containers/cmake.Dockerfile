@@ -20,8 +20,8 @@ WORKDIR /tmp
 RUN mkdir -p cmake
 
 WORKDIR /tmp/cmake
-RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz && \
-    tar -xzf cmake-${CMAKE_VERSION}.tar.gz
+ADD https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz cmake.tar.gz
+RUN tar -xzf cmake.tar.gz
 
 WORKDIR /tmp/cmake/cmake-${CMAKE_VERSION}
 RUN ./bootstrap && \

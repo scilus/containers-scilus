@@ -42,13 +42,13 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
-RUN wget https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.gz && \
-    tar -xzf mesa-${MESA_VERSION}.tar.gz && \
+ADD https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.gz mesa.tar.gz
+RUN tar -xzf mesa.tar.gz && \
     rm mesa-${MESA_VERSION}.tar.gz
 
 WORKDIR ${VTK_BUILD_PATH}
-RUN wget https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz && \
-    tar -xzf vtk-v${VTK_VERSION}.tar.gz && \
+ADD https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz vtk.tar.gz
+RUN tar -xzf vtk.tar.gz && \
     rm vtk-v${VTK_VERSION}.tar.gz
 
 WORKDIR /mesa-${MESA_VERSION}
