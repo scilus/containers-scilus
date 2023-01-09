@@ -11,7 +11,7 @@ ENV FSL_VERSION=${FSL_VERSION:-6.0.5.2}
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
-        python \
+        python2.7 \
         wget \
         git \
     && rm -rf /var/lib/apt/lists/*
@@ -19,11 +19,14 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
 RUN mkdir -p /tmp/fsl_sources
 
 WORKDIR /tmp
-RUN git clone https://git.fmrib.ox.ac.uk/fsl/installer.git && \
-    mv installer/fslinstaller.py fsl_sources/fslinstaller.py
+RUN git clone https://git.fmrib.ox.ac.uk/fsl/conda/installer.git && \
+    mv installer/fsl/installer/fslinstaller.py fsl_sources/fslinstaller.py
 
 WORKDIR /tmp/fsl_sources
-RUN python fslinstaller.py \
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && \
+    update-alternatives --config python && \
+    update-alternatives  --set python /usr/bin/python2.7 && \
+    python fslinstaller.py \
         -d ${FSL_INSTALL_PATH} \
         -V ${FSL_VERSION} && \
     rm -rf ${FSL_INSTALL_PATH}/src \
