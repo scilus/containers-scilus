@@ -45,6 +45,11 @@ on:
         description: base python image to get from dockerhub
         required: false
         type: string
+      build-system-ref:
+        description: github reference of the build system to checkout
+        required: false
+        type: string
+        default: main
   workflow_call:
     inputs:
       target:
@@ -105,6 +110,10 @@ on:
       bst-flow-version:
         required: false
         type: string
+      build-system-ref:
+        required: false
+        type: string
+        default: main
     secrets:
       DOCKER_USERNAME:
         description: 'Image repository on dockerhub to which to push'
@@ -129,7 +138,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: scilus/containers-scilus
-          ref: develop
+          ref: ${{ inputs.build-system-ref }}
       -
         name: Resolve versioning from workflow inputs
         id: local-versioning
