@@ -15,7 +15,8 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         wget && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget -qO- https://github.com/nextflow-io/nextflow/releases/download/v${NEXTFLOW_VERSION}/nextflow | bash && \
+ADD https://github.com/nextflow-io/nextflow/releases/download/v${NEXTFLOW_VERSION}/nextflow nextflow
+RUN bash nextflow && \
     chmod +x nextflow && \
     mv nextflow /usr/bin/nextflow && \
     apt-get -y remove \
