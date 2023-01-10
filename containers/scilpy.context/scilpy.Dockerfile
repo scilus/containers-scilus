@@ -2,6 +2,8 @@
 
 FROM scilpy-base as scilpy
 
+LABEL maintainer=SCIL
+
 ARG BLAS_NUM_THREADS
 ARG PYTHON_VERSION
 ARG SCILPY_VERSION
