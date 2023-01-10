@@ -25,15 +25,22 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
     mkdir ${MESA_INSTALL_PATH} ${VTK_INSTALL_PATH} ${VTK_BUILD_PATH} && \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
+        bison \
         build-essential \
+        flex \
         gcc \
         git \
-        llvm-7 \
-        llvm-7-dev \
-        llvm-7-runtime \
+        llvm-14 \
+        llvm-14-dev \
+        llvm-14-runtime \
         libboost-all-dev \
         libopenmpi-dev \
+        meson \
+        ninja-build \
+        pkg-config \
+        python${PYTHON_MAJOR}-mako \
         python${PYTHON_MAJOR}-pip \
+        python${PYTHON_MAJOR}-setuptools \
         python${VTK_PYTHON_VERSION} \
         python${VTK_PYTHON_VERSION}-dev \
         clang \
@@ -42,9 +49,9 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
-ADD https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.gz mesa.tar.gz
-RUN tar -xzf mesa.tar.gz && \
-    rm mesa.tar.gz
+ADD https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz mesa.tar.xz
+RUN tar -xJf mesa.tar.xz && \
+    rm mesa.tar.xz
 
 WORKDIR ${VTK_BUILD_PATH}
 ADD https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz vtk.tar.gz
@@ -52,73 +59,94 @@ RUN tar -xzf vtk.tar.gz && \
     rm vtk.tar.gz
 
 WORKDIR /mesa-${MESA_VERSION}
-RUN ./configure --prefix=${MESA_INSTALL_PATH} \
-                --enable-autotools \
-                --enable-gallium-llvm \
-                --enable-gallium-osmesa \
-                --enable-llvm-shared-libs \
-                --enable-opengl \
-                --enable-shared-glapi \
-                --disable-dri \
-                --disable-egl \
-                --disable-gbm \
-                --disable-gles1 \
-                --disable-gles2 \
-                --disable-glx \
-                --disable-osmesa \
-                --disable-va \
-                --disable-vdpau \
-                --disable-texture-float \
-                --disable-xvmc \
-                --with-dri-drivers= \
-                --with-egl-platforms= \
-                --with-gallium-drivers=swrast,swr \
-                --with-llvm-prefix=/usr/lib/llvm-7 && \
+RUN mkdir build && \
+    echo "[binaries]\nllvm-config = '/usr/bin/llvm-config'" >> llvm.ini && \
+    meson setup \
+        --native-file llvm.ini \
+        -Dprefix=${MESA_INSTALL_PATH} \
+        -Dbuildtype=release \
+        -Dshared-llvm=enabled \
+        -Dopengl=true \
+        -Dshared-glapi=enabled \
+        -Ddri3=disabled \
+        -Degl=disabled \
+        -Dgbm=disabled \
+        -Dgles1=disabled \
+        -Dgles2=disabled \
+        -Dglx=disabled \
+        -Dglx-direct=false \
+        -Dosmesa=true \
+        -Dgallium-va=disabled \
+        -Dgallium-vdpau=disabled \
+        -Dgallium-xvmc=disabled \
+        -Ddri-drivers=[] \
+        -Dvulkan-drivers=[] \
+        -Dplatforms=[] \
+        -Dgallium-drivers=swrast \
+        build . && \
     [ -z "$MESA_BUILD_NTHREADS" ] && \
-        { make -j $(nproc --all); } || \
-        { make -j ${MESA_BUILD_NTHREADS}; } && \
-    make install
+        { ninja -C build/ -j $(nproc --all) install; } || \
+        { ninja -C build/ -j ${MESA_BUILD_NTHREADS} install; }
+
+ENV LD_LIBRARY_PATH=${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:${MESA_INSTALL_PATH}/lib:$LD_LIBRARY_PATH
 
 WORKDIR ${VTK_BUILD_PATH}
-RUN cmake -DCMAKE_BUILD_TYPE=Release \
-          -DBUILD_TESTING=OFF \
-          -DBUILD_DOCUMENTATION=OFF \
-          -DBUILD_EXAMPLES=OFF \
-          -DVTK_DATA_EXCLUDE_FROM_ALL:BOOL=ON \
-          -DVTK_Group_Qt:BOOL=OFF \
-          -DVTK_DEBUG_LEAKS:BOOL=OFF \
-          -DVTK_WRAP_PYTHON=ON \
-          -DVTK_PYTHON_VERSION=${VTK_PYTHON_VERSION} \
-          -DVTK_ENABLE_VTKPYTHON:BOOL=OFF \
-          -DVTK_USE_X=OFF \
-          -DVTK_USE_COCOA=FALSE \
-          -DBUILD_SHARED_LIBS=ON \
-          -DVTK_OPENGL_HAS_EGL=False \
-          -DVTK_OPENGL_HAS_OSMESA=ON \
-          -DVTK_DEFAULT_RENDER_WINDOW_OFFSCREEN=ON \
-          -DOSMESA_INCLUDE_DIR=${MESA_INSTALL_PATH}/include/ \
-          -DOSMESA_LIBRARY=${MESA_INSTALL_PATH}/lib/libOSMesa.so \
-          -DCMAKE_INSTALL_PREFIX=${VTK_INSTALL_PATH} \
-          -DPYTHON_EXECUTABLE=/usr/bin/python${VTK_PYTHON_VERSION} \
-          -DPYTHON_INCLUDE_DIR=/usr/include/python${VTK_PYTHON_VERSION} \
-          -DPYTHON_LIBRARY=/usr/lib/python${VTK_PYTHON_VERSION}/config-${VTK_PYTHON_VERSION}m-x86_64-linux-gnu/libpython${VTK_PYTHON_VERSION}.so \
-          vtk-v${VTK_VERSION}/ && \
+RUN if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
+    cmake -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS:BOOL=ON \
+        -DVTK_USE_CUDA:BOOL=OFF \
+        -DVTK_USE_MPI:BOOL=ON \
+        -DVTK_WRAP_PYTHON:BOOL=ON \
+        -DVTK_PYTHON_VERSION:STRING=${PYTHON_MAJOR} \
+        -DVTK_BUILD_EXAMPLES:BOOL=OFF \
+        -DVTK_ENABLE_LOGGING:BOOL=ON \
+        -DVTK_BUILD_TESTING:BOOL=OFF \
+        -DVTK_ENABLE_KITS:BOOL=ON \
+        -DVTK_ENABLE_WRAPPING:BOOL=ON \
+        -DVTK_BUILD_DOCUMENTATION:BOOL=OFF \
+        -DVTK_INSTALL_SDK:BOOL=OFF \
+        -DVTK_RELOCATABLE_INSTALL:BOOL=ON \
+        -DVTK_WHEEL_BUILD:BOOL=ON \
+        -DVTK_DEBUG_LEAKS:BOOL=OFF \
+        -DVTK_DEFAULT_RENDER_WINDOW_OFFSCREEN:BOOL=ON \
+        -DVTK_GROUP_ENABLE_Qt:STRING=NO \
+        -DVTK_GROUP_ENABLE_Views:STRING=NO \
+        -DVTK_GROUP_ENABLE_Web:STRING=NO \
+        -DVTK_ENABLE_REMOTE_MODULES:BOOL=OFF \
+        -DVTK_MODULE_ENABLE_VTK_PythonInterpreter:STRING=NO \
+        -DVTK_OPENGL_HAS_EGL:BOOL=OFF \
+        -DVTK_OPENGL_HAS_OSMESA:BOOL=ON \
+        -DVTK_OPENGL_USE_GLES:BOOL=OFF \
+        -DVTK_REPORT_OPENGL_ERRORS:BOOL=ON \
+        -DVTK_REPORT_OPENGL_ERRORS_IN_RELEASE_BUILDS:BOOL=ON \
+        -DVTK_SMP_ENABLE_OPENMP:BOOL=ON \
+        -DVTK_SMP_IMPLEMENTATION_TYPE:STRING=OpenMP \
+        -DVTK_USE_SDL2:BOOL=OFF \
+        -DVTK_USE_X:BOOL=OFF \
+        -DVTK_PYTHON_OPTIONAL_LINK:BOOL=ON \
+        -DVTK_BUILD_PYI_FILES:BOOL=ON \
+        -DPython{PYTHON_MAJOR}_EXECUTABLE:STRING=/usr/bin/python${VTK_PYTHON_VERSION} \
+        -DPython${PYTHON_MAJOR}_INCLUDE_DIR:STRING=/usr/include/python${VTK_PYTHON_VERSION} \
+        -DPython${PYTHON_MAJOR}_LIBRARY:STRING=/usr/lib/x86_64-linux-gnu/libpython${VTK_PYTHON_VERSION}.so \
+        -DOSMESA_INCLUDE_DIR=${MESA_INSTALL_PATH}/include/ \
+        -DOSMESA_LIBRARY=${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu/libOSMesa.so \
+        -DCMAKE_INSTALL_PREFIX=${VTK_INSTALL_PATH} \
+        vtk-v${VTK_VERSION}/ && \
     [ -z "$VTK_BUILD_NTHREADS" ] && \
-        { make -j $(nproc --all); } || \
-        { make -j ${VTK_BUILD_NTHREADS}; } && \
-    make install
+        { ninja -j $(nproc --all); } || \
+        { ninja -j ${VTK_BUILD_NTHREADS}; } && \
+    ninja install
+    
+RUN if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
+    python${PYTHON_MAJOR} setup.py bdist_wheel && \
+    cp dist/vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl ${VTK_INSTALL_PATH}/vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
 
 ENV VTK_DIR=${VTK_INSTALL_PATH}
 ENV VTKPYTHONPATH=${VTK_DIR}/lib/python${VTK_PYTHON_VERSION}/site-packages:${VTK_DIR}/lib
 
-ENV LD_LIBRARY_PATH=${VTK_DIR}/lib:${MESA_INSTALL_PATH}/lib:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=${VTK_DIR}/lib:$LD_LIBRARY_PATH
 ENV PYTHONPATH=${PYTHONPATH}:${VTKPYTHONPATH}
-
-WORKDIR ${VTK_INSTALL_PATH}/lib/python${VTK_PYTHON_VERSION}/site-packages
-ADD --link setup.py setup.py
-RUN python${VTK_PYTHON_VERSION} setup.py bdist_wheel && \
-    mv dist/vtk-${VTK_VERSION}-py${VTK_PYTHON_VERSION%%.*}-none-any.whl ${VTK_INSTALL_PATH}/vtk-${VTK_VERSION}-py${VTK_PYTHON_VERSION%%.*}-none-any.whl && \
-    rm -rf build dist setup.py vtk.egg-info __pycache__
 
 FROM vtk-base as vtk-install
 
@@ -137,7 +165,7 @@ ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 ENV VTK_DIR=${VTK_INSTALL_PATH}
 ENV VTKPYTHONPATH=${VTK_DIR}/lib/python${VTK_PYTHON_VERSION}/site-packages:${VTK_DIR}/lib
 
-ENV LD_LIBRARY_PATH=${VTK_DIR}/lib:${MESA_INSTALL_PATH}/lib:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=${VTK_DIR}/lib:${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 ENV PYTHONPATH=${PYTHONPATH}:${VTKPYTHONPATH}
 
 WORKDIR /
@@ -146,12 +174,12 @@ COPY --from=vtk --link ${MESA_INSTALL_PATH} ${MESA_INSTALL_PATH}
 COPY --from=vtk --link ${VTK_INSTALL_PATH} ${VTK_INSTALL_PATH}
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
-        llvm-7-runtime \
-        libopenmpi-dev && \
+        llvm-14-runtime \
+        libomp-dev && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${VTK_INSTALL_PATH}
-RUN python${VTK_PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}-py${VTK_PYTHON_VERSION%%.*}-none-any.whl
+RUN which python${VTK_PYTHON_VERSION} && python${VTK_PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
