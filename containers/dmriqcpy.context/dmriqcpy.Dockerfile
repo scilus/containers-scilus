@@ -2,6 +2,8 @@
 
 FROM dmriqcpy-base as dmriqcpy
 
+LABEL maintainer=SCIL
+
 ARG DMRIQCPY_VERSION
 ARG PYTHON_VERSION
 ARG VTK_INSTALL_PATH
@@ -16,6 +18,7 @@ ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
+        fonts-freefont-ttf \
         git && \
     rm -rf /var/lib/apt/lists/*
 
@@ -25,10 +28,6 @@ RUN python${PYTHON_VERSION} -m pip install \
     sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/${PYTHON_PACKAGE_DIR}/matplotlib/mpl-data/matplotlibrc && \
     apt-get -y remove git && \
     apt-get -y autoremove
-
-WORKDIR ${VTK_INSTALL_PATH}
-RUN PYTHON_MAJOR=${VTK_PYTHON_VERSION%%.*} && \
-    python${PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}-py${PYTHON_MAJOR}-none-any.whl
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
@@ -40,4 +39,4 @@ ADD tests/ /tests/
 
 WORKDIR /tests
 RUN python3 -m pip install dipy pytest pytest_console_scripts
-RUN python3 -m pytest
+RUN python3 -m pytest --script-launch-mode=subprocess
