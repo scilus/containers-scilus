@@ -16,6 +16,7 @@ ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
+        fonts-freefont-ttf \
         git && \
     rm -rf /var/lib/apt/lists/*
 
