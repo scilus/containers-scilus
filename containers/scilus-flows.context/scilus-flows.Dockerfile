@@ -31,9 +31,6 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     rm -rf /var/lib/apt/lists/* && \
     mkdir scilus_flows
 
-ADD JHU_template_GIN_dil.tar.bz2 /JHU_template_GIN_dil
-ADD filtering_lists.tar.bz2 /filtering_lists
-
 ADD https://github.com/scilus/tractoflow/archive/${TRACTOFLOW_VERSION}.zip /scilus_flows/tractoflow.zip
 ADD https://github.com/scilus/dmriqc_flow/archive/${DMRIQCFLOW_VERSION}.zip /scilus_flows/dmriqc-flow.zip
 ADD https://github.com/scilus/extractor_flow/archive/${EXTRACTORFLOW_VERSION}.zip /scilus_flows/extractor-flow.zip
@@ -89,6 +86,12 @@ RUN unzip bst-flow.zip && \
 RUN apt-get -y remove \
         unzip && \
     apt-get -y autoremove
+
+WORKDIR /
+RUN mkdir /extractor_flow && \
+    tar -jxf /scilus_flows/extractor_flow/containers/templates_and_ROIs.tar.bz2 -C /extractor_flow/ && \
+    tar -jxf /scilus_flows/extractor_flow/containers/filtering_lists.tar.bz2 -C /extractor_flow/ && \
+    chmod -R +rw /extractor_flow
 
 WORKDIR /usr/bin
 RUN echo "#!/bin/bash\nnextflow run /scilus_flows/tractoflow/main.nf \$@" >> tractoflow && \

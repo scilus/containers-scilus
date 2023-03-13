@@ -20,6 +20,7 @@ ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get install -y \
+        git \
         libblas-dev \
         libfreetype6-dev \
         liblapack-dev \
@@ -41,6 +42,7 @@ RUN SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION
 RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/${PYTHON_PACKAGE_DIR}/matplotlib/mpl-data/matplotlibrc && \
     cp -r /scilpy/data /usr/local/lib/python${PYTHON_VERSION}/${PYTHON_PACKAGE_DIR}/ && \
     apt-get -y remove \
+        git \
         wget \
         unzip && \
     apt-get -y autoremove
