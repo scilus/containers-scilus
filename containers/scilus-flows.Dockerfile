@@ -91,7 +91,7 @@ WORKDIR /
 RUN mkdir /extractor_flow && \
     tar -jxf /scilus_flows/extractor_flow/containers/templates_and_ROIs.tar.bz2 -C /extractor_flow/ && \
     tar -jxf /scilus_flows/extractor_flow/containers/filtering_lists.tar.bz2 -C /extractor_flow/ && \
-    chmod -R +rw /extractor_flow
+    chmod go+rx /extractor_flow
 
 WORKDIR /usr/bin
 RUN echo "#!/bin/bash\nnextflow run /scilus_flows/tractoflow/main.nf \$@" >> tractoflow && \

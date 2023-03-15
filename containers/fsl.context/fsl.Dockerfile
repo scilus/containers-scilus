@@ -6,7 +6,8 @@ ARG FSL_INSTALL_PATH
 ARG FSL_VERSION
 
 ENV FSL_INSTALL_PATH=${FSL_INSTALL_PATH:-/fsl}
-ENV FSL_VERSION=${FSL_VERSION:-6.0.5.2}
+ENV FSL_VERSION=${FSL_VERSION:-6.0.6.4}
+ENV MINICONDA_VERSION=${MINICONDA_VERSION:-22.11.1-4}
 
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
@@ -16,30 +17,35 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         git \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /tmp/fsl_sources
+RUN mkdir -p ${FSL_INSTALL_PATH}
 
-WORKDIR /tmp
-RUN git clone https://git.fmrib.ox.ac.uk/fsl/conda/installer.git && \
-    mv installer/fsl/installer/fslinstaller.py fsl_sources/fslinstaller.py
+ADD fslinstaller.py /fslinstaller.py
+ADD fsl_conda_env.yml /fsl_conda_env.yml
 
-WORKDIR /tmp/fsl_sources
 RUN python fslinstaller.py \
         -d ${FSL_INSTALL_PATH} \
         -V ${FSL_VERSION} \
-        -n && \
-    rm -rf ${FSL_INSTALL_PATH}/src \
-           ${FSL_INSTALL_PATH}/data \
-           ${FSL_INSTALL_PATH}/build \
-           ${FSL_INSTALL_PATH}/include \
-           ${FSL_INSTALL_PATH}/build.log \
-           ${FSL_INSTALL_PATH}/tcl \
-           ${FSL_INSTALL_PATH}/LICENSE \
-           ${FSL_INSTALL_PATH}/README \
-           ${FSL_INSTALL_PATH}/refdoc \
-           ${FSL_INSTALL_PATH}/python \
-           ${FSL_INSTALL_PATH}/doc \
+        -e /fsl_conda_env.yml \
+        -n -o && \
+    rm -rf ${FSL_INSTALL_PATH}/cmake \
+           ${FSL_INSTALL_PATH}/compiler_compat \
+           ${FSL_INSTALL_PATH}/conda-meta \
            ${FSL_INSTALL_PATH}/config \
-           ${FSL_INSTALL_PATH}/fslpython
+           ${FSL_INSTALL_PATH}/doc \
+           ${FSL_INSTALL_PATH}/docs \
+           ${FSL_INSTALL_PATH}/envs \
+           ${FSL_INSTALL_PATH}/etc \
+           ${FSL_INSTALL_PATH}/fonts \
+           ${FSL_INSTALL_PATH}/include \
+           ${FSL_INSTALL_PATH}/man \
+           ${FSL_INSTALL_PATH}/mkspecs \
+           ${FSL_INSTALL_PATH}/phrasebooks \
+           ${FSL_INSTALL_PATH}/qml \
+           ${FSL_INSTALL_PATH}/shell \
+           ${FSL_INSTALL_PATH}/src \
+           ${FSL_INSTALL_PATH}/tcl \
+           ${FSL_INSTALL_PATH}/translations \
+           ${FSL_INSTALL_PATH}/var
 
 FROM fsl-base AS fsl-install
 

@@ -28,7 +28,7 @@ variable "dmriqcpy-version" {
 }
 
 variable "fsl-version" {
-    default = "6.0.5.2"
+    default = "6.0.6.4"
 }
 
 variable "mrtrix-version" {
@@ -128,7 +128,7 @@ variable "bst-flow-version" {
 # ==============================================================================
 
 group "scilus-flows" {
-    targets = ["scilus-flows", "scilus-test", "scilpy-test"]
+    targets = ["scilus-flows"]
 }
 
 group "scilus" {
@@ -198,7 +198,7 @@ target "vtk-test" {
 
 target "scilus-flows" {
     dockerfile = "scilus-flows.Dockerfile"
-    context = "./containers/scilus-flows.context"
+    context = "./containers"
     target = "scilus-flows"
     contexts = {
         flow-base = "target:scilus-nextflow"
@@ -369,7 +369,7 @@ target "dmriqcpy-base" {
 
 target "fsl" {
     dockerfile = "fsl.Dockerfile"
-    context = "./containers"
+    context = "./containers/fsl.context"
     target = "fsl-install"
     contexts = {
         fsl-base = "target:mrtrix"
@@ -378,8 +378,9 @@ target "fsl" {
     args = {
         FSL_VERSION = "${fsl-version}"
     }
+    tags = ["fsl-lean:local"]
     cache-from = ["type=registry,ref=scilus/build-cache:fsl"]
-    output = ["type=cacheonly"]
+    output = ["type=docker"]
 }
 
 target "mrtrix" {

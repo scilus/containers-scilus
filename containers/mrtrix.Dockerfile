@@ -32,7 +32,41 @@ RUN git fetch --tags && \
 RUN ./configure -nogui -openmp && \
     [ -z "$MRTRIX_BUILD_NTHREADS" ] && \
         { NUMBER_OF_PROCESSORS=$(nproc --all) ./build; } || \
-        { NUMBER_OF_PROCESSORS=${MRTRIX_BUILD_NTHREADS} ./build; }
+        { NUMBER_OF_PROCESSORS=${MRTRIX_BUILD_NTHREADS} ./build; } && \
+    rm -rf .gitattributes \
+           .github \
+           .gitignore \
+           .gitmodules \
+           .readthedocs.yml \
+           CONTRIBUTING.md \
+           Dockerfile \
+           Doxyfile \
+           README.md \
+           Singularity \
+           build \
+           build.default.active \
+           build.log \
+           check_syntax \
+           cmd \
+           config \
+           configure \
+           configure.log \
+           docs \
+           doxygen \
+           generate_bash_completion.py \
+           icons \
+           install_mime_types.sh \
+           matlab \
+           mrview.desktop \
+           package_mrtrix \
+           run_pylint \
+           run_tests \
+           set_path \
+           src \
+           testing \
+           tmp \
+           update_copyright \
+           update_dev_doc
 
 FROM mrtrix-base as mrtrix-install
 
