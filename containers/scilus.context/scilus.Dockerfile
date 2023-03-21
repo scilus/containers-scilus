@@ -29,13 +29,13 @@ ADD human-data_master_1d3abfb.tar.bz2 /human-data
 ADD ${FROZEN_REQUIREMENTS} /tmp/requirements.frozen
 
 WORKDIR /tmp
-RUN python${PYTHON_VERSION} -vvv -m pip install -r requirements.frozen && \
+RUN python${PYTHON_VERSION} -m pip install -r requirements.frozen && \
     rm requirements.frozen
 
 ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 
 WORKDIR ${VTK_INSTALL_PATH}
-RUN which python${PYTHON_VERSION} && python${PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
+RUN python${PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
 
 WORKDIR /tests
 RUN python3 -m pip install pytest
