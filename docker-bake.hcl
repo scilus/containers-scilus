@@ -67,10 +67,6 @@ variable "blas-num-threads" {
     default = "1"
 }
 
-variable "scilpy-requirements" {
-    default = "requirements.1.3.0.frozen"
-}
-
 variable "scilpy-test-base" {
     default = "scilpy"
 }
@@ -248,7 +244,6 @@ target "scilus" {
         scilus-base = "target:scilus-scilpy"
     }
     args = {
-        FROZEN_REQUIREMENTS = "${scilpy-requirements}"
         ITK_NUM_THREADS = "${itk-num-threads}"
         SCILPY_VERSION = "${scilpy-version}"
     }

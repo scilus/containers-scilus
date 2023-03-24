@@ -34,7 +34,6 @@ RUN python fslinstaller.py \
            ${FSL_INSTALL_PATH}/doc \
            ${FSL_INSTALL_PATH}/docs \
            ${FSL_INSTALL_PATH}/envs \
-           ${FSL_INSTALL_PATH}/etc \
            ${FSL_INSTALL_PATH}/fonts \
            ${FSL_INSTALL_PATH}/include \
            ${FSL_INSTALL_PATH}/man \

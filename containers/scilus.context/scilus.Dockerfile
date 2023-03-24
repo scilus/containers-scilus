@@ -4,7 +4,6 @@ FROM scilus-base as scilus
 
 LABEL maintainer=SCIL
 
-ARG FROZEN_REQUIREMENTS
 ARG ITK_NUM_THREADS
 ARG SCILPY_VERSION
 
@@ -13,8 +12,6 @@ ENV OPENBLAS_NUM_THREADS=${OPENBLAS_NUM_THREADS:-1}
 ENV SCILPY_VERSION=${SCILPY_VERSION:-master}
 ENV PYTHON_VERSION=${PYTHON_VERSION:-3.10}
 ENV VTK_VERSION=${VTK_VERSION:-9.2.6}
-
-ENV FROZEN_REQUIREMENTS=${FROZEN_REQUIREMENTS:-requirements.${SCILPY_VERSION}.frozen}
 
 ENV LC_ALL=C
 
@@ -26,7 +23,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     && rm -rf /var/lib/apt/lists/*
 
 ADD human-data_master_1d3abfb.tar.bz2 /human-data
-ADD ${FROZEN_REQUIREMENTS} /tmp/requirements.frozen
+ADD https://github.com/scilus/scilpy/releases/download/${SCILPY_VERSION}/requirements.${SCILPY_VERSION}.frozen /tmp/requirements.frozen
 
 WORKDIR /tmp
 RUN python${PYTHON_VERSION} -m pip install -r requirements.frozen && \
