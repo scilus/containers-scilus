@@ -9,11 +9,11 @@ variable "base-scilus-image" {
 }
 
 variable "base-build-image" {
-    default = "ubuntu:18.04"
+    default = "ubuntu:22.04"
 }
 
 variable "base-python-image" {
-    default = "python:3.7.15-buster"
+    default = "python:3.10-bullseye"
 }
 
 variable "ants-version" {
@@ -28,7 +28,7 @@ variable "dmriqcpy-version" {
 }
 
 variable "fsl-version" {
-    default = "6.0.5.2"
+    default = "6.0.6.4"
 }
 
 variable "mrtrix-version" {
@@ -48,7 +48,7 @@ variable "vtk-version" {
 }
 
 variable "python-version" {
-    default = "3.7"
+    default = "3.10"
 }
 
 variable "nextflow-version" {
@@ -65,10 +65,6 @@ variable "itk-num-threads" {
 
 variable "blas-num-threads" {
     default = "1"
-}
-
-variable "scilpy-requirements" {
-    default = "requirements.1.3.0.frozen"
 }
 
 variable "scilpy-test-base" {
@@ -128,7 +124,7 @@ variable "bst-flow-version" {
 # ==============================================================================
 
 group "scilus-flows" {
-    targets = ["scilus-flows", "scilus-test", "scilpy-test"]
+    targets = ["scilus-flows"]
 }
 
 group "scilus" {
@@ -152,43 +148,43 @@ group "dmriqcpy" {
 # ==============================================================================
 
 target "dmriqcpy-test" {
-    context = "./containers/dmriqcpy.context"
     dockerfile = "dmriqcpy.Dockerfile"
+    context = "./containers/dmriqcpy.context"
+    target = "dmriqcpy-test"
     contexts = {
         dmriqcpy = "target:${dmriqcpy-test-base}"
     }
-    target = "dmriqcpy-test"
     output = ["type=cacheonly"]
 }
 
 target "scilpy-test" {
-    context = "./containers/scilpy.context"
     dockerfile = "scilpy.Dockerfile"
+    context = "./containers/scilpy.context"
+    target = "scilpy-test"
     contexts = {
         scilpy = "target:${scilpy-test-base}"
     }
-    target = "scilpy-test"
     output = ["type=cacheonly"]
 }
 
 target "scilus-test" {
-    context = "./containers/scilus.context"
     dockerfile = "scilus.Dockerfile"
+    context = "./containers/scilus.context"
+    target = "scilus-test"
     contexts = {
         scilus = "target:scilus"
     }
-    target = "scilus-test"
     output = ["type=cacheonly"]
 }
 
 target "vtk-test" {
-    context = "./containers/vtk-omesa.context"
     dockerfile = "vtk-omesa.Dockerfile"
+    context = "./containers/vtk-omesa.context"
+    target = "vtk-test"
     contexts = {
         vtk-builder = "target:cmake"
         vtk-install = "target:${vtk-test-base}"
     }
-    target = "vtk-test"
     output = ["type=cacheonly"]
 }
 
@@ -198,7 +194,7 @@ target "vtk-test" {
 
 target "scilus-flows" {
     dockerfile = "scilus-flows.Dockerfile"
-    context = "./containers/scilus-flows.context"
+    context = "./containers"
     target = "scilus-flows"
     contexts = {
         flow-base = "target:scilus-nextflow"
@@ -218,7 +214,6 @@ target "scilus-flows" {
     tags = ["scilus-flows:local"]
     cache-from = ["type=registry,ref=scilus/build-cache:scilus-flows"]
     output = ["type=docker"]
-    pull = true
 }
 
 target "scilus-nextflow" {
@@ -239,7 +234,6 @@ target "scilpy" {
     tags = ["scilpy:local"]
     cache-from = ["type=registry,ref=scilus/build-cache:scilpy"]
     output = ["type=docker"]
-    pull = true
 }
 
 target "scilus" {
@@ -250,14 +244,12 @@ target "scilus" {
         scilus-base = "target:scilus-scilpy"
     }
     args = {
-        FROZEN_REQUIREMENTS = "${scilpy-requirements}"
         ITK_NUM_THREADS = "${itk-num-threads}"
         SCILPY_VERSION = "${scilpy-version}"
     }
     tags = ["scilus:local"]
     cache-from = ["type=registry,ref=scilus/build-cache:scilus"]
     output = ["type=docker"]
-    pull = true
 }
 
 target "scilus-base" {
@@ -274,7 +266,6 @@ target "dmriqcpy" {
     tags = ["dmriqcpy:local"]
     cache-from = ["type=registry,ref=scilus/build-cache:dmriqcpy"]
     output = ["type=docker"]
-    pull = true
 }
 
 # ==============================================================================
@@ -299,6 +290,10 @@ target "scilus-vtk" {
     dockerfile = "vtk-omesa.Dockerfile"
     context = "./containers/vtk-omesa.context/"
     target = "vtk-install"
+    contexts = {
+        vtk-base = "target:scilus-python"
+        vtk-builder = "target:cmake"
+    }
     args = {
         MESA_BUILD_NTHREADS = "6"
         MESA_VERSION = "${mesa-version}"
@@ -306,12 +301,8 @@ target "scilus-vtk" {
         VTK_PYTHON_VERSION = "${python-version}"
         VTK_VERSION = "${vtk-version}"
     }
-    output = ["type=cacheonly"]
-    contexts = {
-        vtk-base = "target:scilus-python"
-        vtk-builder = "target:cmake"
-    }
     cache-from = ["type=registry,ref=scilus/build-cache:scilus-vtk"]
+    output = ["type=cacheonly"]
 }
 
 # ==============================================================================
@@ -373,7 +364,7 @@ target "dmriqcpy-base" {
 
 target "fsl" {
     dockerfile = "fsl.Dockerfile"
-    context = "./containers"
+    context = "./containers/fsl.context"
     target = "fsl-install"
     contexts = {
         fsl-base = "target:mrtrix"
@@ -382,8 +373,9 @@ target "fsl" {
     args = {
         FSL_VERSION = "${fsl-version}"
     }
+    tags = ["fsl-lean:local"]
     cache-from = ["type=registry,ref=scilus/build-cache:fsl"]
-    output = ["type=cacheonly"]
+    output = ["type=docker"]
 }
 
 target "mrtrix" {
