@@ -20,10 +20,14 @@ ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get install -y \
+        clinfo \
         git \
         libblas-dev \
         libfreetype6-dev \
         liblapack-dev \
+        ocl-icd-libopencl1 \
+        opencl-headers \
+        python3-pyopencl \
         wget \
         unzip && \
     rm -rf /var/lib/apt/lists/*
@@ -37,6 +41,7 @@ RUN unzip scilpy.zip && \
 
 WORKDIR /scilpy
 RUN SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install -e . && \
+    python${PYTHON_VERSION} -m pip install pyopencl && \
     python${PYTHON_VERSION} -m pip cache purge
 
 RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/${PYTHON_PACKAGE_DIR}/matplotlib/mpl-data/matplotlibrc && \
