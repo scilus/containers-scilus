@@ -23,7 +23,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     && rm -rf /var/lib/apt/lists/*
 
 ADD human-data_master_1d3abfb.tar.bz2 /human-data
-ADD https://github.com/scilus/scilpy/releases/download/${SCILPY_VERSION}/requirements.${SCILPY_VERSION}.frozen /tmp/requirements.frozen
+ADD https://github.com/scilus/scilpy/releases/download/1.5.0/requirements.1.5.0.frozen /tmp/requirements.frozen
 
 WORKDIR /tmp
 RUN python${PYTHON_VERSION} -m pip install -r requirements.frozen && \
