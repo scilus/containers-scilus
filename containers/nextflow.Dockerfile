@@ -15,13 +15,24 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         wget && \
     rm -rf /var/lib/apt/lists/*
 
-ADD https://github.com/nextflow-io/nextflow/releases/download/v${NEXTFLOW_VERSION}/nextflow nextflow
+RUN mkdir /nextflow /.nextflow /work && \
+    chmod -R go+rwx /.nextflow /work
+
+ENV NXF_HOME=/nextflow/.nextflow
+
+ADD https://github.com/nextflow-io/nextflow/releases/download/v${NEXTFLOW_VERSION}/nextflow /nextflow/nextflow
+
+WORKDIR /nextflow
 RUN bash nextflow && \
-    chmod +x nextflow && \
+    chmod go+rx nextflow && \
+    chmod -R go+rwx .nextflow && \
     mv nextflow /usr/bin/nextflow && \
-    apt-get -y remove \
-        wget && \
     apt-get -y autoremove
+
+ENV NXF_OFFLINE=true
+
+VOLUME $NXF_HOME
+VOLUME /.nextflow
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \

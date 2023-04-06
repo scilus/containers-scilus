@@ -104,16 +104,16 @@ RUN echo "#!/bin/bash\nnextflow run /scilus_flows/tractoflow/main.nf \$@" >> tra
     echo "#!/bin/bash\nnextflow run /scilus_flows/freewater_flow/main.nf \$@" >> freewater-flow && \
     echo "#!/bin/bash\nnextflow run /scilus_flows/noddi_flow/main.nf \$@" >> noddi-flow && \
     echo "#!/bin/bash\nnextflow run /scilus_flows/bst_flow/main.nf \$@" >> bst-flow && \
-    chmod +x tractoflow \
-             dmriqc-flow \
-             extractor-flow \
-             rbx-flow \
-             tractometry-flow \
-             register-flow \
-             disconets-flow \
-             freewater-flow \
-             noddi-flow \
-             bst-flow
+    chmod go+rx tractoflow \
+                dmriqc-flow \
+                extractor-flow \
+                rbx-flow \
+                tractometry-flow \
+                register-flow \
+                disconets-flow \
+                freewater-flow \
+                noddi-flow \
+                bst-flow
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
