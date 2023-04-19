@@ -115,6 +115,8 @@ RUN echo "#!/bin/bash\nnextflow run /scilus_flows/tractoflow/main.nf \$@" >> tra
                 noddi-flow \
                 bst-flow
 
+ENV NXF_OFFLINE=true
+
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Tractoflow => ${TRACTOFLOW_VERSION}\n" >> VERSION && \
