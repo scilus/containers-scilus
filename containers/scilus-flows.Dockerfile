@@ -27,6 +27,7 @@ ENV BSTFLOW_VERSION=${BSTFLOW_VERSION:-1.0.0-rc1}
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
+        rsync \
         unzip && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir scilus_flows
