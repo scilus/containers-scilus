@@ -333,16 +333,6 @@ target "scilus-python" {
     output = ["type=cacheonly"]
 }
 
-target "nvidia-base" {
-    dockerfile = "nvidia.Dockerfile"
-    context = "./containers"
-    contexts = {
-        nvidia-base = "docker-image://${base-scilus-image}"
-    }
-    cache-from = ["type=registry,ref=scilus/build-cache:scilus-nvidia"]
-    output = ["type=cacheonly"]
-}
-
 target "scilpy-base" {
     dockerfile = "scilpy.Dockerfile"
     context = "./containers/scilpy.context"
@@ -409,7 +399,7 @@ target "ants" {
     context = "./containers"
     target = "ants-install"
     contexts = {
-        ants-base = "target:nvidia-base"
+        ants-base = "docker-image://${base-scilus-image}"
         ants-builder = "target:cmake"
     }
     args = {
