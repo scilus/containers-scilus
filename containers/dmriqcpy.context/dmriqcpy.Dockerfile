@@ -28,8 +28,8 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         locales && \
     rm -rf /var/lib/apt/lists/*
 
-RUN locale-gen "en_US.UTF-8" && \
-    dpkg-reconfigure locales
+RUN locale-gen en_US.UTF-8 && \
+    update-locale LANG=en_US.UTF-8
 
 RUN python${PYTHON_VERSION} -m pip install \
         git+https://github.com/scilus/dmriqcpy.git@${DMRIQCPY_VERSION} && \

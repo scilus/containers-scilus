@@ -35,7 +35,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen "en_US.UTF-8" && \
-    dpkg-reconfigure locales
+    update-locale LANG=en_US.UTF-8
 
 WORKDIR /
 ADD https://github.com/scilus/scilpy/archive/${SCILPY_VERSION}.zip scilpy.zip

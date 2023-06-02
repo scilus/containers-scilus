@@ -30,8 +30,8 @@ RUN wget https://github.com/scilus/scilpy/releases/download/${SCILPY_VERSION}/re
     exit 0
 RUN if [ -f requirements.${SCILPY_VERSION}.frozen ]; \
     then \
-        python${PYTHON_VERSION} -m pip install -r requirements.frozen && \
-        rm requirements.frozen; \
+        python${PYTHON_VERSION} -m pip install -r requirements.${SCILPY_VERSION}.frozen && \
+        rm requirements.${SCILPY_VERSION}.frozen; \
     fi
 
 ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
