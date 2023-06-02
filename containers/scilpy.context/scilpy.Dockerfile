@@ -17,6 +17,11 @@ ENV OPENBLAS_NUM_THREADS=${BLAS_NUM_THREADS:-1}
 ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 
+ENV LC_CTYPE="en_US.UTF-8"
+ENV LC_ALL="en_US.UTF-8"
+ENV LANG="en_US.UTF-8"
+ENV LANGUAGE="en_US.UTF-8"
+
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get install -y \
@@ -24,9 +29,13 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         libblas-dev \
         libfreetype6-dev \
         liblapack-dev \
+        locales \
         wget \
         unzip && \
     rm -rf /var/lib/apt/lists/*
+
+RUN locale-gen "en_US.UTF-8" && \
+    dpkg-reconfigure locales
 
 WORKDIR /
 ADD https://github.com/scilus/scilpy/archive/${SCILPY_VERSION}.zip scilpy.zip

@@ -20,6 +20,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     python${PYTHON_VERSION} -m pip install pip && \
     pip${PYTHON_MOD} install --upgrade pip && \
     pip${PYTHON_MOD} install -U setuptools && \
+    pip${PYTHON_MOD} install Cython && \
     DEBIAN_FRONTEND=noninteractive apt-get -y install \
         python${PYTHON_MOD}-lxml \
         python${PYTHON_MOD}-six \

@@ -13,21 +13,26 @@ ENV SCILPY_VERSION=${SCILPY_VERSION:-master}
 ENV PYTHON_VERSION=${PYTHON_VERSION:-3.10}
 ENV VTK_VERSION=${VTK_VERSION:-9.2.6}
 
-ENV LC_ALL=C
+ENV NVIDIA_DISABLE_REQUIRE=1
 
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
         bc \
         git \
         nvidia-cuda-toolkit \
+        wget \
     && rm -rf /var/lib/apt/lists/*
 
 ADD human-data_master_1d3abfb.tar.bz2 /human-data
-ADD https://github.com/scilus/scilpy/releases/download/${SCILPY_VERSION}/requirements.${SCILPY_VERSION}.frozen /tmp/requirements.frozen
 
 WORKDIR /tmp
-RUN python${PYTHON_VERSION} -m pip install -r requirements.frozen && \
-    rm requirements.frozen
+RUN wget https://github.com/scilus/scilpy/releases/download/${SCILPY_VERSION}/requirements.${SCILPY_VERSION}.frozen; \
+    exit 0
+RUN if [ -f requirements.${SCILPY_VERSION}.frozen ]; \
+    then \
+        python${PYTHON_VERSION} -m pip install -r requirements.frozen && \
+        rm requirements.frozen; \
+    fi
 
 ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 

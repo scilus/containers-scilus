@@ -15,12 +15,21 @@ ENV PYTHON_VERSION=${PYTHON_VERSION:-3.10}
 ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 
+ENV LC_CTYPE="en_US.UTF-8"
+ENV LC_ALL="en_US.UTF-8"
+ENV LANG="en_US.UTF-8"
+ENV LANGUAGE="en_US.UTF-8"
+
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
         fonts-freefont-ttf \
-        git && \
+        git \
+        locales && \
     rm -rf /var/lib/apt/lists/*
+
+RUN locale-gen "en_US.UTF-8" && \
+    dpkg-reconfigure locales
 
 RUN python${PYTHON_VERSION} -m pip install \
         git+https://github.com/scilus/dmriqcpy.git@${DMRIQCPY_VERSION} && \
