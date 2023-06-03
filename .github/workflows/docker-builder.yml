@@ -137,7 +137,7 @@ jobs:
         name: Checkout build system
         uses: actions/checkout@v2
         with:
-          repository: scilus/containers-scilus
+          repository: ${{ github.repository_owner }}/containers-scilus
           ref: ${{ inputs.build-system-ref }}
       -
         name: Resolve versioning from workflow inputs
