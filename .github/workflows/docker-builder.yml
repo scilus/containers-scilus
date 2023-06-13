@@ -183,20 +183,20 @@ jobs:
         id: dockerhub-cache-from
         run: |
           cat <<EOT >> cache-from-bindings.hcl
-          target "scilus"          { cache-from = ["type=registry,ref=scilus/build-cache:scilus","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus"]                   }
-          target "scilus-base"     { cache-from = ["type=registry,ref=scilus/build-cache:scilus-base","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-base"]         }
-          target "scilpy"          { cache-from = ["type=registry,ref=scilus/build-cache:scilpy","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilpy"]                   }
-          target "dmriqcpy"        { cache-from = ["type=registry,ref=scilus/build-cache:dmriqcpy","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:dmriqcpy"]               }
-          target "vtk"             { cache-from = ["type=registry,ref=scilus/build-cache:vtk","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:vtk"]                         }
-          target "scilus-python"   { cache-from = ["type=registry,ref=scilus/build-cache:scilus-python","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-python"]     }
-          target "scilus-scilpy"   { cache-from = ["type=registry,ref=scilus/build-cache:scilus-scilpy","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-scilpy"]     }
-          target "scilus-nextflow" { cache-from = ["type=registry,ref=scilus/build-cache:scilus-nextflow","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-nextflow"] }
-          target "scilus-vtk"      { cache-from = ["type=registry,ref=scilus/build-cache:scilus-vtk","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-vtk"]           }
-          target "scilus-flows"    { cache-from = ["type=registry,ref=scilus/build-cache:scilus-flows","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-flows"]       }
-          target "cmake"           { cache-from = ["type=registry,ref=scilus/build-cache:cmake","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:cmake"]                     }
-          target "mrtrix"          { cache-from = ["type=registry,ref=scilus/build-cache:mrtrix","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:mrtrix"]                   }
-          target "fsl"             { cache-from = ["type=registry,ref=scilus/build-cache:fsl","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:fsl"]                         }
-          target "ants"            { cache-from = ["type=registry,ref=scilus/build-cache:ants","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:ants"]                       }
+          target "scilus"          { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus","type=registry,ref=scilus/build-cache:scilus"]                   }
+          target "scilus-base"     { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-base","type=registry,ref=scilus/build-cache:scilus-base"]         }
+          target "scilpy"          { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilpy","type=registry,ref=scilus/build-cache:scilpy"]                   }
+          target "dmriqcpy"        { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:dmriqcpy","type=registry,ref=scilus/build-cache:dmriqcpy"]               }
+          target "vtk"             { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:vtk","type=registry,ref=scilus/build-cache:vtk"]                         }
+          target "scilus-python"   { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-python","type=registry,ref=scilus/build-cache:scilus-python"]     }
+          target "scilus-scilpy"   { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-scilpy","type=registry,ref=scilus/build-cache:scilus-scilpy"]     }
+          target "scilus-nextflow" { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-nextflow","type=registry,ref=scilus/build-cache:scilus-nextflow"] }
+          target "scilus-vtk"      { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-vtk","type=registry,ref=scilus/build-cache:scilus-vtk"]           }
+          target "scilus-flows"    { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-flows","type=registry,ref=scilus/build-cache:scilus-flows"]       }
+          target "cmake"           { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:cmake","type=registry,ref=scilus/build-cache:cmake"]                     }
+          target "mrtrix"          { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:mrtrix","type=registry,ref=scilus/build-cache:mrtrix"]                   }
+          target "fsl"             { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:fsl","type=registry,ref=scilus/build-cache:fsl"]                         }
+          target "ants"            { cache-from = ["type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:ants","type=registry,ref=scilus/build-cache:ants"]                       }
           EOT
           echo "bake-file=$PWD/cache-from-bindings.hcl" >> $GITHUB_OUTPUT
       -
