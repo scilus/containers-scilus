@@ -375,7 +375,6 @@ target "fsl" {
     args = {
         FSL_VERSION = "${fsl-version}"
     }
-    tags = ["fsl-lean:local"]
     cache-from = ["type=registry,ref=scilus/build-cache:fsl"]
     output = ["type=docker"]
 }
