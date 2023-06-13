@@ -162,10 +162,10 @@ jobs:
           [ -z "${{ inputs.bst-flow-version }}" ]          || echo "bst-flow-version=\"${{ inputs.bst-flow-version }}\""                   >> local-versioning.hcl
           echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
       -
-        name: Bind dockerhub image cache
-        id: dockerhub-cache
+        name: Bind dockerhub image cache push
+        id: dockerhub-cache-to
         run: |
-          cat <<EOT >> cache-bindings.hcl
+          cat <<EOT >> cache-to-bindings.hcl
           target "scilus"          { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus"]          }
           target "scilus-base"     { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-base"]     }
           target "scilpy"          { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilpy"]          }
@@ -177,7 +177,28 @@ jobs:
           target "scilus-vtk"      { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-vtk"]      }
           target "scilus-flows"    { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-flows"]    }
           EOT
-          echo "bake-file=$PWD/cache-bindings.hcl" >> $GITHUB_OUTPUT
+          echo "bake-file=$PWD/cache-to-bindings.hcl" >> $GITHUB_OUTPUT
+      -
+        name: Bind dockerhub image cache pull
+        id: dockerhub-cache-from
+        run: |
+          cat <<EOT >> cache-from-bindings.hcl
+          target "scilus"          { cache-from = ["type=registry,ref=scilus/build-cache:scilus","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus"]                   }
+          target "scilus-base"     { cache-from = ["type=registry,ref=scilus/build-cache:scilus-base","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-base"]         }
+          target "scilpy"          { cache-from = ["type=registry,ref=scilus/build-cache:scilpy","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilpy"]                   }
+          target "dmriqcpy"        { cache-from = ["type=registry,ref=scilus/build-cache:dmriqcpy","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:dmriqcpy"]               }
+          target "vtk"             { cache-from = ["type=registry,ref=scilus/build-cache:vtk","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:vtk"]                         }
+          target "scilus-python"   { cache-from = ["type=registry,ref=scilus/build-cache:scilus-python","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-python"]     }
+          target "scilus-scilpy"   { cache-from = ["type=registry,ref=scilus/build-cache:scilus-scilpy","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-scilpy"]     }
+          target "scilus-nextflow" { cache-from = ["type=registry,ref=scilus/build-cache:scilus-nextflow","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-nextflow"] }
+          target "scilus-vtk"      { cache-from = ["type=registry,ref=scilus/build-cache:scilus-vtk","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-vtk"]           }
+          target "scilus-flows"    { cache-from = ["type=registry,ref=scilus/build-cache:scilus-flows","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-flows"]       }
+          target "cmake"           { cache-from = ["type=registry,ref=scilus/build-cache:cmake","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:cmake"]                     }
+          target "mrtrix"          { cache-from = ["type=registry,ref=scilus/build-cache:mrtrix","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:mrtrix"]                   }
+          target "fsl"             { cache-from = ["type=registry,ref=scilus/build-cache:fsl","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:fsl"]                         }
+          target "ants"            { cache-from = ["type=registry,ref=scilus/build-cache:ants","type=registry,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:ants"]                       }
+          EOT
+          echo "bake-file=$PWD/cache-from-bindings.hcl" >> $GITHUB_OUTPUT
       -
         name: Set output image tags and registry to publish to
         id: dockerhub-tags
@@ -198,7 +219,8 @@ jobs:
         with:
           name: HCL artifacts
           path: |
-            ${{ steps.dockerhub-cache.outputs.bake-file }}
+            ${{ steps.dockerhub-cache-from.outputs.bake-file }}
+            ${{ steps.dockerhub-cache-to.outputs.bake-file }}
             ${{ steps.local-versioning.outputs.bake-file }}
             ${{ steps.dockerhub-tags.outputs.tags-file }}
             ${{ steps.dockerhub-tags.outputs.git-output }}
@@ -223,7 +245,8 @@ jobs:
           targets: |
             ${{ inputs.target }}
           files: |
-            ${{ steps.dockerhub-cache.outputs.bake-file }}
+            ${{ steps.dockerhub-cache-from.outputs.bake-file }}
+            ${{ steps.dockerhub-cache-to.outputs.bake-file }}
             ${{ steps.local-versioning.outputs.bake-file }}
             ./versioning/${{ inputs.target }}-versioning.hcl
             ./docker-bake.hcl
