@@ -118,8 +118,8 @@ RUN if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && 
         -DVTK_OPENGL_HAS_EGL:BOOL=OFF \
         -DVTK_OPENGL_HAS_OSMESA:BOOL=ON \
         -DVTK_OPENGL_USE_GLES:BOOL=OFF \
-        -DVTK_REPORT_OPENGL_ERRORS:BOOL=ON \
-        -DVTK_REPORT_OPENGL_ERRORS_IN_RELEASE_BUILDS:BOOL=ON \
+        -DVTK_REPORT_OPENGL_ERRORS:BOOL=OFF \
+        -DVTK_REPORT_OPENGL_ERRORS_IN_RELEASE_BUILDS:BOOL=OFF \
         -DVTK_SMP_ENABLE_OPENMP:BOOL=ON \
         -DVTK_SMP_IMPLEMENTATION_TYPE:STRING=OpenMP \
         -DVTK_USE_SDL2:BOOL=OFF \
@@ -144,7 +144,6 @@ RUN if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && 
 
 ENV VTK_DIR=${VTK_INSTALL_PATH}
 ENV VTKPYTHONPATH=${VTK_DIR}/lib/python${VTK_PYTHON_VERSION}/site-packages:${VTK_DIR}/lib
-
 ENV LD_LIBRARY_PATH=${VTK_DIR}/lib:$LD_LIBRARY_PATH
 ENV PYTHONPATH=${PYTHONPATH}:${VTKPYTHONPATH}
 
@@ -173,13 +172,19 @@ RUN mkdir -p ${MESA_INSTALL_PATH}
 COPY --from=vtk --link ${MESA_INSTALL_PATH} ${MESA_INSTALL_PATH}
 COPY --from=vtk --link ${VTK_INSTALL_PATH} ${VTK_INSTALL_PATH}
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
         llvm-14-runtime \
-        libomp-dev && \
+        libopenmpi-dev \
+        python${PYTHON_MAJOR}-mako \
+        python${PYTHON_MAJOR}-pip \
+        python${PYTHON_MAJOR}-setuptools \
+        python${VTK_PYTHON_VERSION} \
+        python${VTK_PYTHON_VERSION}-dev && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${VTK_INSTALL_PATH}
-RUN which python${VTK_PYTHON_VERSION} && python${VTK_PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
+RUN python${VTK_PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \

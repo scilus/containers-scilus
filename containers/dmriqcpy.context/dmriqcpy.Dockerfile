@@ -8,6 +8,7 @@ ARG DMRIQCPY_VERSION
 ARG PYTHON_VERSION
 ARG VTK_INSTALL_PATH
 ARG VTK_VERSION
+ARG PYTHON_PACKAGE_DIR
 
 ENV DMRIQCPY_VERSION=${DMRIQCPY_VERSION:-0.1.6}
 ENV PYTHON_PACKAGE_DIR=${PYTHON_PACKAGE_DIR:-site-packages}
@@ -25,7 +26,9 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
         fonts-freefont-ttf \
         git \
-        locales && \
+        locales \
+        python3.10 \
+        python3-dev && \
     rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8 && \

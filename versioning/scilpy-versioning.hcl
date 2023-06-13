@@ -1,6 +1,7 @@
 # scilpy-versioning.hcl
 
-base-python-image="python:3.10-bullseye"
+base-build-image="ubuntu:jammy-20230301"
+base-python-image="ubuntu:jammy-20230301"
 
 scilpy-version="1.5.0-rc3"
 python-version="3.10"

@@ -344,6 +344,7 @@ target "scilpy-base" {
         SCILPY_VERSION = "${scilpy-version}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
         VTK_VERSION = "${vtk-version}"
+        PYTHON_PACKAGE_DIR = "dist-packages"
     }
     output = ["type=cacheonly"]
 }
@@ -358,6 +359,7 @@ target "dmriqcpy-base" {
         DMRIQCPY_VERSION = "${dmriqcpy-version}"
         PYTHON_VERSION = "${python-version}"
         VTK_VERSION = "${vtk-version}"
+        PYTHON_PACKAGE_DIR = "dist-packages"
     }
     output = ["type=cacheonly"]
 }

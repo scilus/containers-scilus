@@ -15,15 +15,19 @@ ENV VTK_VERSION=${VTK_VERSION:-9.2.6}
 
 ENV NVIDIA_DISABLE_REQUIRE=1
 
+ADD human-data_master_1d3abfb.tar.bz2 /human-data
+
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
         bc \
         git \
+        locales \
         nvidia-cuda-toolkit \
         wget \
     && rm -rf /var/lib/apt/lists/*
 
-ADD human-data_master_1d3abfb.tar.bz2 /human-data
+RUN locale-gen "en_US.UTF-8" && \
+    update-locale LANG=en_US.UTF-8
 
 WORKDIR /tmp
 RUN wget https://github.com/scilus/scilpy/releases/download/${SCILPY_VERSION}/requirements.${SCILPY_VERSION}.frozen; \
