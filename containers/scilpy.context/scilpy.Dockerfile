@@ -65,7 +65,7 @@ RUN ( [ -f "VERSION" ] || touch VERSION ) && \
 
 
 FROM scilpy as scilpy-test
-ADD tests/ /tests/
+COPY --link tests/ /tests/
 
 WORKDIR /tests
 RUN python3 -m pytest
