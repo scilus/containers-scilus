@@ -135,23 +135,10 @@ jobs:
           fi
       -
         name: Checkout build system
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{ github.repository_owner }}/containers-scilus
           ref: ${{ inputs.build-system-ref }}
-      -
-        name: Archive repository
-        id: debug-archive
-        run: |
-          tar -czf ../repo.tar.gz ../containers-scilus
-          echo "archive=$PWD/../repo.tar.gz" >> $GITHUB_OUTPUT
-      -
-        name: Upload repo for debug
-        uses: actions/upload-artifact@v3.1.1
-        with:
-          name: Repository
-          path: |
-            ${{ steps.debug-archive.outputs.archive }}
       -
         name: Resolve versioning from workflow inputs
         id: local-versioning
