@@ -193,7 +193,7 @@ RUN ( [ -f "VERSION" ] || touch VERSION ) && \
 
 
 FROM vtk-install as vtk-test
-ADD tests/ /tests/
+COPY --link tests/ /tests/
 
 WORKDIR /tests
 RUN python3 -m pip install pytest

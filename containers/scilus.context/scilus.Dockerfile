@@ -53,7 +53,7 @@ RUN apt-get -y remove \
     apt-get -y autoremove
 
 FROM scilus as scilus-test
-ADD tests/ /tests/
+COPY --link tests/ /tests/
 
 WORKDIR /tests
 RUN python3 -m pip install pytest

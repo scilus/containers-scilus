@@ -19,8 +19,8 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
 
 RUN mkdir -p ${FSL_INSTALL_PATH}
 
-ADD fslinstaller.py /fslinstaller.py
-ADD fsl_conda_env.yml /fsl_conda_env.yml
+COPY --link fslinstaller.py /fslinstaller.py
+COPY --link fsl_conda_env.yml /fsl_conda_env.yml
 
 RUN python fslinstaller.py \
         -d ${FSL_INSTALL_PATH} \
