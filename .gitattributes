@@ -2,9 +2,9 @@
 * text=auto
 
 # Freeze files in build contexts to have LF EOL strictly
-containers/**/*.py text eol=lf
-containers/fsl.context/fsl_conda_env.yml text eol=lf
-containers/fsl.context/fslinstaller.py text eol=lf
+*.py text eol=lf
+fsl_conda_env.yml text eol=lf
+fslinstaller.py text eol=lf
 
 # Freeze binary files to be untouched
 *.tar.bz2 binary
