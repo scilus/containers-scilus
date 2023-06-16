@@ -10,6 +10,6 @@ COPY --chmod=666 fsl_conda_env.yml .
 
 RUN ls -lha
 
-ADD --chmod=755 https://github.com/MShekow/directory-checksum/releases/download/v1.4.1/directory-checksum_1.4.1_linux_amd64 /usr/local/bin/directory-checksum
+ADD --link --chmod=755 https://github.com/MShekow/directory-checksum/releases/download/v1.4.1/directory-checksum_1.4.1_linux_amd64 /usr/local/bin/directory-checksum
 
 RUN directory-checksum --max-depth=4 .
