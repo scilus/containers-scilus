@@ -143,6 +143,10 @@ group "dmriqcpy" {
     targets = ["dmriqcpy", "dmriqcpy-test", "vtk-test"]
 }
 
+group "debug" {
+    targets = ["debug"]
+}
+
 # ==============================================================================
 # TEST TARGETS
 # ==============================================================================
@@ -257,8 +261,8 @@ target "scilus-base" {
     contexts = {
         dmriqcpy-base = "target:scilus-vtk"
     }
-    tags = ["scilus-base:local"]
     cache-from = ["type=registry,ref=scilus/build-cache:scilus-base"]
+    output = ["type=cacheonly"]
 }
 
 target "dmriqcpy" {
@@ -284,6 +288,7 @@ target "scilus-scilpy" {
         PYTHON_PACKAGE_DIR = "dist-packages"
     }
     cache-from = ["type=registry,ref=scilus/build-cache:scilus-scilpy"]
+    output = ["type=cacheonly"]
 }
 
 target "scilus-vtk" {
@@ -443,4 +448,16 @@ target "cmake" {
     }
     cache-from = ["type=registry,ref=scilus/build-cache:cmake"]
     output = ["type=cacheonly"]
+}
+
+target "debug" {
+    dockerfile = "debug.Dockerfile"
+    context = "./containers/fsl.context"
+    target = "debug"
+    contexts = {
+        base-image = "docker-image://${base-build-image}"
+    }
+    cache-from = ["type=registry,ref=avcaron/build-cache:debug"]
+    tags = ["debug:local"]
+    output = ["type=docker"]
 }

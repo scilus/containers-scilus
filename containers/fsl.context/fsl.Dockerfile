@@ -17,8 +17,6 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         git \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p ${FSL_INSTALL_PATH}
-
 COPY --link fslinstaller.py /fslinstaller.py
 COPY --link fsl_conda_env.yml /fsl_conda_env.yml
 
@@ -70,8 +68,8 @@ COPY --from=fsl --link ${FSL_INSTALL_PATH} ${FSL_INSTALL_PATH}
 
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
-    dc \
-    libopenmpi-dev \
+        dc \
+        libopenmpi-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \

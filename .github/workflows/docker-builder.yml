@@ -11,7 +11,8 @@ on:
         - scilus
         - scilpy
         - dmriqcpy
-        - scilus-flows 
+        - scilus-flows
+        - debug
       tag:
         description: tag to create for the image built
         required: true
