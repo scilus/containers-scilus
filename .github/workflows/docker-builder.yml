@@ -245,11 +245,11 @@ jobs:
           targets: |
             ${{ inputs.target }}
           files: |
-            ${{ steps.dockerhub-cache-from.outputs.bake-file }}
             ${{ steps.dockerhub-cache-to.outputs.bake-file }}
             ${{ steps.local-versioning.outputs.bake-file }}
             ./versioning/${{ inputs.target }}-versioning.hcl
             ./docker-bake.hcl
+            ${{ steps.dockerhub-cache-from.outputs.bake-file }}
           set: ${{ steps.dockerhub-tags.outputs.tags-string }}
           push: true
       -
