@@ -376,7 +376,7 @@ target "fsl" {
         FSL_VERSION = "${fsl-version}"
     }
     cache-from = ["type=registry,ref=scilus/build-cache:fsl"]
-    output = ["type=docker"]
+    output = ["type=cacheonly"]
 }
 
 target "mrtrix" {
