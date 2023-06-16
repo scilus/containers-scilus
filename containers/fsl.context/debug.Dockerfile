@@ -3,8 +3,8 @@
 FROM base-image as debug
 
 WORKDIR /
-COPY --link fslinstaller.py /fslinstaller.py
-COPY --link fsl_conda_env.yml /fsl_conda_env.yml
+COPY --chmod=755 --link fslinstaller.py /fslinstaller.py
+COPY --chmod=666 --link fsl_conda_env.yml /fsl_conda_env.yml
 
 WORKDIR /
-RUN ls -lha && cd kaka
+RUN ls -lha
