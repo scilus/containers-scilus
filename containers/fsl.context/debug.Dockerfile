@@ -7,7 +7,6 @@ RUN mkdir -p /fsl_build
 
 WORKDIR /fsl_build
 COPY --chmod=755 fslinstaller.py .
-COPY --chmod=666 fsl_conda_env.yml .
 
 RUN ls -lha
 
