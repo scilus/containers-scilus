@@ -3,8 +3,8 @@
 FROM base-image as debug
 
 WORKDIR /
-COPY --link fslinstaller.py /fslinstaller.py
-COPY --link fsl_conda_env.yml /fsl_conda_env.yml
+COPY --chmod=0:0 --link fslinstaller.py /fslinstaller.py
+COPY --chmod=0:0 --link fsl_conda_env.yml /fsl_conda_env.yml
 
 WORKDIR /
 RUN cat fslinstaller.py && cat fsl_conda_env.yml
