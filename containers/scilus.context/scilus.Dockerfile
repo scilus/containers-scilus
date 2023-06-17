@@ -1,5 +1,9 @@
 # syntax=docker.io/docker/dockerfile:1.5.0
 
+FROM alpine as scilus-staging
+
+ADD --chmod=666 human-data_master_1d3abfb.tar.bz2 /human-data
+
 FROM scilus-base as scilus
 
 LABEL maintainer=SCIL
@@ -41,7 +45,7 @@ ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 WORKDIR ${VTK_INSTALL_PATH}
 RUN python${PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
 
-ADD --link human-data_master_1d3abfb.tar.bz2 /human-data
+COPY --from=scilus-staging --link /human-data /human-data
 
 RUN apt-get -y remove \
         git && \
