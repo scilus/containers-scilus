@@ -1,5 +1,10 @@
 # syntax=docker.io/docker/dockerfile:1.5.0
 
+FROM alpine as fsl-staging
+
+COPY --link --chmod=755 fslinstaller.py /fslinstaller.py
+COPY --link --chmod=666 fsl_conda_env.yml /fsl_conda_env.yml
+
 FROM fsl-builder as fsl
 
 ARG FSL_INSTALL_PATH
@@ -17,8 +22,8 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         git \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --link fslinstaller.py /fslinstaller.py
-COPY --link fsl_conda_env.yml /fsl_conda_env.yml
+COPY --from=fsl-staging --link --chmod=755 /fslinstaller.py /fslinstaller.py
+COPY --from=fsl-staging --link --chmod=666 /fsl_conda_env.yml /fsl_conda_env.yml
 
 RUN python fslinstaller.py \
         -d ${FSL_INSTALL_PATH} \

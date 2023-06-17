@@ -12,7 +12,6 @@ on:
         - scilpy
         - dmriqcpy
         - scilus-flows
-        - debug
       tag:
         description: tag to create for the image built
         required: true
