@@ -15,8 +15,6 @@ ENV VTK_VERSION=${VTK_VERSION:-9.2.6}
 
 ENV NVIDIA_DISABLE_REQUIRE=1
 
-ADD human-data_master_1d3abfb.tar.bz2 /human-data
-
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
         bc \
@@ -43,10 +41,7 @@ ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 WORKDIR ${VTK_INSTALL_PATH}
 RUN python${PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
 
-WORKDIR /tests
-RUN python3 -m pip install pytest
-RUN python3 -m pytest
-
+ADD --link human-data_master_1d3abfb.tar.bz2 /human-data
 
 RUN apt-get -y remove \
         git && \
