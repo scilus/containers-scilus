@@ -1,9 +1,5 @@
 # syntax=docker.io/docker/dockerfile:1.5.0
 
-FROM alpine as scilpy-staging
-
-COPY --link tests/ /tests/
-
 FROM scilpy-base as scilpy
 
 LABEL maintainer=SCIL
@@ -66,11 +62,3 @@ RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/${PYTH
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Scilpy => ${SCILPY_VERSION}\n" >> VERSION
-
-
-FROM scilpy as scilpy-test
-
-COPY --from=scilpy-staging --link /tests /tests
-
-WORKDIR /tests
-RUN python3 -m pytest

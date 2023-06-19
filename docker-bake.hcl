@@ -116,7 +116,7 @@ group "scilus-flows" {
 }
 
 group "scilus" {
-    targets = ["scilus"]
+    targets = ["scilus", "scilus-test"]
 }
 
 group "scilus-base" {
@@ -124,11 +124,56 @@ group "scilus-base" {
 }
 
 group "scilpy" {
-    targets = ["scilpy"]
+    targets = ["scilpy", "scilpy-test"]
 }
 
 group "dmriqcpy" {
-    targets = ["dmriqcpy"]
+    targets = ["dmriqcpy", "dmriqcpy-test"]
+}
+
+# ==============================================================================
+# TEST TARGETS
+# ==============================================================================
+
+target "scilus-test" {
+    name = "scilus-test-${tgt}"
+    inherits = ["pytest-base"]
+    matrix = {
+        tgt = ["scilus", "scilpy", "dmriqcpy", "vtk-omesa"]
+    }
+    context = "./containers/${tgt}.context"
+    contexts = {
+        test-base = "target:scilus"
+    }
+}
+
+target "scilpy-test" {
+    name = "scilpy-test-${tgt}"
+    inherits = ["pytest-base"]
+    matrix = {
+        tgt = ["scilpy", "vtk-omesa"]
+    }
+    context = "./containers/${tgt}.context"
+    contexts = {
+        test-base = "target:scilpy"
+    }
+}
+
+target "dmriqcpy-test" {
+    name = "dmriqcpy-test-${tgt}"
+    inherits = ["pytest-base"]
+    matrix = {
+        tgt = ["dmriqcpy", "vtk-omesa"]
+    }
+    context = "./containers/${tgt}.context"
+    contexts = {
+        test-base = "target:dmriqcpy"
+    }
+}
+
+target "pytest-base" {
+    dockerfile-inline = "FROM test-base\nCOPY /tests /tests\nWORKDIR /tests\nRUN python3 -m pip install pytest pytest_console_scripts && python3 -m pytest"
+    output = ["type=cacheonly"]
 }
 
 # ==============================================================================
@@ -191,7 +236,12 @@ target "scilus" {
         SCILPY_VERSION = "${scilpy-version}"
     }
     tags = ["scilus:local"]
-    cache-from = ["type=registry,ref=avcaron/build-cache:scilus"]
+    cache-from = [
+        "type=registry,ref=avcaron/build-cache:scilus",
+        "type=registry,ref=avcaron/scilus:latest",
+        "type=registry,ref=avcaron/scilus:dev",
+        "type=registry,ref=avcaron/scilus:git-build"
+    ]
     output = ["type=docker"]
 }
 
