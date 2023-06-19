@@ -45,11 +45,11 @@ ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 WORKDIR ${VTK_INSTALL_PATH}
 RUN python${PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
 
-COPY --from=scilus-staging --link /human-data /human-data
-
 RUN apt-get -y remove \
         git && \
     apt-get -y autoremove
+
+COPY --from=scilus-staging --link /human-data /human-data
 
 FROM scilus as scilus-test
 COPY --link tests/ /tests/
