@@ -1,5 +1,9 @@
 # syntax=docker.io/docker/dockerfile:1.5.0
 
+FROM alpine as vtk-staging
+
+COPY --link tests/ /tests/
+
 FROM vtk-builder as vtk
 
 ARG MESA_BUILD_NTHREADS
@@ -193,7 +197,8 @@ RUN ( [ -f "VERSION" ] || touch VERSION ) && \
 
 
 FROM vtk-install as vtk-test
-COPY --link tests/ /tests/
+
+COPY --from=vtk-staging --link /tests /tests
 
 WORKDIR /tests
 RUN python3 -m pip install pytest

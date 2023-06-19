@@ -1,5 +1,9 @@
 # syntax=docker.io/docker/dockerfile:1.5.0
 
+FROM alpine as dmriqcpy-staging
+
+COPY --link tests/ /tests/
+
 FROM dmriqcpy-base as dmriqcpy
 
 LABEL maintainer=SCIL
@@ -47,7 +51,8 @@ RUN ( [ -f "VERSION" ] || touch VERSION ) && \
 
 
 FROM dmriqcpy as dmriqcpy-test
-COPY --link tests/ /tests/
+
+COPY --from=dmriqcpy-staging --link /tests /tests
 
 WORKDIR /tests
 RUN python3 -m pip install dipy pytest pytest_console_scripts

@@ -1,5 +1,9 @@
 # syntax=docker.io/docker/dockerfile:1.5.0
 
+FROM alpine as scilpy-staging
+
+COPY --link tests/ /tests/
+
 FROM scilpy-base as scilpy
 
 LABEL maintainer=SCIL
@@ -65,7 +69,8 @@ RUN ( [ -f "VERSION" ] || touch VERSION ) && \
 
 
 FROM scilpy as scilpy-test
-COPY --link tests/ /tests/
+
+COPY --from=scilpy-staging --link /tests /tests
 
 WORKDIR /tests
 RUN python3 -m pytest

@@ -3,6 +3,7 @@
 FROM alpine as scilus-staging
 
 ADD --chmod=666 human-data_master_1d3abfb.tar.bz2 /human-data
+COPY --link tests/ /tests/
 
 FROM scilus-base as scilus
 
@@ -52,7 +53,8 @@ RUN apt-get -y remove \
 COPY --from=scilus-staging --link /human-data /human-data
 
 FROM scilus as scilus-test
-COPY --link tests/ /tests/
+
+COPY --from=scilus-staging --link /tests /tests
 
 WORKDIR /tests
 RUN python3 -m pip install pytest
