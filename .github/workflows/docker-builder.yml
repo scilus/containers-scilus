@@ -144,8 +144,8 @@ jobs:
         id: local-versioning
         run: |
           touch local-versioning.hcl
-          echo "dockerhub-user-pull=\"${{ secrets.DOCKER_USERNAME }}\""
-          echo "dockerhub-user-push=\"${{ secrets.DOCKER_USERNAME }}\""
+          echo "dockerhub-user-pull=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
+          echo "dockerhub-user-push=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
           [ -z "${{ inputs.scilpy-version }}" ]            || echo "scilpy-version=\"${{ inputs.scilpy-version }}\""                       >> local-versioning.hcl
           [ -z "${{ inputs.dmriqcpy-version }}" ]          || echo "dmriqcpy-version=\"${{ inputs.dmriqcpy-version }}\""                   >> local-versioning.hcl
           [ -z "${{ inputs.python-version }}" ]            || echo "python-version=\"${{ inputs.python-version }}\""                       >> local-versioning.hcl
