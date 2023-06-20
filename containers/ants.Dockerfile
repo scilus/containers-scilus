@@ -51,12 +51,13 @@ ENV ANTS_VERSION=${ANTS_VERSION:-2.3.4}
 ENV ANTSPATH=${ANTS_INSTALL_PATH}/bin/
 ENV PATH=$PATH:$ANTSPATH
 
-WORKDIR /
-COPY --from=ants --link ${ANTS_INSTALL_PATH} ${ANTS_INSTALL_PATH}
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
         zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
 
+COPY --from=ants --link ${ANTS_INSTALL_PATH} ${ANTS_INSTALL_PATH}
+
+WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "ANTs => ${ANTS_VERSION}\n" >> VERSION

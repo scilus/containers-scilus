@@ -68,14 +68,14 @@ ENV LD_LIBRARY_PATH=${FSLDIR}:${FSLDIR}/bin:$LD_LIBRARY_PATH
 ENV PATH=${FSLDIR}/share/fsl/bin:$PATH
 ENV POSSUMDIR=${FSLDIR}
 
-WORKDIR /
-COPY --from=fsl --link ${FSL_INSTALL_PATH} ${FSL_INSTALL_PATH}
-
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
         dc \
         libopenmpi-dev \
     && rm -rf /var/lib/apt/lists/*
 
+COPY --from=fsl --link ${FSL_INSTALL_PATH} ${FSL_INSTALL_PATH}
+
+WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "FSL => ${FSL_VERSION}\n" >> VERSION

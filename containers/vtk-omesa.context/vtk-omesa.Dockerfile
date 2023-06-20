@@ -167,10 +167,6 @@ ENV VTKPYTHONPATH=${VTK_DIR}/lib/python${VTK_PYTHON_VERSION}/site-packages:${VTK
 ENV LD_LIBRARY_PATH=${VTK_DIR}/lib:${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 ENV PYTHONPATH=${PYTHONPATH}:${VTKPYTHONPATH}
 
-WORKDIR /
-RUN mkdir -p ${MESA_INSTALL_PATH}
-COPY --from=vtk --link ${MESA_INSTALL_PATH} ${MESA_INSTALL_PATH}
-COPY --from=vtk --link ${VTK_INSTALL_PATH} ${VTK_INSTALL_PATH}
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
@@ -182,6 +178,9 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         python${VTK_PYTHON_VERSION} \
         python${VTK_PYTHON_VERSION}-dev && \
     rm -rf /var/lib/apt/lists/*
+
+COPY --from=vtk --link ${MESA_INSTALL_PATH} ${MESA_INSTALL_PATH}
+COPY --from=vtk --link ${VTK_INSTALL_PATH} ${VTK_INSTALL_PATH}
 
 WORKDIR ${VTK_INSTALL_PATH}
 RUN python${VTK_PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
