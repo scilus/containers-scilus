@@ -41,8 +41,8 @@ on:
         description: nextflow version (format X.X.X)
         required: false
         type: string
-      base-python-image:
-        description: base python image to get from dockerhub
+      base-install-image:
+        description: base install image to get from dockerhub
         required: false
         type: string
       build-system-ref:
@@ -77,7 +77,7 @@ on:
       nextflow-version:
         required: false
         type: string
-      base-python-image:
+      base-install-image:
         required: false
         type: string
       tractoflow-version:
@@ -151,7 +151,7 @@ jobs:
           [ -z "${{ inputs.python-version }}" ]            || echo "python-version=\"${{ inputs.python-version }}\""                       >> local-versioning.hcl
           [ -z "${{ inputs.vtk-version }}" ]               || echo "vtk-version=\"${{ inputs.vtk-version }}\""                             >> local-versioning.hcl
           [ -z "${{ inputs.nextflow-version }}" ]          || echo "nextflow-version=\"${{ inputs.nextflow-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.base-python-image }}" ]         || echo "base-python-image=\"${{ inputs.base-python-image }}\""                 >> local-versioning.hcl
+          [ -z "${{ inputs.base-install-image }}" ]         || echo "base-install-image=\"${{ inputs.base-install-image }}\""                 >> local-versioning.hcl
           [ -z "${{ inputs.tractoflow-version }}" ]        || echo "tractoflow-version=\"${{ inputs.tractoflow-version }}\""               >> local-versioning.hcl
           [ -z "${{ inputs.dmriqc-flow-version }}" ]       || echo "dmriqc-flow-version=\"${{ inputs.dmriqc-flow-version }}\""             >> local-versioning.hcl
           [ -z "${{ inputs.extractor-flow-version }}" ]    || echo "extractor-flow-version=\"${{ inputs.extractor-flow-version }}\""       >> local-versioning.hcl

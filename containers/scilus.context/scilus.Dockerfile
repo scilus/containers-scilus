@@ -15,7 +15,7 @@ ENV ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=${ITK_NUM_THREADS:-8}
 ENV OPENBLAS_NUM_THREADS=${OPENBLAS_NUM_THREADS:-1}
 ENV SCILPY_VERSION=${SCILPY_VERSION:-master}
 ENV PYTHON_VERSION=${PYTHON_VERSION:-3.10}
-ENV VTK_VERSION=${VTK_VERSION:-9.2.6}
+ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 
 ENV NVIDIA_DISABLE_REQUIRE=1
 
@@ -26,7 +26,6 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         bc \
         git \
         locales \
-        nvidia-cuda-toolkit \
         wget \
     && rm -rf /var/lib/apt/lists/*
 
@@ -40,13 +39,12 @@ RUN if [ -f requirements.${SCILPY_VERSION}.frozen ]; \
     then \
         python${PYTHON_VERSION} -m pip install -r requirements.${SCILPY_VERSION}.frozen && \
         rm requirements.${SCILPY_VERSION}.frozen; \
+        cd ${VTK_INSTALL_PATH}; \
+        python${PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl; \
     fi
-
-ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
-
-WORKDIR ${VTK_INSTALL_PATH}
-RUN python${PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
 
 RUN apt-get -y remove \
         git && \
     apt-get -y autoremove
+
+WORKDIR /

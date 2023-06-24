@@ -14,11 +14,11 @@ target "scilus-base" {
     cache-to = ["type=registry,mode=max,ref=${dockerhub-user-push}/build-cache:scilus-base"]
 }
 
-target "scilpy" {
+target "scilpy-base" {
     cache-to = ["type=registry,mode=max,ref=${dockerhub-user-push}/build-cache:scilpy"]
 }
 
-target "dmriqcpy" {
+target "dmriqcpy-base" {
     cache-to = ["type=registry,mode=max,ref=${dockerhub-user-push}/build-cache:dmriqcpy"]
 }
 
@@ -40,22 +40,6 @@ target "mrtrix" {
 
 target "fsl" {
     cache-to = ["type=registry,mode=max,ref=${dockerhub-user-push}/build-cache:fsl"]
-}
-
-target "scilus-python" {
-    cache-to = ["type=registry,mode=max,ref=${dockerhub-user-push}/build-cache:scilus-python"]
-}
-
-target "scilus-scilpy" {
-    cache-to = ["type=registry,mode=max,ref=${dockerhub-user-push}/build-cache:scilus-scilpy"]
-}
-
-target "scilus-nextflow" {
-    cache-to = ["type=registry,mode=max,ref=${dockerhub-user-push}/build-cache:scilus-nextflow"]
-}
-
-target "scilus-vtk" {
-    cache-to = ["type=registry,mode=max,ref=${dockerhub-user-push}/build-cache:scilus-vtk"]
 }
 
 target "scilus-flows" {

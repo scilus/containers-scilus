@@ -1,7 +1,7 @@
 # dmriqcpy-versioning.hcl
 
 base-build-image="ubuntu:jammy-20230301"
-base-python-image="ubuntu:jammy-20230301"
+base-install-image="ubuntu:jammy-20230301"
 
 cmake-version="3.16.3"
 dmriqcpy-version="0.1.6"

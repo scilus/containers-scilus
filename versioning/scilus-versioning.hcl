@@ -1,6 +1,6 @@
 # scilus-versioning.hcl
 
-base-scilus-image="nvidia/cuda:11.7.1-runtime-ubuntu22.04"
+base-install-image="nvidia/cuda:11.7.1-runtime-ubuntu22.04"
 base-build-image="ubuntu:jammy-20230301"
 
 ants-version="2.4.3"

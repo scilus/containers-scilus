@@ -4,16 +4,12 @@
 # BUILD VARIABLES
 # ==============================================================================
 
-variable "base-scilus-image" {
-    default = "nvidia/cuda:9.2-runtime-ubuntu18.04"
+variable "base-install-image" {
+    default = "ubuntu:22.04"
 }
 
 variable "base-build-image" {
     default = "ubuntu:22.04"
-}
-
-variable "base-python-image" {
-    default = "python:3.10-bullseye"
 }
 
 variable "ants-version" {
@@ -234,30 +230,6 @@ target "scilpy" {
     output = ["type=docker"]
 }
 
-target "scilus" {
-    inherits = ["scilus-cache"]
-    dockerfile = "scilus.Dockerfile"
-    context = "./containers/scilus.context/"
-    target = "scilus"
-    contexts = {
-        scilus-base = "target:scilus-scilpy"
-    }
-    args = {
-        ITK_NUM_THREADS = "${itk-num-threads}"
-        SCILPY_VERSION = "${scilpy-version}"
-    }
-    tags = ["scilus:local"]
-    output = ["type=docker"]
-}
-
-target "scilus-base" {
-    inherits = ["dmriqcpy-base", "scilus-base-cache"]
-    contexts = {
-        dmriqcpy-base = "target:scilus-vtk"
-    }
-    output = ["type=cacheonly"]
-}
-
 target "dmriqcpy" {
     inherits = ["dmriqcpy-base", "dmriqcpy-cache"]
     tags = ["dmriqcpy:local"]
@@ -265,46 +237,87 @@ target "dmriqcpy" {
 }
 
 # ==============================================================================
-# SPECIALIZED BUILD TARGETS
+# SCILUS BUILD TARGETS
 # ==============================================================================
+
+target "scilus" {
+    inherits = ["scilus-cache"]
+    dockerfile = "scilus.Dockerfile"
+    context = "./containers/scilus.context"
+    contexts = {
+        scilus-base = "target:scilus-fsl"
+    }
+    args = {
+        SCILPY_VERSION = "${scilpy-version}"
+        ITK_NUM_THREADS = "${"itk-num-threads"}"
+    }
+    tags = ["scilus:local"]
+    output = ["type=docker"]
+}
+
+target "scilus-fsl" {
+    inherits = ["fsl"]
+    contexts = {
+        fsl-base = "target:scilus-mrtrix"
+    }
+}
+
+target "scilus-mrtrix" {
+    inherits = ["mrtrix"]
+    contexts = {
+        mrtrix-base = "target:scilus-ants"
+    }
+}
+
+target "scilus-ants" {
+    inherits = ["ants"]
+    contexts = {
+        ants-base = "target:scilus-vtk"
+    }
+}
+
+target "scilus-vtk" {
+    inherits = ["vtk"]
+    contexts = {
+        vtk-base = "target:scilus-scilpy"
+    }
+}
 
 target "scilus-scilpy" {
     inherits = ["scilpy-base"]
     contexts = {
-        scilpy-base = "target:scilus-base"
+        scilpy-base = "target:scilus-dmriqcpy"
+    }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilpy",
+        "type=registry,ref=scilus/build-cache:scilpy"
+    ]
+}
+
+target "scilus-dmriqcpy" {
+    inherits = ["dmriqcpy-base"]
+    contexts = {
+        dmriqcpy-base = "target:scilus-base"
+    }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:dmriqcpy",
+        "type=registry,ref=scilus/build-cache:dmriqcpy"
+    ]
+}
+
+target "scilus-base" {
+    dockerfile = "scilus-base.Dockerfile"
+    context = "./containers/scilus.context"
+    contexts = {
+        scilus-image-base = "docker-image://${base-install-image}"
     }
     args = {
         PYTHON_VERSION = "${python-version}"
         SCILPY_VERSION = "${scilpy-version}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
+        VTK_VERSION = "${vtk-version}"
         PYTHON_PACKAGE_DIR = "dist-packages"
     }
-    cache-from = [
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-scilpy",
-        "type=registry,ref=scilus/build-cache:scilus-scilpy"
-    ]
-    output = ["type=cacheonly"]
-}
-
-target "scilus-vtk" {
-    dockerfile = "vtk-omesa.Dockerfile"
-    context = "./containers/vtk-omesa.context/"
-    target = "vtk-install"
-    contexts = {
-        vtk-base = "target:scilus-python"
-        vtk-builder = "target:cmake"
-    }
-    args = {
-        MESA_BUILD_NTHREADS = "6"
-        MESA_VERSION = "${mesa-version}"
-        VTK_BUILD_NTHREADS = "6"
-        VTK_PYTHON_VERSION = "${python-version}"
-        VTK_VERSION = "${vtk-version}"
-    }
-    cache-from = [
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-vtk",
-        "type=registry,ref=scilus/build-cache:scilus-vtk"
-    ]
     output = ["type=cacheonly"]
 }
 
@@ -320,22 +333,6 @@ target "nextflow" {
         NEXTFLOW_VERSION = "${nextflow-version}"
         JAVA_VERSION = "${java-version}"
     }
-    output = ["type=cacheonly"]
-}
-
-target "scilus-python" {
-    dockerfile = "scilus-python.Dockerfile"
-    context = "./containers"
-    contexts = {
-        python-base = "target:fsl"
-    }
-    args = {
-        PYTHON_VERSION = "${python-version}"
-    }
-    cache-from = [
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-python",
-        "type=registry,ref=scilus/build-cache:scilus-python"
-    ]
     output = ["type=cacheonly"]
 }
 
@@ -375,7 +372,7 @@ target "fsl" {
     context = "./containers/fsl.context"
     target = "fsl-install"
     contexts = {
-        fsl-base = "target:mrtrix"
+        fsl-base = "docker-image://${base-install-image}"
         fsl-builder = "docker-image://${base-build-image}"
     }
     args = {
@@ -393,7 +390,7 @@ target "mrtrix" {
     context = "./containers"
     target = "mrtrix-install"
     contexts = {
-        mrtrix-base = "target:ants"
+        mrtrix-base = "docker-image://${base-install-image}"
         mrtrix-builder = "docker-image://${base-build-image}"
     }
     args = {
@@ -412,7 +409,7 @@ target "ants" {
     context = "./containers"
     target = "ants-install"
     contexts = {
-        ants-base = "docker-image://${base-scilus-image}"
+        ants-base = "docker-image://${base-install-image}"
         ants-builder = "target:cmake"
     }
     args = {
@@ -431,7 +428,7 @@ target "vtk" {
     context = "./containers/vtk-omesa.context/"
     target = "vtk-install"
     contexts = {
-        vtk-base = "docker-image://${base-python-image}"
+        vtk-base = "docker-image://${base-install-image}"
         vtk-builder = "target:cmake"
     }
     args = {
@@ -473,12 +470,10 @@ target "cmake" {
 target "scilpy-cache" {
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilpy",
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-vtk",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:vtk",
         "type=registry,ref=${dockerhub-user-pull}/scilpy:latest",
         "type=registry,ref=${dockerhub-user-pull}/scilpy:dev",
         "type=registry,ref=scilus/build-cache:scilpy",
-        "type=registry,ref=scilus/build-cache:scilus-vtk",
         "type=registry,ref=scilus/build-cache:vtk",
         "type=registry,ref=scilus/scilpy:latest",
         "type=registry,ref=scilus/scilpy:dev"
@@ -488,12 +483,10 @@ target "scilpy-cache" {
 target "dmriqcpy-cache" {
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:dmriqcpy",
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-vtk",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:vtk",
         "type=registry,ref=${dockerhub-user-pull}/dmriqcpy:latest",
         "type=registry,ref=${dockerhub-user-pull}/dmriqcpy:dev",
         "type=registry,ref=scilus/build-cache:dmriqcpy",
-        "type=registry,ref=scilus/build-cache:scilus-vtk",
         "type=registry,ref=scilus/build-cache:vtk",
         "type=registry,ref=scilus/dmriqcpy:latest",
         "type=registry,ref=scilus/dmriqcpy:dev"
@@ -515,14 +508,12 @@ target "scilus-cache" {
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-base",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus",
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-scilpy",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilpy",
         "type=registry,ref=${dockerhub-user-pull}/scilus:latest",
         "type=registry,ref=${dockerhub-user-pull}/scilus:dev",
         "type=registry,ref=${dockerhub-user-pull}/scilus:git-build",
         "type=registry,ref=scilus/build-cache:scilus-base",
         "type=registry,ref=scilus/build-cache:scilus",
-        "type=registry,ref=scilus/build-cache:scilus-scilpy",
         "type=registry,ref=scilus/build-cache:scilpy",
         "type=registry,ref=scilus/scilus:latest",
         "type=registry,ref=scilus/scilus:dev"
@@ -532,21 +523,17 @@ target "scilus-cache" {
 target "scilus-base-cache" {
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-base",
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-python",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:dmriqcpy",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:fsl",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:mrtrix",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:ants",
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-vtk",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:vtk",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:cmake",
         "type=registry,ref=scilus/build-cache:scilus-base",
-        "type=registry,ref=scilus/build-cache:scilus-python",
         "type=registry,ref=scilus/build-cache:dmriqcpy",
         "type=registry,ref=scilus/build-cache:fsl",
         "type=registry,ref=scilus/build-cache:mrtrix",
         "type=registry,ref=scilus/build-cache:ants",
-        "type=registry,ref=scilus/build-cache:scilus-vtk",
         "type=registry,ref=scilus/build-cache:vtk",
         "type=registry,ref=scilus/build-cache:cmake"
     ]
