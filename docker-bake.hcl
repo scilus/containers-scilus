@@ -318,6 +318,10 @@ target "scilus-base" {
         VTK_VERSION = "${vtk-version}"
         PYTHON_PACKAGE_DIR = "dist-packages"
     }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-base",
+        "type=registry,ref=scilus/build-cache:scilus-base"
+    ]
     output = ["type=cacheonly"]
 }
 
