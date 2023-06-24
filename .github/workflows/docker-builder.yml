@@ -11,7 +11,7 @@ on:
         - scilus
         - scilpy
         - dmriqcpy
-        - scilus-flows 
+        - scilus-flows
       tag:
         description: tag to create for the image built
         required: true
@@ -41,8 +41,8 @@ on:
         description: nextflow version (format X.X.X)
         required: false
         type: string
-      base-python-image:
-        description: base python image to get from dockerhub
+      base-install-image:
+        description: base install image to get from dockerhub
         required: false
         type: string
       build-system-ref:
@@ -77,7 +77,7 @@ on:
       nextflow-version:
         required: false
         type: string
-      base-python-image:
+      base-install-image:
         required: false
         type: string
       tractoflow-version:
@@ -135,21 +135,23 @@ jobs:
           fi
       -
         name: Checkout build system
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          repository: scilus/containers-scilus
+          repository: ${{ github.repository_owner }}/containers-scilus
           ref: ${{ inputs.build-system-ref }}
       -
         name: Resolve versioning from workflow inputs
         id: local-versioning
         run: |
           touch local-versioning.hcl
+          echo "dockerhub-user-pull=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
+          echo "dockerhub-user-push=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
           [ -z "${{ inputs.scilpy-version }}" ]            || echo "scilpy-version=\"${{ inputs.scilpy-version }}\""                       >> local-versioning.hcl
           [ -z "${{ inputs.dmriqcpy-version }}" ]          || echo "dmriqcpy-version=\"${{ inputs.dmriqcpy-version }}\""                   >> local-versioning.hcl
           [ -z "${{ inputs.python-version }}" ]            || echo "python-version=\"${{ inputs.python-version }}\""                       >> local-versioning.hcl
           [ -z "${{ inputs.vtk-version }}" ]               || echo "vtk-version=\"${{ inputs.vtk-version }}\""                             >> local-versioning.hcl
           [ -z "${{ inputs.nextflow-version }}" ]          || echo "nextflow-version=\"${{ inputs.nextflow-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.base-python-image }}" ]         || echo "base-python-image=\"${{ inputs.base-python-image }}\""                 >> local-versioning.hcl
+          [ -z "${{ inputs.base-install-image }}" ]         || echo "base-install-image=\"${{ inputs.base-install-image }}\""                 >> local-versioning.hcl
           [ -z "${{ inputs.tractoflow-version }}" ]        || echo "tractoflow-version=\"${{ inputs.tractoflow-version }}\""               >> local-versioning.hcl
           [ -z "${{ inputs.dmriqc-flow-version }}" ]       || echo "dmriqc-flow-version=\"${{ inputs.dmriqc-flow-version }}\""             >> local-versioning.hcl
           [ -z "${{ inputs.extractor-flow-version }}" ]    || echo "extractor-flow-version=\"${{ inputs.extractor-flow-version }}\""       >> local-versioning.hcl
@@ -161,23 +163,6 @@ jobs:
           [ -z "${{ inputs.noddi-flow-version }}" ]        || echo "noddi-flow-version=\"${{ inputs.noddi-flow-version }}\""               >> local-versioning.hcl
           [ -z "${{ inputs.bst-flow-version }}" ]          || echo "bst-flow-version=\"${{ inputs.bst-flow-version }}\""                   >> local-versioning.hcl
           echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
-      -
-        name: Bind dockerhub image cache
-        id: dockerhub-cache
-        run: |
-          cat <<EOT >> cache-bindings.hcl
-          target "scilus"          { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus"]          }
-          target "scilus-base"     { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-base"]     }
-          target "scilpy"          { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilpy"]          }
-          target "dmriqcpy"        { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:dmriqcpy"]        }
-          target "vtk"             { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:vtk"]             }
-          target "scilus-python"   { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-python"]   }
-          target "scilus-scilpy"   { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-scilpy"]   }
-          target "scilus-nextflow" { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-nextflow"] }
-          target "scilus-vtk"      { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-vtk"]      }
-          target "scilus-flows"    { cache-to = ["type=registry,mode=max,ref=${{ secrets.DOCKER_USERNAME }}/build-cache:scilus-flows"]    }
-          EOT
-          echo "bake-file=$PWD/cache-bindings.hcl" >> $GITHUB_OUTPUT
       -
         name: Set output image tags and registry to publish to
         id: dockerhub-tags
@@ -198,7 +183,6 @@ jobs:
         with:
           name: HCL artifacts
           path: |
-            ${{ steps.dockerhub-cache.outputs.bake-file }}
             ${{ steps.local-versioning.outputs.bake-file }}
             ${{ steps.dockerhub-tags.outputs.tags-file }}
             ${{ steps.dockerhub-tags.outputs.git-output }}
@@ -212,23 +196,21 @@ jobs:
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
-          version: v0.9.1
+          version: v0.11.0
           driver-opts: |
-            image=moby/buildkit:v0.10.6
+            image=moby/buildkit:v0.11.6
       -
         name: Build container
         id: container-build
-        uses: docker/bake-action@v2.3.0
+        uses: docker/bake-action@v3.1.0
         with:
           targets: |
             ${{ inputs.target }}
           files: |
-            ${{ steps.dockerhub-cache.outputs.bake-file }}
             ${{ steps.local-versioning.outputs.bake-file }}
             ./versioning/${{ inputs.target }}-versioning.hcl
             ./docker-bake.hcl
           set: ${{ steps.dockerhub-tags.outputs.tags-string }}
-          pull: true
           push: true
       -
         name: Save output container metadata to file

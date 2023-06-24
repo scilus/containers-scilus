@@ -1,4 +1,9 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker.io/docker/dockerfile:1.5.0
+
+FROM alpine as fsl-staging
+
+COPY --link --chmod=755 fslinstaller.py /fslinstaller.py
+COPY --link --chmod=666 fsl_conda_env.yml /fsl_conda_env.yml
 
 FROM fsl-builder as fsl
 
@@ -17,10 +22,8 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         git \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p ${FSL_INSTALL_PATH}
-
-ADD fslinstaller.py /fslinstaller.py
-ADD fsl_conda_env.yml /fsl_conda_env.yml
+COPY --from=fsl-staging --link --chmod=755 /fslinstaller.py /fslinstaller.py
+COPY --from=fsl-staging --link --chmod=666 /fsl_conda_env.yml /fsl_conda_env.yml
 
 RUN python fslinstaller.py \
         -d ${FSL_INSTALL_PATH} \
@@ -65,14 +68,14 @@ ENV LD_LIBRARY_PATH=${FSLDIR}:${FSLDIR}/bin:$LD_LIBRARY_PATH
 ENV PATH=${FSLDIR}/share/fsl/bin:$PATH
 ENV POSSUMDIR=${FSLDIR}
 
-WORKDIR /
-COPY --from=fsl --link ${FSL_INSTALL_PATH} ${FSL_INSTALL_PATH}
-
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
-    dc \
-    libopenmpi-dev \
+        dc \
+        libopenmpi-dev \
     && rm -rf /var/lib/apt/lists/*
 
+COPY --from=fsl --link ${FSL_INSTALL_PATH} ${FSL_INSTALL_PATH}
+
+WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "FSL => ${FSL_VERSION}\n" >> VERSION

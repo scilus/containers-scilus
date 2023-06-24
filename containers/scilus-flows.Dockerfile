@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker.io/docker/dockerfile:1.5.0
 
 FROM flow-base as scilus-flows
 

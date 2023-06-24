@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker.io/docker/dockerfile:1.5.0
 
 FROM dmriqcpy-base as dmriqcpy
 
@@ -8,6 +8,7 @@ ARG DMRIQCPY_VERSION
 ARG PYTHON_VERSION
 ARG VTK_INSTALL_PATH
 ARG VTK_VERSION
+ARG PYTHON_PACKAGE_DIR
 
 ENV DMRIQCPY_VERSION=${DMRIQCPY_VERSION:-0.1.6}
 ENV PYTHON_PACKAGE_DIR=${PYTHON_PACKAGE_DIR:-site-packages}
@@ -25,7 +26,9 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
         fonts-freefont-ttf \
         git \
-        locales && \
+        locales \
+        python3.10 \
+        python3-dev && \
     rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8 && \
@@ -41,11 +44,3 @@ RUN python${PYTHON_VERSION} -m pip install \
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "dMRIqcpy => ${DMRIQCPY_VERSION}\n" >> VERSION
-
-
-FROM dmriqcpy as dmriqcpy-test
-ADD tests/ /tests/
-
-WORKDIR /tests
-RUN python3 -m pip install dipy pytest pytest_console_scripts
-RUN python3 -m pytest --script-launch-mode=subprocess

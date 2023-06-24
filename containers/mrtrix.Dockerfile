@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker.io/docker/dockerfile:1.5.0
 
 FROM mrtrix-builder as mrtrix
 
@@ -89,7 +89,8 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /
 COPY --from=mrtrix --link /mrtrix3 ${MRTRIX_INSTALL_PATH}
+
+WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Mrtrix => ${MRTRIX_VERSION}\n" >> VERSION

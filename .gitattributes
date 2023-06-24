@@ -1,0 +1,10 @@
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# Freeze files in build contexts to have LF EOL strictly
+*.py text eol=lf
+fsl_conda_env.yml text eol=lf
+fslinstaller.py text eol=lf
+
+# Freeze binary files to be untouched
+*.tar.bz2 binary

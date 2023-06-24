@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker.io/docker/dockerfile:1.5.0
 
 FROM scilpy-base as scilpy
 
@@ -9,6 +9,7 @@ ARG PYTHON_VERSION
 ARG SCILPY_VERSION
 ARG VTK_INSTALL_PATH
 ARG VTK_VERSION
+ARG PYTHON_PACKAGE_DIR
 
 ENV PYTHON_PACKAGE_DIR=${PYTHON_PACKAGE_DIR:-site-packages}
 ENV PYTHON_VERSION=${PYTHON_VERSION:-3.10}
@@ -24,14 +25,16 @@ ENV LANGUAGE="en_US.UTF-8"
 
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
-    apt-get update && apt-get install -y \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
         git \
         libblas-dev \
         libfreetype6-dev \
         liblapack-dev \
         locales \
-        wget \
-        unzip && \
+        python3.10 \
+        python3-dev \
+        unzip \
+        wget && \
     rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen "en_US.UTF-8" && \
@@ -59,10 +62,3 @@ RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/${PYTH
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Scilpy => ${SCILPY_VERSION}\n" >> VERSION
-
-
-FROM scilpy as scilpy-test
-ADD tests/ /tests/
-
-WORKDIR /tests
-RUN python3 -m pytest

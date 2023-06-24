@@ -8,7 +8,4 @@ dependencies:
  - fsl-eddy 2111.0
  - fsl-eddy_qc v1.2.1
  - fsl-topup 2203.1
- - fsl-cudabasisfield-cuda-10.2 1.1.1
  - fsl-eddy-cuda-10.2 2111.0
- - fsl-fdt-cuda-10.2 2202.6
- - fsl-ptx2-cuda-10.2 2111.4
