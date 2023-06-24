@@ -108,7 +108,7 @@ variable "bst-flow-version" {
 }
 
 variable "dockerhub-user-pull" {
-    default = "scilus"
+    default = "avcaron"
 }
 
 # ==============================================================================
@@ -185,6 +185,7 @@ target "pytest-base" {
 # ==============================================================================
 
 target "scilus-flows" {
+    inherits = ["scilus-cache"]
     dockerfile = "scilus-flows.Dockerfile"
     context = "./containers"
     target = "scilus-flows"
@@ -230,10 +231,6 @@ target "scilus-nextflow" {
 target "scilpy" {
     inherits = ["scilpy-base", "scilpy-cache"]
     tags = ["scilpy:local"]
-    cache-from = [
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilpy",
-        "type=registry,ref=scilus/build-cache:scilpy"
-    ]
     output = ["type=docker"]
 }
 
@@ -272,7 +269,7 @@ target "dmriqcpy" {
 # ==============================================================================
 
 target "scilus-scilpy" {
-    inherits = ["scilpy-base", "scilus-cache"]
+    inherits = ["scilpy-base"]
     contexts = {
         scilpy-base = "target:scilus-base"
     }
@@ -282,11 +279,14 @@ target "scilus-scilpy" {
         BLAS_NUM_THREADS = "${blas-num-threads}"
         PYTHON_PACKAGE_DIR = "dist-packages"
     }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-scilpy",
+        "type=registry,ref=scilus/build-cache:scilus-scilpy"
+    ]
     output = ["type=cacheonly"]
 }
 
 target "scilus-vtk" {
-    inherits = ["scilus-base-cache"]
     dockerfile = "vtk-omesa.Dockerfile"
     context = "./containers/vtk-omesa.context/"
     target = "vtk-install"
@@ -301,6 +301,10 @@ target "scilus-vtk" {
         VTK_PYTHON_VERSION = "${python-version}"
         VTK_VERSION = "${vtk-version}"
     }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-vtk",
+        "type=registry,ref=scilus/build-cache:scilus-vtk"
+    ]
     output = ["type=cacheonly"]
 }
 
@@ -320,7 +324,6 @@ target "nextflow" {
 }
 
 target "scilus-python" {
-    inherits = ["scilus-base-cache"]
     dockerfile = "scilus-python.Dockerfile"
     context = "./containers"
     contexts = {
@@ -329,6 +332,10 @@ target "scilus-python" {
     args = {
         PYTHON_VERSION = "${python-version}"
     }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-python",
+        "type=registry,ref=scilus/build-cache:scilus-python"
+    ]
     output = ["type=cacheonly"]
 }
 
@@ -364,7 +371,6 @@ target "dmriqcpy-base" {
 }
 
 target "fsl" {
-    inherits = ["scilus-base-cache"]
     dockerfile = "fsl.Dockerfile"
     context = "./containers/fsl.context"
     target = "fsl-install"
@@ -375,11 +381,14 @@ target "fsl" {
     args = {
         FSL_VERSION = "${fsl-version}"
     }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:fsl",
+        "type=registry,ref=scilus/build-cache:fsl"
+    ]
     output = ["type=cacheonly"]
 }
 
 target "mrtrix" {
-    inherits = ["scilus-base-cache"]
     dockerfile = "mrtrix.Dockerfile"
     context = "./containers"
     target = "mrtrix-install"
@@ -391,11 +400,14 @@ target "mrtrix" {
         MRTRIX_BUILD_NTHREADS = "6"
         MRTRIX_VERSION = "${mrtrix-version}"
     }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:mrtrix",
+        "type=registry,ref=scilus/build-cache:mrtrix"
+    ]
     output = ["type=cacheonly"]
 }
 
 target "ants" {
-    inherits = ["scilus-base-cache"]
     dockerfile = "ants.Dockerfile"
     context = "./containers"
     target = "ants-install"
@@ -407,6 +419,10 @@ target "ants" {
         ANTS_BUILD_NTHREADS = "6"
         ANTS_VERSION = "${ants-version}"
     }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:ants",
+        "type=registry,ref=scilus/build-cache:ants"
+    ]
     output = ["type=cacheonly"]
 }
 
@@ -427,7 +443,7 @@ target "vtk" {
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:vtk",
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:cmake"
+        "type=registry,ref=scilus/build-cache:vtk"
     ]
     output = ["type=cacheonly"]
 }
@@ -443,7 +459,10 @@ target "cmake" {
         CMAKE_BUILD_NTHREADS = "6"
         CMAKE_VERSION = "${cmake-version}"
     }
-    cache-from = ["type=registry,ref=${dockerhub-user-pull}/build-cache:cmake"]
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:cmake",
+        "type=registry,ref=scilus/build-cache:cmake"
+    ]
     output = ["type=cacheonly"]
 }
 
