@@ -83,7 +83,7 @@ RUN mkdir build && \
         -Dvulkan-drivers=[] \
         -Dplatforms=[] \
         -Dgallium-drivers=swrast \
-        build . && \
+        build . || (cat build/meson-logs/meson-log.txt && exit 1) && \
     [ -z "$MESA_BUILD_NTHREADS" ] && \
         { ninja -C build/ -j $(nproc --all) install; } || \
         { ninja -C build/ -j ${MESA_BUILD_NTHREADS} install; }

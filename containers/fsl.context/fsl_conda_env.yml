@@ -2,7 +2,9 @@ name: FSL 6.0.6.4 lean
 channels:
  - https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/
  - conda-forge
+ - anaconda
 dependencies:
+ - cudatoolkit 10.2.89
  - boost-cpp
  - fsl-base
  - fsl-newnifti

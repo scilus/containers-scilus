@@ -45,3 +45,7 @@ target "fsl" {
 target "scilus-flows" {
     cache-to = ["type=registry,mode=max,ref=${dockerhub-user-push}/build-cache:scilus-flows"]
 }
+
+target "scilus-fsl" {
+    cache-to = ["type=registry,mode=max,ref=${dockerhub-user-push}/build-cache:scilus-deps"]
+}

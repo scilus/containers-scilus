@@ -107,6 +107,15 @@ variable "dockerhub-user-pull" {
     default = "scilus"
 }
 
+variable "DEPS_TAG" {
+}
+
+variable "SCILUS_TAG" {
+}
+
+variable "FLOWS_TAG" {
+}
+
 # ==============================================================================
 # DOCKER BUILDX BAKE TARGETS
 # ==============================================================================
@@ -119,8 +128,8 @@ group "scilus" {
     targets = ["scilus", "scilus-test"]
 }
 
-group "scilus-base" {
-    targets = ["scilus-base"]
+group "scilus-deps" {
+    targets = ["scilus-fsl"]
 }
 
 group "scilpy" {
@@ -200,7 +209,10 @@ target "scilus-flows" {
         NODDIFLOW_VERSION = "${noddi-flow-version}"
         BSTFLOW_VERSION = "${bst-flow-version}"
     }
-    tags = ["scilus-flows:local"]
+    tags = [
+        "scilus-flows:local",
+        notequal("",FLOWS_TAG) ? "scilus/scilus-flows:${FLOWS_TAG}" : ""
+    ]
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-flows",
         "type=registry,ref=scilus/build-cache:scilus-flows"
@@ -211,7 +223,7 @@ target "scilus-flows" {
 target "scilus-nextflow" {
     inherits = ["nextflow"]
     contexts = {
-        nextflow-base = "target:scilus"
+        nextflow-base = notequal("",SCILUS_TAG) ? "docker-image://${dockerhub-user-pull}/scilus:${SCILUS_TAG}" : "target:scilus"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-nextflow",
@@ -245,14 +257,39 @@ target "scilus" {
     dockerfile = "scilus.Dockerfile"
     context = "./containers/scilus.context"
     contexts = {
-        scilus-base = "target:scilus-fsl"
+        scilus-base = "target:scilus-scilpy"
     }
     args = {
         SCILPY_VERSION = "${scilpy-version}"
         ITK_NUM_THREADS = "${"itk-num-threads"}"
     }
-    tags = ["scilus:local"]
+    tags = [
+        "scilus:local",
+        notequal("",SCILUS_TAG) ? "scilus/scilus:${SCILUS_TAG}" : ""
+    ]
     output = ["type=docker"]
+}
+
+target "scilus-scilpy" {
+    inherits = ["scilpy-base"]
+    contexts = {
+        scilpy-base = "target:scilus-dmriqcpy"
+    }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilpy",
+        "type=registry,ref=scilus/build-cache:scilpy"
+    ]
+}
+
+target "scilus-dmriqcpy" {
+    inherits = ["dmriqcpy-base"]
+    contexts = {
+        dmriqcpy-base = notequal("",DEPS_TAG) ? "docker-image://${dockerhub-user-pull}/scilus-deps:${DEPS_TAG}" : "target:scilus-fsl"
+    }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:dmriqcpy",
+        "type=registry,ref=scilus/build-cache:dmriqcpy"
+    ]
 }
 
 target "scilus-fsl" {
@@ -260,6 +297,15 @@ target "scilus-fsl" {
     contexts = {
         fsl-base = "target:scilus-mrtrix"
     }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-deps",
+        "type=registry,ref=scilus/build-cache:scilus-deps"
+    ]
+    tags = [
+        "scilus-deps:local",
+        notequal("",DEPS_TAG) ? "scilus/scilus-deps:${DEPS_TAG}" : ""
+    ]
+    output = ["type=docker"]
 }
 
 target "scilus-mrtrix" {
@@ -279,30 +325,8 @@ target "scilus-ants" {
 target "scilus-vtk" {
     inherits = ["vtk"]
     contexts = {
-        vtk-base = "target:scilus-scilpy"
+        vtk-base = "target:scilus-base"
     }
-}
-
-target "scilus-scilpy" {
-    inherits = ["scilpy-base"]
-    contexts = {
-        scilpy-base = "target:scilus-dmriqcpy"
-    }
-    cache-from = [
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilpy",
-        "type=registry,ref=scilus/build-cache:scilpy"
-    ]
-}
-
-target "scilus-dmriqcpy" {
-    inherits = ["dmriqcpy-base"]
-    contexts = {
-        dmriqcpy-base = "target:scilus-base"
-    }
-    cache-from = [
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:dmriqcpy",
-        "type=registry,ref=scilus/build-cache:dmriqcpy"
-    ]
 }
 
 target "scilus-base" {
