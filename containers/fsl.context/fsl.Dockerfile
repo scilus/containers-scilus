@@ -14,13 +14,22 @@ ENV FSL_INSTALL_PATH=${FSL_INSTALL_PATH:-/fsl}
 ENV FSL_VERSION=${FSL_VERSION:-6.0.6.4}
 ENV MINICONDA_VERSION=${MINICONDA_VERSION:-22.11.1-4}
 
+ENV LC_CTYPE="en_US.UTF-8"
+ENV LC_ALL="en_US.UTF-8"
+ENV LANG="en_US.UTF-8"
+ENV LANGUAGE="en_US.UTF-8"
+
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
+        locales \
         python-is-python3 \
         wget \
         git \
     && rm -rf /var/lib/apt/lists/*
+
+RUN locale-gen "en_US.UTF-8" && \
+    update-locale LANG=en_US.UTF-8
 
 COPY --from=fsl-staging --link --chmod=755 /fslinstaller.py /fslinstaller.py
 COPY --from=fsl-staging --link --chmod=666 /fsl_conda_env.yml /fsl_conda_env.yml
@@ -29,7 +38,7 @@ RUN python fslinstaller.py \
         -d ${FSL_INSTALL_PATH} \
         -V ${FSL_VERSION} \
         -e /fsl_conda_env.yml \
-        -n -o && \
+        -n -o || (cd /root && cat $(ls | grep fsl_installation) && exit 1) && \
     rm -rf ${FSL_INSTALL_PATH}/cmake \
            ${FSL_INSTALL_PATH}/compiler_compat \
            ${FSL_INSTALL_PATH}/conda-meta \

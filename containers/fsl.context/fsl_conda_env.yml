@@ -3,9 +3,21 @@ channels:
  - https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/
  - conda-forge
 dependencies:
+ - boost-cpp
+ - fsl-base
+ - fsl-newnifti
+ - fsl-armawrap
+ - fsl-basisfield
+ - fsl-cprob
+ - fsl-miscmaths
+ - fsl-newimage
+ - fsl-utils
+ - fsl-warpfns
+ - fsl-znzlib
  - fsl-avwutils 2209.0
  - fsl-bet2 2111.2
  - fsl-eddy 2111.0
  - fsl-eddy_qc v1.2.1
  - fsl-topup 2203.1
+ - fsl-cudabasisfield-cuda-10.2
  - fsl-eddy-cuda-10.2 2111.0

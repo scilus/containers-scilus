@@ -13,10 +13,6 @@ mesa-version="22.0.5"
 vtk-version="9.2.6"
 python-version="3.10"
 
-dmriqcpy-test-base="scilus-base"
-scilpy-test-base="scilus-scilpy"
-vtk-test-base="scilus-vtk"
-
 java-version="11"
 nextflow-version="21.04.3"
 
