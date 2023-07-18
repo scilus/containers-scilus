@@ -29,20 +29,13 @@ on:
         description: dmriqcpy version (release or branch name)
         required: false
         type: string
-      python-version:
-        description: python version (format X.X, must be available through base OS default ppa, see REAMDE)
+      scilus-dependencies-tag:
+        description: tag to fetch from dockerhub for scilus dependencies
         required: false
         type: string
-      vtk-version:
-        description: vtk version, from kitwake repository (format X.X.X)
-        required: false
-        type: string
+        default: latest
       nextflow-version:
         description: nextflow version (format X.X.X)
-        required: false
-        type: string
-      base-install-image:
-        description: base install image to get from dockerhub
         required: false
         type: string
       build-system-ref:
@@ -148,10 +141,7 @@ jobs:
           echo "dockerhub-user-push=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
           [ -z "${{ inputs.scilpy-version }}" ]            || echo "scilpy-version=\"${{ inputs.scilpy-version }}\""                       >> local-versioning.hcl
           [ -z "${{ inputs.dmriqcpy-version }}" ]          || echo "dmriqcpy-version=\"${{ inputs.dmriqcpy-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.python-version }}" ]            || echo "python-version=\"${{ inputs.python-version }}\""                       >> local-versioning.hcl
-          [ -z "${{ inputs.vtk-version }}" ]               || echo "vtk-version=\"${{ inputs.vtk-version }}\""                             >> local-versioning.hcl
           [ -z "${{ inputs.nextflow-version }}" ]          || echo "nextflow-version=\"${{ inputs.nextflow-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.base-install-image }}" ]         || echo "base-install-image=\"${{ inputs.base-install-image }}\""                 >> local-versioning.hcl
           [ -z "${{ inputs.tractoflow-version }}" ]        || echo "tractoflow-version=\"${{ inputs.tractoflow-version }}\""               >> local-versioning.hcl
           [ -z "${{ inputs.dmriqc-flow-version }}" ]       || echo "dmriqc-flow-version=\"${{ inputs.dmriqc-flow-version }}\""             >> local-versioning.hcl
           [ -z "${{ inputs.extractor-flow-version }}" ]    || echo "extractor-flow-version=\"${{ inputs.extractor-flow-version }}\""       >> local-versioning.hcl
@@ -162,6 +152,7 @@ jobs:
           [ -z "${{ inputs.freewater-flow-version }}" ]    || echo "freewater-flow-version=\"${{ inputs.freewater-flow-version }}\""       >> local-versioning.hcl
           [ -z "${{ inputs.noddi-flow-version }}" ]        || echo "noddi-flow-version=\"${{ inputs.noddi-flow-version }}\""               >> local-versioning.hcl
           [ -z "${{ inputs.bst-flow-version }}" ]          || echo "bst-flow-version=\"${{ inputs.bst-flow-version }}\""                   >> local-versioning.hcl
+          echo "DEPS_TAG=\"${{ inputs.scilus-dependencies-tag }}\"" >> local-versioning.hcl
           echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
       -
         name: Set output image tags and registry to publish to

@@ -210,8 +210,7 @@ target "scilus-flows" {
         BSTFLOW_VERSION = "${bst-flow-version}"
     }
     tags = [
-        "scilus-flows:local",
-        notequal("",FLOWS_TAG) ? "scilus/scilus-flows:${FLOWS_TAG}" : ""
+        notequal("", FLOWS_TAG) ? "scilus/scilus-flows:${FLOWS_TAG}" : "scilus-flows:local"
     ]
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-flows",
@@ -223,7 +222,7 @@ target "scilus-flows" {
 target "scilus-nextflow" {
     inherits = ["nextflow"]
     contexts = {
-        nextflow-base = notequal("",SCILUS_TAG) ? "docker-image://${dockerhub-user-pull}/scilus:${SCILUS_TAG}" : "target:scilus"
+        nextflow-base = notequal("", SCILUS_TAG) ? "docker-image://${dockerhub-user-pull}/scilus:${SCILUS_TAG}" : "target:scilus"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-nextflow",
@@ -264,8 +263,7 @@ target "scilus" {
         ITK_NUM_THREADS = "${"itk-num-threads"}"
     }
     tags = [
-        "scilus:local",
-        notequal("",SCILUS_TAG) ? "scilus/scilus:${SCILUS_TAG}" : ""
+        notequal("", SCILUS_TAG) ? "scilus/scilus:${SCILUS_TAG}" : "scilus:local"
     ]
     output = ["type=docker"]
 }
@@ -284,7 +282,7 @@ target "scilus-scilpy" {
 target "scilus-dmriqcpy" {
     inherits = ["dmriqcpy-base"]
     contexts = {
-        dmriqcpy-base = notequal("",DEPS_TAG) ? "docker-image://${dockerhub-user-pull}/scilus-deps:${DEPS_TAG}" : "target:scilus-fsl"
+        dmriqcpy-base = notequal("", DEPS_TAG) ? "docker-image://${dockerhub-user-pull}/scilus-deps:${DEPS_TAG}" : "target:scilus-fsl"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:dmriqcpy",
@@ -302,8 +300,7 @@ target "scilus-fsl" {
         "type=registry,ref=scilus/build-cache:scilus-deps"
     ]
     tags = [
-        "scilus-deps:local",
-        notequal("",DEPS_TAG) ? "scilus/scilus-deps:${DEPS_TAG}" : ""
+        notequal("", DEPS_TAG) ? "scilus/scilus-deps:${DEPS_TAG}" : ""
     ]
     output = ["type=docker"]
 }
