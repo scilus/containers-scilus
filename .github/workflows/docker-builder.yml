@@ -205,7 +205,7 @@ jobs:
             ${{ inputs.target }}
           files: |
             ${{ steps.local-versioning.outputs.bake-file }}
-            ./versioning/${{ inputs.target }}-versioning.hcl
+            ./versioning.hcl
             ./docker-bake.hcl
           set: ${{ steps.dockerhub-tags.outputs.tags-string }}
           push: true
