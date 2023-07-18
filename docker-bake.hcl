@@ -260,7 +260,7 @@ target "scilus" {
     }
     args = {
         SCILPY_VERSION = "${scilpy-version}"
-        ITK_NUM_THREADS = "${"itk-num-threads"}"
+        ITK_NUM_THREADS = "${itk-num-threads}"
     }
     tags = [
         notequal("", SCILUS_TAG) ? "scilus/scilus:${SCILUS_TAG}" : "scilus:local"
