@@ -12,7 +12,7 @@ ENV NXF_HOME=/nextflow/.nextflow
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
-        openjdk-${JAVA_VERSION}-jre \
+        openjdk-${JAVA_VERSION}-jre-headless \
         wget && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /nextflow/.nextflow/plugins && \
