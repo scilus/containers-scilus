@@ -41,6 +41,9 @@ RUN python${PYTHON_VERSION} -m pip install \
     apt-get -y remove git && \
     apt-get -y autoremove
 
+WORKDIR ${VTK_INSTALL_PATH}
+RUN python${PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
+
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "dMRIqcpy => ${DMRIQCPY_VERSION}\n" >> VERSION
