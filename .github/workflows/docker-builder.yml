@@ -30,7 +30,12 @@ on:
         required: false
         type: string
       scilus-dependencies-tag:
-        description: tag to fetch from dockerhub for scilus dependencies
+        description: tag to fetch from dockerhub for scilus dependencies (base for scilus image)
+        required: false
+        type: string
+        default: latest
+      scilus-for-scilus-flows-tag:
+        description: tag to fetch from dockerhub for scilus (base for scilus-flows)
         required: false
         type: string
         default: latest
@@ -153,6 +158,7 @@ jobs:
           [ -z "${{ inputs.noddi-flow-version }}" ]        || echo "noddi-flow-version=\"${{ inputs.noddi-flow-version }}\""               >> local-versioning.hcl
           [ -z "${{ inputs.bst-flow-version }}" ]          || echo "bst-flow-version=\"${{ inputs.bst-flow-version }}\""                   >> local-versioning.hcl
           echo "DEPS_TAG=\"${{ inputs.scilus-dependencies-tag }}\"" >> local-versioning.hcl
+          [ "${{ inputs.target }}" == "scilus-flows" ] && echo "SCILUS_TAG=\"${{ inputs.scilus-for-scilus-flows-tag }}\"" >> local-versioning.hcl
           echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
       -
         name: Set output image tags and registry to publish to
