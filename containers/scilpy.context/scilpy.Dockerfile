@@ -26,6 +26,7 @@ ENV LANGUAGE="en_US.UTF-8"
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        clinfo \
         git \
         libblas-dev \
         libfreetype6-dev \
@@ -49,6 +50,7 @@ RUN unzip scilpy.zip && \
 
 WORKDIR /scilpy
 RUN SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install -e . && \
+    python${PYTHON_VERSION} -m pip install pyopencl==2023.1.3 && \
     python${PYTHON_VERSION} -m pip cache purge
 
 WORKDIR ${VTK_INSTALL_PATH}

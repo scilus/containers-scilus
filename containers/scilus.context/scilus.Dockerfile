@@ -48,6 +48,10 @@ RUN if [ -f requirements.${SCILPY_VERSION}.frozen ]; \
         python${PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl; \
     fi
 
+WORKDIR /
+RUN mkdir -p /etc/OpenCL/vendors && \
+    echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
+
 RUN apt-get -y remove \
         git && \
     apt-get -y autoremove
