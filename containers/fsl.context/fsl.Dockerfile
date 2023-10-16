@@ -80,7 +80,6 @@ ENV POSSUMDIR=${FSLDIR}
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
         dc \
-        libopenmpi-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=fsl --link ${FSL_INSTALL_PATH} ${FSL_INSTALL_PATH}
