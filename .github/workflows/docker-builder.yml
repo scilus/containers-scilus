@@ -21,6 +21,11 @@ on:
         required: false
         type: boolean
         default: false
+      disable-builddate-tag:
+        description: disable pushing stamped tag (suffixed with timestamp -YYYYMMDD)
+        required: false
+        type: boolean
+        default: false
       scilpy-version:
         description: scilpy version (release or branch name)
         required: false
@@ -39,10 +44,6 @@ on:
         required: false
         type: string
         default: latest
-      nextflow-version:
-        description: nextflow version (format X.X.X)
-        required: false
-        type: string
       build-system-ref:
         description: github reference of the build system to checkout
         required: false
@@ -57,6 +58,10 @@ on:
         required: true
         type: string
       update-latest:
+        required: false
+        type: boolean
+        default: false
+      disable-builddate-tag:
         required: false
         type: boolean
         default: false
@@ -167,6 +172,7 @@ jobs:
           touch tag-publishing
           echo "${{ inputs.target }}.output=type=registry" >> tag-publishing
           echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:${{ inputs.tag }}" >> tag-publishing
+          [ "${{ inputs.disable-builddate-tag }}" != "true" ] && echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:${{ inputs.tag }}-$(date +'%Y%m%d')" >> tag-publishing
           [ "${{ inputs.update-latest }}" == "true" ] && echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:latest" >> tag-publishing
           DELIM="$(echo $RANDOM | base64 | head -c 3; echo)"
           echo "tags-file=$PWD/tag-publishing" >> $GITHUB_OUTPUT

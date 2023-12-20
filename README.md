@@ -181,19 +181,19 @@ is equivalent to
 `docker run <scilus-flows image> nextflow run /scilus_flows/tractometry_flow/main.nf <args>`
 ___
 
-## Singularity
+## Singularity / Apptainer
 
-The image for Singularity can be built using `singularity_scilus.def` with the 
+The image for Singularity / Apptainer can be built using `singularity_scilus.def` with the 
 command:
 
-`sudo singularity build scilus_${SCILPY_VERSION}.img singularity_scilus.def`.
+`sudo apptainer build scilus_${SCILPY_VERSION}.img singularity_scilus.def`.
 
-Singularity container is built from the Docker stored on dockerhub.
+The image is built from the Docker stored on dockerhub.
 
 It can be used to run any SCILUS flows with the option
 `-with-singularity scilus_${SCILPY_VERSION}.img` of Nextflow.
 
-If you use this singularity, please cite:
+If you use this image, please cite:
 
 ```
 Kurtzer GM, Sochat V, Bauer MW (2017)

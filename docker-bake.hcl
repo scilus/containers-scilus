@@ -117,6 +117,15 @@ variable "FLOWS_TAG" {
 }
 
 # ==============================================================================
+# UTILITY FUNCTIONS
+# ==============================================================================
+
+function "stamp_tag" {
+    params = [base_tag, stamp]
+    result = ["${base_tag}", "${base_tag}-${formatdate("YYYYMMDD", stamp)}"]
+}
+
+# ==============================================================================
 # DOCKER BUILDX BAKE TARGETS
 # ==============================================================================
 
@@ -209,9 +218,7 @@ target "scilus-flows" {
         NODDIFLOW_VERSION = "${noddi-flow-version}"
         BSTFLOW_VERSION = "${bst-flow-version}"
     }
-    tags = [
-        notequal("", FLOWS_TAG) ? "scilus/scilus-flows:${FLOWS_TAG}" : "scilus-flows:local"
-    ]
+    tags = notequal("", FLOWS_TAG) ? stamp_tag("scilus/scilus-flows:${FLOWS_TAG}", timestamp()) : ["scilus-flows:local"]
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-flows",
         "type=registry,ref=scilus/build-cache:scilus-flows"
@@ -262,9 +269,7 @@ target "scilus" {
         SCILPY_VERSION = "${scilpy-version}"
         ITK_NUM_THREADS = "${itk-num-threads}"
     }
-    tags = [
-        notequal("", SCILUS_TAG) ? "scilus/scilus:${SCILUS_TAG}" : "scilus:local"
-    ]
+    tags = notequal("", SCILUS_TAG) ? stamp_tag("scilus/scilus:${SCILUS_TAG}", timestamp()) : ["scilus:local"]
     output = ["type=docker"]
 }
 
@@ -299,9 +304,7 @@ target "scilus-fsl" {
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-deps",
         "type=registry,ref=scilus/build-cache:scilus-deps"
     ]
-    tags = [
-        notequal("", DEPS_TAG) ? "scilus/scilus-deps:${DEPS_TAG}" : ""
-    ]
+    tags = notequal("", DEPS_TAG) ? stamp_tag("scilus/scilus-deps:${DEPS_TAG}", timestamp()) : []
     output = ["type=docker"]
 }
 
