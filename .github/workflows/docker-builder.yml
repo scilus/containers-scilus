@@ -21,6 +21,11 @@ on:
         required: false
         type: boolean
         default: false
+      disable-builddate-tag:
+        description: disable pushing stamped tag (suffixed with timestamp -YYYYMMDD)
+        required: false
+        type: boolean
+        default: false
       scilpy-version:
         description: scilpy version (release or branch name)
         required: false
@@ -39,10 +44,6 @@ on:
         required: false
         type: string
         default: latest
-      nextflow-version:
-        description: nextflow version (format X.X.X)
-        required: false
-        type: string
       build-system-ref:
         description: github reference of the build system to checkout
         required: false
@@ -57,6 +58,10 @@ on:
         required: true
         type: string
       update-latest:
+        required: false
+        type: boolean
+        default: false
+      disable-builddate-tag:
         required: false
         type: boolean
         default: false
