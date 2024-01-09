@@ -16,14 +16,14 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         wget && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /nextflow/.nextflow/plugins && \
-    chmod -R go+rx /nextflow
+    chmod -R ugo+rx /nextflow
 
 ADD https://github.com/nextflow-io/nextflow/releases/download/v${NEXTFLOW_VERSION}/nextflow-${NEXTFLOW_VERSION}-all /nextflow/nextflow
 
 WORKDIR /nextflow
 RUN bash nextflow && \
-    chmod go+rx nextflow && \
-    chmod -R go+rx .nextflow && \
+    chmod ugo+rx nextflow && \
+    chmod -R ugo+rx .nextflow && \
     mv nextflow /usr/bin/nextflow && \
     apt-get -y autoremove
 
