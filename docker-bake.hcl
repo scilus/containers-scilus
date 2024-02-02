@@ -12,6 +12,10 @@ variable "base-build-image" {
     default = "ubuntu:22.04"
 }
 
+variable "action-runner-image" {
+    default = "ghcr.io/actions/actions-runner:2.312.0"
+}
+
 variable "ants-version" {
     default = "2.3.4"
 }
@@ -120,6 +124,9 @@ variable "SCILUS_TAG" {
 variable "FLOWS_TAG" {
 }
 
+variable "ACR_TAG" {
+}
+
 # ==============================================================================
 # UTILITY FUNCTIONS
 # ==============================================================================
@@ -132,6 +139,10 @@ function "stamp_tag" {
 # ==============================================================================
 # DOCKER BUILDX BAKE TARGETS
 # ==============================================================================
+
+group "github-action-runner" {
+    targets = ["github-action-runner"]
+}
 
 group "scilus-flows" {
     targets = ["scilus-flows"]
@@ -196,6 +207,22 @@ target "dmriqcpy-test" {
 target "pytest-base" {
     dockerfile-inline = "FROM test-base\nCOPY /tests /tests\nWORKDIR /tests\nRUN python3 -m pip install pytest pytest_console_scripts && python3 -m pytest"
     output = ["type=cacheonly"]
+}
+
+# ==============================================================================
+# GITHUB ACTION RUNNER TARGETS
+# ==============================================================================
+
+target "github-action-runner" {
+    inherits = ["vtk"]
+    contexts = {
+        vtk-base = "docker-image://${action-runner-image}"
+    }
+    args = {
+        DOCKER_USER = "0"
+    }
+    output = ["type=docker"]
+    tags = notequal("", ACR_TAG) ? stamp_tag("scilus/action-runner:${ACR_TAG}", timestamp()) : ["action-runner:local"]
 }
 
 # ==============================================================================
