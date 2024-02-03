@@ -90,6 +90,10 @@ RUN mkdir build && \
 
 ENV LD_LIBRARY_PATH=${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:${MESA_INSTALL_PATH}/lib:$LD_LIBRARY_PATH
 
+WORKDIR ${VTK_BUILD_PATH}/vtk-v${VTK_VERSION}
+ADD patches/vtk-${VTK_VERSION}/setup.py.in CMake/setup.py.in
+ADD patches/vtk-${VTK_VERSION}/vtkWheelPreparation.cmake CMake/vtkWheelPreparation.cmake
+
 WORKDIR ${VTK_BUILD_PATH}
 RUN if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
     cmake -GNinja \
@@ -126,6 +130,9 @@ RUN if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && 
         -DVTK_USE_X:BOOL=OFF \
         -DVTK_PYTHON_OPTIONAL_LINK:BOOL=ON \
         -DVTK_BUILD_PYI_FILES:BOOL=ON \
+        -DVTK_VERSION_SUFFIX= \
+        -DVTK_DIST_NAME_SUFFIX= \
+        -DVtK_VERSION_LOCAL=scilosmesa \
         -DPython{PYTHON_MAJOR}_EXECUTABLE:STRING=/usr/bin/python${VTK_PYTHON_VERSION} \
         -DPython${PYTHON_MAJOR}_INCLUDE_DIR:STRING=/usr/include/python${VTK_PYTHON_VERSION} \
         -DPython${PYTHON_MAJOR}_LIBRARY:STRING=/usr/lib/x86_64-linux-gnu/libpython${VTK_PYTHON_VERSION}.so \
@@ -140,7 +147,7 @@ RUN if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && 
     
 RUN if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
     python${PYTHON_MAJOR} setup.py bdist_wheel && \
-    cp dist/vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl ${VTK_INSTALL_PATH}/vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
+    cp dist/vtk-${VTK_VERSION}+scil+osmesa-cp310-cp310-linux_x86_64.whl ${VTK_INSTALL_PATH}/vtk-${VTK_VERSION}+scil+osmesa-cp310-cp310-linux_x86_64.whl
 
 ENV VTK_DIR=${VTK_INSTALL_PATH}
 ENV VTKPYTHONPATH=${VTK_DIR}/lib/python${VTK_PYTHON_VERSION}/site-packages:${VTK_DIR}/lib
@@ -154,7 +161,8 @@ ARG MESA_VERSION
 ARG VTK_INSTALL_PATH
 ARG VTK_PYTHON_VERSION
 ARG VTK_VERSION
-ARG DOCKER_USER
+ARG INSTALL_USER
+ARG RUN_USER
 
 ENV MESA_INSTALL_PATH=${MESA_INSTALL_PATH:-/mesa}
 ENV MESA_VERSION=${MESA_VERSION:-19.0.8}
@@ -169,9 +177,10 @@ ENV VTKPYTHONPATH=${VTK_DIR}/vtkmodules
 ENV LD_LIBRARY_PATH=${VTK_DIR}/lib.linux-x86_64-${VTK_PYTHON_VERSION}/vtkmodules:${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 ENV PYTHONPATH=${PYTHONPATH}:${VTKPYTHONPATH}
 
-ENV DOCKER_USER=${DOCKER_USER:-USER}
+ENV INSTALL_USER=${INSTALL_USER:-USER}
+ENV RUN_USER=${RUN_USER:-USER}
 
-USER $DOCKER_USER
+USER $INSTALL_USER
 
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
@@ -185,13 +194,21 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         python${VTK_PYTHON_VERSION}-dev && \
     rm -rf /var/lib/apt/lists/*
 
+WORKDIR /
+RUN mkdir -p /local_wheels && \
+    python${VTK_PYTHON_VERSION} -m pip config --global set install.find-links "/local_wheels"
+
 COPY --from=vtk --link ${MESA_INSTALL_PATH} ${MESA_INSTALL_PATH}
 COPY --from=vtk --link ${VTK_INSTALL_PATH} ${VTK_INSTALL_PATH}
+COPY --from=vtk --link ${VTK_INSTALL_PATH}/vtk-${VTK_VERSION}+scil+osmesa-cp310-cp310-linux_x86_64.whl /local_wheels/vtk-${VTK_VERSION}+scil+osmesa-cp310-cp310-linux_x86_64.whl
 
 WORKDIR ${VTK_INSTALL_PATH}
-RUN python${VTK_PYTHON_VERSION} -m pip install vtk-${VTK_VERSION}.dev0-cp310-cp310-linux_x86_64.whl
+RUN python${VTK_PYTHON_VERSION} -m pip install vtk==${VTK_VERSION}
+
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Mesa => ${MESA_VERSION}\n" >> VERSION && \
     echo "VTK => ${VTK_VERSION}\n" >> VERSION
+
+USER $RUN_USER
