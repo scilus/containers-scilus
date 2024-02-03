@@ -215,7 +215,8 @@ target "github-action-runner" {
         vtk-base = "docker-image://${action-runner-image}"
     }
     args = {
-        DOCKER_USER = "0"
+        INSTALL_USER = "root"
+        RUN_USER = "runner"
     }
     output = ["type=docker"]
     tags = notequal("", ACR_TAG) ? stamp_tag("scilus/action-runner:${ACR_TAG}", timestamp()) : ["action-runner:local"]
