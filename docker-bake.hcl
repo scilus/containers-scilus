@@ -16,11 +16,11 @@ variable "action-runner-image" {
     default = "ghcr.io/actions/actions-runner:2.312.0"
 }
 
-variable "ants-version" {
-    default = "2.3.4"
+variable "ants-revision" {
+    default = "v2.3.4"
 }
-variable "cmake-version" {
-    default = "3.16.3"
+variable "cmake-revision" {
+    default = "v3.16.3"
 }
 
 variable "dmriqcpy-version" {
@@ -35,7 +35,7 @@ variable "fsl-installer-version" {
     default = "3.14.0"
 }
 
-variable "mrtrix-version" {
+variable "mrtrix-revision" {
     default = "3.0_RC3"
 }
 
@@ -456,7 +456,7 @@ target "mrtrix" {
     }
     args = {
         MRTRIX_BUILD_NTHREADS = "6"
-        MRTRIX_VERSION = "${mrtrix-version}"
+        MRTRIX_REVISION = "${mrtrix-revision}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:mrtrix",
@@ -475,7 +475,7 @@ target "ants" {
     }
     args = {
         ANTS_BUILD_NTHREADS = "6"
-        ANTS_VERSION = "${ants-version}"
+        ANTS_REVISION = "${ants-revision}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:ants",
@@ -515,7 +515,7 @@ target "cmake" {
     }
     args = {
         CMAKE_BUILD_NTHREADS = "6"
-        CMAKE_VERSION = "${cmake-version}"
+        CMAKE_REVISION = "${cmake-revision}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:cmake",

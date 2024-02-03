@@ -1,4 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1.5.0
+# syntax=docker.io/docker/dockerfile:1.6.0
 
 FROM vtk-builder as vtk
 
@@ -53,11 +53,6 @@ ADD https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz mesa.tar.xz
 RUN tar -xJf mesa.tar.xz && \
     rm mesa.tar.xz
 
-WORKDIR ${VTK_BUILD_PATH}
-ADD https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz vtk.tar.gz
-RUN tar -xzf vtk.tar.gz && \
-    rm vtk.tar.gz
-
 WORKDIR /mesa-${MESA_VERSION}
 RUN mkdir build && \
     echo "[binaries]\nllvm-config = '/usr/bin/llvm-config'" >> llvm.ini && \
@@ -89,6 +84,11 @@ RUN mkdir build && \
         { ninja -C build/ -j ${MESA_BUILD_NTHREADS} install; }
 
 ENV LD_LIBRARY_PATH=${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:${MESA_INSTALL_PATH}/lib:$LD_LIBRARY_PATH
+
+WORKDIR ${VTK_BUILD_PATH}
+ADD https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz vtk.tar.gz
+RUN tar -xzf vtk.tar.gz && \
+    rm vtk.tar.gz
 
 WORKDIR ${VTK_BUILD_PATH}/vtk-v${VTK_VERSION}
 ADD patches/vtk-${VTK_VERSION}/setup.py.in CMake/setup.py.in
