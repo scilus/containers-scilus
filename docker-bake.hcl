@@ -19,11 +19,12 @@ variable "action-runner-image" {
 variable "ants-revision" {
     default = "v2.3.4"
 }
+
 variable "cmake-revision" {
     default = "v3.16.3"
 }
 
-variable "dmriqcpy-version" {
+variable "dmriqcpy-revision" {
     default = "0.1.6"
 }
 
@@ -39,7 +40,7 @@ variable "mrtrix-revision" {
     default = "3.0_RC3"
 }
 
-variable "scilpy-version" {
+variable "scilpy-revision" {
     default = "master"
 }
 
@@ -298,7 +299,7 @@ target "scilus" {
         scilus-base = "target:scilus-scilpy"
     }
     args = {
-        SCILPY_VERSION = "${scilpy-version}"
+        SCILPY_REVISION = "${scilpy-revision}"
         ITK_NUM_THREADS = "${itk-num-threads}"
     }
     tags = notequal("", SCILUS_TAG) ? stamp_tag("scilus/scilus:${SCILUS_TAG}", timestamp()) : ["scilus:local"]
@@ -369,7 +370,7 @@ target "scilus-base" {
     }
     args = {
         PYTHON_VERSION = "${python-version}"
-        SCILPY_VERSION = "${scilpy-version}"
+        SCILPY_REVISION = "${scilpy-revision}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
         VTK_VERSION = "${vtk-version}"
         PYTHON_PACKAGE_DIR = "dist-packages"
@@ -404,7 +405,7 @@ target "scilpy-base" {
     }
     args = {
         PYTHON_VERSION = "${python-version}"
-        SCILPY_VERSION = "${scilpy-version}"
+        SCILPY_REVISION = "${scilpy-revision}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
         VTK_VERSION = "${vtk-version}"
         PYTHON_PACKAGE_DIR = "dist-packages"
@@ -419,7 +420,7 @@ target "dmriqcpy-base" {
         dmriqcpy-base = "target:vtk"
     }
     args = {
-        DMRIQCPY_VERSION = "${dmriqcpy-version}"
+        DMRIQCPY_REVISION = "${dmriqcpy-revision}"
         PYTHON_VERSION = "${python-version}"
         VTK_VERSION = "${vtk-version}"
         PYTHON_PACKAGE_DIR = "dist-packages"
