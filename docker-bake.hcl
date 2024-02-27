@@ -137,8 +137,8 @@ function "stamp_tag" {
 # DOCKER BUILDX BAKE TARGETS
 # ==============================================================================
 
-group "github-action-runner" {
-    targets = ["github-action-runner"]
+group "action-runner" {
+    targets = ["action-runner"]
 }
 
 group "scilus-flows" {
@@ -207,10 +207,29 @@ target "pytest-base" {
 }
 
 # ==============================================================================
-# GITHUB ACTION RUNNER TARGETS
+# ACTION RUNNER TARGETS
 # ==============================================================================
 
-target "github-action-runner" {
+target "action-runner" {
+    dockerfile = "action-runner.Dockerfile"
+    context = "./containers"
+    target = "action-runner"
+    contexts = {
+        action-runner-base = "target:action-runner-vtk"
+    }
+    args = {
+        INSTALL_USER = "root"
+        RUN_USER = "runner"
+    }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:action-runner",
+        "type=registry,ref=scilus/build-cache:action-runner"
+    ]
+    output = ["type=docker"]
+    tags = notequal("", ACR_TAG) ? stamp_tag("scilus/action-runner:${ACR_TAG}", timestamp()) : ["action-runner:local"]
+}
+
+target "action-runner-vtk" {
     inherits = ["vtk"]
     contexts = {
         vtk-base = "docker-image://${action-runner-image}"
@@ -219,8 +238,13 @@ target "github-action-runner" {
         INSTALL_USER = "root"
         RUN_USER = "runner"
     }
-    output = ["type=docker"]
-    tags = notequal("", ACR_TAG) ? stamp_tag("scilus/action-runner:${ACR_TAG}", timestamp()) : ["action-runner:local"]
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:action-runner-vtk",
+        "type=registry,ref=scilus/build-cache:action-runner-vtk",
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:vtk",
+        "type=registry,ref=scilus/build-cache:vtk"
+    ]
+    output = ["type=cacheonly"]
 }
 
 # ==============================================================================
