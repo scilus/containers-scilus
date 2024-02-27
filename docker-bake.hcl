@@ -112,6 +112,14 @@ variable "dockerhub-user-pull" {
     default = "scilus"
 }
 
+variable "python-wheels-local-version" {
+    default = "scilus"
+}
+
+variable "wheelhouse-path" {
+    default = "/wheelhouse"
+}
+
 variable "DEPS_TAG" {
 }
 
@@ -218,8 +226,8 @@ target "action-runner" {
         action-runner-base = "target:action-runner-vtk"
     }
     args = {
-        INSTALL_USER = "root"
-        RUN_USER = "runner"
+        CONTAINER_INSTALL_USER = "root"
+        CONTAINER_RUN_USER = "runner"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:action-runner",
@@ -392,7 +400,6 @@ target "scilus-base" {
         PYTHON_VERSION = "${python-version}"
         SCILPY_REVISION = "${scilpy-revision}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
-        VTK_VERSION = "${vtk-version}"
         PYTHON_PACKAGE_DIR = "dist-packages"
     }
     cache-from = [
@@ -427,7 +434,6 @@ target "scilpy-base" {
         PYTHON_VERSION = "${python-version}"
         SCILPY_REVISION = "${scilpy-revision}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
-        VTK_VERSION = "${vtk-version}"
         PYTHON_PACKAGE_DIR = "dist-packages"
     }
     output = ["type=cacheonly"]
@@ -442,7 +448,6 @@ target "dmriqcpy-base" {
     args = {
         DMRIQCPY_REVISION = "${dmriqcpy-revision}"
         PYTHON_VERSION = "${python-version}"
-        VTK_VERSION = "${vtk-version}"
         PYTHON_PACKAGE_DIR = "dist-packages"
     }
     output = ["type=cacheonly"]
@@ -518,6 +523,8 @@ target "vtk" {
         VTK_BUILD_NTHREADS = "6"
         VTK_PYTHON_VERSION = "${python-version}"
         VTK_VERSION = "${vtk-version}"
+        VTK_WHEEL_VERSION_LOCAL = "${python-wheels-local-version}osmesa"
+        WHEELHOUSE_PATH = "${wheelhouse-path}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:vtk",
