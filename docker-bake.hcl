@@ -247,8 +247,8 @@ target "action-runner-vtk" {
         vtk-base = "docker-image://${action-runner-image}"
     }
     args = {
-        INSTALL_USER = "root"
-        RUN_USER = "runner"
+        CONTAINER_INSTALL_USER = "root"
+        CONTAINER_RUN_USER = "runner"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:action-runner-vtk",
