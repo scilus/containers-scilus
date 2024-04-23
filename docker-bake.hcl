@@ -116,6 +116,10 @@ variable "SCILUS_TAG" {
 variable "FLOWS_TAG" {
 }
 
+variable "FS_VERSION" {
+    default = "7.4.1"
+}
+
 # ==============================================================================
 # UTILITY FUNCTIONS
 # ==============================================================================
@@ -147,6 +151,10 @@ group "scilpy" {
 
 group "dmriqcpy" {
     targets = ["dmriqcpy", "dmriqcpy-test"]
+}
+
+group "freesurfer" {
+    targets = ["freesurfer"]
 }
 
 # ==============================================================================
@@ -308,6 +316,19 @@ target "scilus-fsl" {
     output = ["type=docker"]
 }
 
+target "scilus-freesurfer" {
+    inherits = ["freesurfer"]
+    contexts = {
+        freesurfer-base = "target:scilus-base"
+    }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-deps",
+        "type=registry,ref=scilus/build-cache:scilus-deps"
+    ]
+    tags = notequal("", DEPS_TAG) ? stamp_tag("scilus/scilus-deps:${DEPS_TAG}", timestamp()) : []
+    output = ["type=docker"]
+}
+
 target "scilus-mrtrix" {
     inherits = ["mrtrix"]
     contexts = {
@@ -411,6 +432,24 @@ target "fsl" {
         "type=registry,ref=scilus/build-cache:fsl"
     ]
     output = ["type=cacheonly"]
+}
+
+target "freesurfer" {
+    dockerfile = "freesurfer.Dockerfile"
+    context = "./containers/freesurfer.context"
+    target = "freesurfer-install"
+    contexts = {
+        freesurfer-base = "docker-image://${base-install-image}"
+        freesurfer-builder = "docker-image://${base-build-image}"
+    }
+    args = {
+        FREESURFER_VERSION = "${fs-version}"
+    }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:freesurfer",
+        "type=registry,ref=scilus/build-cache:freesurfer"
+    ]
+    output = ["type=cacheonly"]  
 }
 
 target "mrtrix" {
