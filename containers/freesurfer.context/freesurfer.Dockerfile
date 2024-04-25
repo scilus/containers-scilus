@@ -1,30 +1,22 @@
 # docker build for distributing a base fs 7.2.0 container
 
-FROM freesurfer-builder as freesurfer
+FROM freesurfer-base as freesurfer
 
 ARG FREESURFER_VERSION
+ENV FREESURFER_VERSION=${FREESURFER_VERSION:-7.4.1}
 
 # shell settings
-WORKDIR /root
+WORKDIR /
 
 # install utils
 RUN apt-get -y update
-RUN apt-get -y install bc \
-    libgomp \
-    perl \
-    tar \
-    tcsh \
-    wget \
-    vim-common \
-    mesa-libGL \
-    libXext \
-    libSM \
-    libXrender \
-    libXmu
+RUN apt-get -y install bc perl tar tcsh wget vim-common
+
+RUN echo ${FREESURFER_VERSION}
 
 # install fs
-RUN wget https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/${FREESURFER_VERSION}/freesurfer_ubuntu22${FREESURFER_VERSION}_amd64.deb && \
-    dpkg -i freesurfer_${FREESURFER_VERSION}_amd64.deb
+RUN wget https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/${FREESURFER_VERSION}/freesurfer_ubuntu22-${FREESURFER_VERSION}_amd64.deb && \
+    dpkg -i freesurfer_${FREESURFER_VERSION}_amd64.deb && \
     rm freesurfer_${FREESURFER_VERSION}_amd64.deb
 
 # setup fs env
@@ -52,3 +44,6 @@ ENV MNI_PERL5LIB /usr/local/freesurfer/mni/share/perl5
 ENV PERL5LIB /usr/local/freesurfer/mni/share/perl5
 
 ENV FS_LICENSE='/license.txt'
+
+RUN ( [ -f "VERSION" ] || touch VERSION ) && \
+    echo "freesurfer => ${FREESURFER_VERSION}\n" >> VERSION
