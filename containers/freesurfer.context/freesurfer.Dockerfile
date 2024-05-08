@@ -5,19 +5,24 @@ FROM freesurfer-base as freesurfer
 ARG FREESURFER_VERSION
 ENV FREESURFER_VERSION=${FREESURFER_VERSION:-7.4.1}
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 # shell settings
 WORKDIR /
 
 # install utils
 RUN apt-get -y update
-RUN apt-get -y install bc perl tar tcsh wget vim-common
+RUN apt-get -y install bc perl tar tcsh wget vim-common 
+
+RUN apt-get -y install language-pack-en libx11-dev gettext xterm x11-apps csh xorg-dev libncurses5 libgl1 libegl1 xorg xserver-xorg-video-intel libglu1-mesa libjpeg62 libopengl0 libwayland-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-render0 libxcb-util1 libxcb-xinerama0 libxcb-xinput0 libxcb-xkb1 libxkbcommon-x11-0 libxkbcommon0
 
 RUN echo ${FREESURFER_VERSION}
 
 # install fs
-RUN wget https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/${FREESURFER_VERSION}/freesurfer_ubuntu22-${FREESURFER_VERSION}_amd64.deb && \
-    dpkg -i freesurfer_${FREESURFER_VERSION}_amd64.deb && \
-    rm freesurfer_${FREESURFER_VERSION}_amd64.deb
+ADD freesurfer_ubuntu22-7.4.1_amd64.deb /
+## RUN wget https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/${FREESURFER_VERSION}/freesurfer_ubuntu22-${FREESURFER_VERSION}_amd64.deb && \
+RUN dpkg -i freesurfer_ubuntu22-${FREESURFER_VERSION}_amd64.deb && \
+    rm freesurfer_ubuntu22-${FREESURFER_VERSION}_amd64.deb
 
 # setup fs env
 ENV OS Linux
