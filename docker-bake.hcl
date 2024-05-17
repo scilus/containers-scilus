@@ -116,6 +116,9 @@ variable "SCILUS_TAG" {
 variable "FLOWS_TAG" {
 }
 
+variable "FREESURFER_TAG" {
+}
+
 variable "FREESURFER_VERSION" {
     default = "7.4.1"
 }
@@ -325,7 +328,7 @@ target "scilus-freesurfer" {
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus",
         "type=registry,ref=scilus/build-cache:scilus"
     ]
-    tags = notequal("", DEPS_TAG) ? stamp_tag("scilus/scilus-freesurfer:${DEPS_TAG}", timestamp()) : []
+    tags = notequal("", SCILUS_TAG) ? stamp_tag("scilus/scilus-freesurfer:${SCILUS_TAG}", timestamp()) : ["scilus-freesurfer:local"]
     output = ["type=docker"]
 }
 
