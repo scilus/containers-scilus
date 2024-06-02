@@ -4,11 +4,12 @@ base-install-image="nvidia/cuda:11.7.1-runtime-ubuntu22.04"
 base-build-image="ubuntu:jammy-20230301"
 
 dmriqcpy-version="0.1.7"
-scilpy-version="1.6.0"
+scilpy-version="2.0.2"
 
 ants-version="2.4.3"
 cmake-version="3.16.3"
 fsl-version="6.0.6"
+freesurfer-version="7.4.1"
 mrtrix-version="3.0.4"
 mesa-version="22.0.5"
 vtk-version="9.2.6"
