@@ -3,7 +3,7 @@
 FROM freesurfer-base as freesurfer
 
 ARG FREESURFER_VERSION
-ENV FREESURFER_VERSION=${FREESURFER_VERSION:-7.4.1}
+ENV FREESURFER_VERSION=${FREESURFER_VERSION:-${FREESURFER_VERSION}}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -19,21 +19,21 @@ RUN apt-get -y install language-pack-en libx11-dev gettext xterm x11-apps csh xo
 RUN echo ${FREESURFER_VERSION}
 
 # install fs
-ADD freesurfer_ubuntu22-7.4.1_amd64.deb /
+ADD freesurfer_ubuntu22-${FREESURFER_VERSION}_amd64.deb /
 ## RUN wget https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/${FREESURFER_VERSION}/freesurfer_ubuntu22-${FREESURFER_VERSION}_amd64.deb && \
 RUN dpkg -i freesurfer_ubuntu22-${FREESURFER_VERSION}_amd64.deb && \
     rm freesurfer_ubuntu22-${FREESURFER_VERSION}_amd64.deb
 
 # setup fs env
 ENV OS Linux
-ENV PATH /usr/local/freesurfer/bin:/usr/local/freesurfer/fsfast/bin:/usr/local/freesurfer/tktools:/usr/local/freesurfer/mni/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-ENV FREESURFER_HOME /usr/local/freesurfer
-ENV FREESURFER /usr/local/freesurfer
-ENV SUBJECTS_DIR /usr/local/freesurfer/subjects
-ENV LOCAL_DIR /usr/local/freesurfer/local
-ENV FSFAST_HOME /usr/local/freesurfer/fsfast
-ENV FMRI_ANALYSIS_DIR /usr/local/freesurfer/fsfast
-ENV FUNCTIONALS_DIR /usr/local/freesurfer/sessions
+ENV PATH /usr/local/freesurfer/${FREESURFER_VERSION}/bin:/usr/local/freesurfer/${FREESURFER_VERSION}/fsfast/bin:/usr/local/freesurfer/${FREESURFER_VERSION}/tktools:/usr/local/freesurfer/${FREESURFER_VERSION}/mni/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+ENV FREESURFER_HOME /usr/local/freesurfer/${FREESURFER_VERSION}
+ENV FREESURFER /usr/local/freesurfer/${FREESURFER_VERSION}
+ENV SUBJECTS_DIR /usr/local/freesurfer/${FREESURFER_VERSION}/subjects
+ENV LOCAL_DIR /usr/local/freesurfer/${FREESURFER_VERSION}/local
+ENV FSFAST_HOME /usr/local/freesurfer/${FREESURFER_VERSION}/fsfast
+ENV FMRI_ANALYSIS_DIR /usr/local/freesurfer/${FREESURFER_VERSION}/fsfast
+ENV FUNCTIONALS_DIR /usr/local/freesurfer/${FREESURFER_VERSION}/sessions
 
 # set default fs options
 ENV FS_OVERRIDE 0
@@ -41,12 +41,12 @@ ENV FIX_VERTEX_AREA ""
 ENV FSF_OUTPUT_FORMAT nii.gz
 
 # mni env requirements
-ENV MINC_BIN_DIR /usr/local/freesurfer/mni/bin
-ENV MINC_LIB_DIR /usr/local/freesurfer/mni/lib
-ENV MNI_DIR /usr/local/freesurfer/mni
-ENV MNI_DATAPATH /usr/local/freesurfer/mni/data
-ENV MNI_PERL5LIB /usr/local/freesurfer/mni/share/perl5
-ENV PERL5LIB /usr/local/freesurfer/mni/share/perl5
+ENV MINC_BIN_DIR /usr/local/freesurfer/${FREESURFER_VERSION}/mni/bin
+ENV MINC_LIB_DIR /usr/local/freesurfer/${FREESURFER_VERSION}/mni/lib
+ENV MNI_DIR /usr/local/freesurfer/${FREESURFER_VERSION}/mni
+ENV MNI_DATAPATH /usr/local/freesurfer/${FREESURFER_VERSION}/mni/data
+ENV MNI_PERL5LIB /usr/local/freesurfer/${FREESURFER_VERSION}/mni/share/perl5
+ENV PERL5LIB /usr/local/freesurfer/${FREESURFER_VERSION}/mni/share/perl5
 
 ENV FS_LICENSE='/license.txt'
 
