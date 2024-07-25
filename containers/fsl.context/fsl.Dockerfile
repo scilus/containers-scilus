@@ -1,17 +1,14 @@
 # syntax=docker.io/docker/dockerfile:1.5.0
 
-FROM alpine as fsl-staging
-
-COPY --link --chmod=755 fslinstaller.py /fslinstaller.py
-COPY --link --chmod=666 fsl_conda_env.yml /fsl_conda_env.yml
-
 FROM fsl-builder as fsl
 
 ARG FSL_INSTALL_PATH
 ARG FSL_VERSION
+ARG FSL_INSTALLER_VERSION
 
 ENV FSL_INSTALL_PATH=${FSL_INSTALL_PATH:-/fsl}
 ENV FSL_VERSION=${FSL_VERSION:-6.0.6.4}
+ENV FSL_INSTALLER_VERSION=${FSL_INSTALLER_VERSION:-3.14.0}
 ENV MINICONDA_VERSION=${MINICONDA_VERSION:-22.11.1-4}
 
 ENV LC_CTYPE="en_US.UTF-8"
@@ -31,13 +28,13 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
 RUN locale-gen "en_US.UTF-8" && \
     update-locale LANG=en_US.UTF-8
 
-COPY --from=fsl-staging --link --chmod=755 /fslinstaller.py /fslinstaller.py
-COPY --from=fsl-staging --link --chmod=666 /fsl_conda_env.yml /fsl_conda_env.yml
+COPY --link --chmod=666 manifest.json /manifest.json
+ADD https://git.fmrib.ox.ac.uk/fsl/conda/installer/-/raw/${FSL_INSTALLER_VERSION}/fsl/installer/fslinstaller.py fslinstaller.py
 
 RUN python fslinstaller.py \
         -d ${FSL_INSTALL_PATH} \
         -V ${FSL_VERSION} \
-        -e /fsl_conda_env.yml \
+        --manifest manifest.json \
         -n -o || (cd /root && cat $(ls | grep fsl_installation) && exit 1) && \
     rm -rf ${FSL_INSTALL_PATH}/cmake \
            ${FSL_INSTALL_PATH}/compiler_compat \

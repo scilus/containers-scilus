@@ -27,6 +27,10 @@ variable "fsl-version" {
     default = "6.0.6.4"
 }
 
+variable "fsl-installer-version" {
+    default = "3.14.0"
+}
+
 variable "mrtrix-version" {
     default = "3.0_RC3"
 }
@@ -405,6 +409,7 @@ target "fsl" {
     }
     args = {
         FSL_VERSION = "${fsl-version}"
+        FSL_INSTALLER_VERSION = "${fsl-installer-version}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:fsl",

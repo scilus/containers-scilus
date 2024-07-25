@@ -26,6 +26,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         bc \
         git \
         locales \
+        unzip \
         wget \
     && rm -rf /var/lib/apt/lists/*
 

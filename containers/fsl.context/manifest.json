@@ -1,0 +1,91 @@
+{
+    "installer": {
+        "license_url": "https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence",
+        "registration_url": "https://fsl.fmrib.ox.ac.uk/fsldownloads/registration/",
+        "sha256": "09906cb84b3742e42704cfd19e0a344db4ae6ef94f63fa43ac561c6851955d0e",
+        "url": "https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py",
+        "version": "3.13.4"
+    },
+    "miniconda": {
+        "linux-64": {
+            "python3.10": {
+                "output": "9",
+                "sha256": "def595b1b182749df0974cddb5c8befe70664ace16403d7a7bf54467be5ea48b",
+                "url": "https://repo.anaconda.com/miniconda/Miniconda3-py310_24.3.0-0-Linux-x86_64.sh"
+            },
+            "python3.11": {
+                "output": "9",
+                "sha256": "4da8dde69eca0d9bc31420349a204851bfa2a1c87aeb87fe0c05517797edaac4",
+                "url": "https://repo.anaconda.com/miniconda/Miniconda3-py311_24.3.0-0-Linux-x86_64.sh"
+            },
+            "python3.12": {
+                "output": "9",
+                "sha256": "96a44849ff17e960eeb8877ecd9055246381c4d4f2d031263b63fa7e2e930af1",
+                "url": "https://repo.anaconda.com/miniconda/Miniconda3-py312_24.3.0-0-Linux-x86_64.sh"
+            }
+        },
+        "macos-64": {
+            "python3.10": {
+                "output": "10",
+                "sha256": "094c5a94818caf41deba41411876c3cffa918efdf8ada40dc32bcc535d181c78",
+                "url": "https://repo.anaconda.com/miniconda/Miniconda3-py310_24.3.0-0-MacOSX-x86_64.sh"
+            },
+            "python3.11": {
+                "output": "10",
+                "sha256": "fdd6294aaa0472f7ddeac89deacceec1469e76bd2a16ac11f37b4ab584fe5089",
+                "url": "https://repo.anaconda.com/miniconda/Miniconda3-py311_24.3.0-0-MacOSX-x86_64.sh"
+            },
+            "python3.12": {
+                "output": "10",
+                "sha256": "fd71a4bf03fbb21d4b4d25245f17bef6308dfec478e901a60594dfa02e4605eb",
+                "url": "https://repo.anaconda.com/miniconda/Miniconda3-py312_24.3.0-0-MacOSX-x86_64.sh"
+            }
+        },
+        "macos-M1": {
+            "python3.10": {
+                "output": "10",
+                "sha256": "ceae63e7c99b4ff33ddb1a9973956d829d4a00d39f1f7c6e2056e0e076059535",
+                "url": "https://repo.anaconda.com/miniconda/Miniconda3-py310_24.3.0-0-MacOSX-arm64.sh"
+            },
+            "python3.11": {
+                "output": "10",
+                "sha256": "b7663626fedf8395d3fed78383b08060a13bd6747003bdb2a39220407f55cf65",
+                "url": "https://repo.anaconda.com/miniconda/Miniconda3-py311_24.3.0-0-MacOSX-arm64.sh"
+            },
+            "python3.12": {
+                "output": "10",
+                "sha256": "72d4e9198a6884c0bd86cce2b4a3e8abb05415776e3b142c4b1de625bbaf4c50",
+                "url": "https://repo.anaconda.com/miniconda/Miniconda3-py312_24.3.0-0-MacOSX-arm64.sh"
+            }
+        }
+    },
+    "versions": {
+        "6.0.6.4": [
+            {
+                "base_packages": [
+                    "boost-cpp",
+                    "fslpy",
+                    "fsl-base",
+                    "fsl_sub",
+                    "fsl_sub_plugin_sge",
+                    "fsl_sub_plugin_slurm",
+                    "libopenblas",
+                    "numpy",
+                    "python",
+                    "tk",
+                    "vtk",
+                    "zlib"
+                ],
+                "environment": "https://raw.githubusercontent.com/scilus/containers-scilus/main/containers/fsl.context/conda_environments/fsl-6.0.6.4_linux64.yml",
+                "output": {
+                    "install": {
+                        "value": "621",
+                        "version": "2"
+                    }
+                },
+                "platform": "linux-64",
+                "sha256": "a92d6d8eb88ac0f4d51e393c1c44f166020961e2c9fdad58e83ce036494634e6"
+            }
+        ]
+    }
+}
