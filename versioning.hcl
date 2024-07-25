@@ -2,7 +2,7 @@
 
 base-install-image="nvidia/cuda:11.7.1-runtime-ubuntu22.04"
 base-build-image="ubuntu:jammy-20230301"
-action-runner-image="ghcr.io/actions/actions-runner:2.314.0"
+actions-runner-image="ghcr.io/actions/actions-runner:2.317.0"
 
 dmriqcpy-revision="0.1.7"
 scilpy-revision="2.0.2"

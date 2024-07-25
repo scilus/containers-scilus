@@ -21,7 +21,11 @@ ADD https://github.com/ANTsX/ANTs.git#${ANTS_REVISION} /ants_build
 
 
 WORKDIR /ants_build
-RUN cmake -DBUILD_SHARED_LIBS=OFF \
+RUN mkdir build
+
+WORKDIR /ants_build/build
+RUN ls && mkdir build && \
+    cmake -DBUILD_SHARED_LIBS=OFF \
           -DUSE_VTK=OFF \
           -DSuperBuild_ANTS_USE_GIT_PROTOCOL=OFF \
           -DBUILD_TESTING=OFF \
@@ -30,12 +34,12 @@ RUN cmake -DBUILD_SHARED_LIBS=OFF \
           -DSuperBuild_ANTS_C_OPTIMIZATION_FLAGS="-mtune=native -march=x86-64" \
           -DSuperBuild_ANTS_CXX_OPTIMIZATION_FLAGS="-mtune=native -march=x86-64" \
           -DCMAKE_INSTALL_PREFIX=${ANTS_INSTALL_PATH} \
-          ../ANTs && \
+          .. && \
     [ -z "$ANTS_BUILD_NTHREADS" ] && \
         { make -j $(nproc --all); } || \
         { make -j ${ANTS_BUILD_NTHREADS}; }
 
-WORKDIR /ants_build/ANTS-build
+WORKDIR /ants_build/build
 RUN make install
 
 FROM ants-base as ants-install
