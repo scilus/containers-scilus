@@ -12,7 +12,7 @@ variable "base-build-image" {
     default = "ubuntu:22.04"
 }
 
-variable "action-runner-image" {
+variable "actions-runner-image" {
     default = "ghcr.io/actions/actions-runner:2.312.0"
 }
 
@@ -145,8 +145,8 @@ function "stamp_tag" {
 # DOCKER BUILDX BAKE TARGETS
 # ==============================================================================
 
-group "action-runner" {
-    targets = ["action-runner"]
+group "actions-runner" {
+    targets = ["actions-runner"]
 }
 
 group "scilus-flows" {
@@ -218,37 +218,37 @@ target "pytest-base" {
 # ACTION RUNNER TARGETS
 # ==============================================================================
 
-target "action-runner" {
-    dockerfile = "action-runner.Dockerfile"
+target "actions-runner" {
+    dockerfile = "actions-runner.Dockerfile"
     context = "./containers"
-    target = "action-runner"
+    target = "actions-runner"
     contexts = {
-        action-runner-base = "target:action-runner-vtk"
+        actions-runner-base = "target:actions-runner-vtk"
     }
     args = {
         CONTAINER_INSTALL_USER = "root"
         CONTAINER_RUN_USER = "runner"
     }
     cache-from = [
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:action-runner",
-        "type=registry,ref=scilus/build-cache:action-runner"
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:actions-runner",
+        "type=registry,ref=scilus/build-cache:actions-runner"
     ]
     output = ["type=docker"]
-    tags = notequal("", ACR_TAG) ? stamp_tag("scilus/action-runner:${ACR_TAG}", timestamp()) : ["action-runner:local"]
+    tags = notequal("", ACR_TAG) ? stamp_tag("scilus/actions-runner:${ACR_TAG}", timestamp()) : ["actions-runner:local"]
 }
 
-target "action-runner-vtk" {
+target "actions-runner-vtk" {
     inherits = ["vtk"]
     contexts = {
-        vtk-base = "docker-image://${action-runner-image}"
+        vtk-base = "docker-image://${actions-runner-image}"
     }
     args = {
         CONTAINER_INSTALL_USER = "root"
         CONTAINER_RUN_USER = "runner"
     }
     cache-from = [
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:action-runner-vtk",
-        "type=registry,ref=scilus/build-cache:action-runner-vtk",
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:actions-runner-vtk",
+        "type=registry,ref=scilus/build-cache:actions-runner-vtk",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:vtk",
         "type=registry,ref=scilus/build-cache:vtk"
     ]

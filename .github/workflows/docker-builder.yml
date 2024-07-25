@@ -12,6 +12,7 @@ on:
         - scilpy
         - dmriqcpy
         - scilus-flows
+        - actions-runner
       tag:
         description: tag to create for the image built
         required: true
@@ -32,6 +33,10 @@ on:
         type: string
       dmriqcpy-version:
         description: dmriqcpy version (release or branch name)
+        required: false
+        type: string
+      actions-runner-version:
+        description: version for github actions runner (on ghcr.io)
         required: false
         type: string
       scilus-dependencies-tag:
@@ -113,6 +118,9 @@ on:
       bst-flow-version:
         required: false
         type: string
+      actions-runner-version:
+        required: false
+        type: string
       build-system-ref:
         required: false
         type: string
@@ -162,6 +170,7 @@ jobs:
           [ -z "${{ inputs.freewater-flow-version }}" ]    || echo "freewater-flow-version=\"${{ inputs.freewater-flow-version }}\""       >> local-versioning.hcl
           [ -z "${{ inputs.noddi-flow-version }}" ]        || echo "noddi-flow-version=\"${{ inputs.noddi-flow-version }}\""               >> local-versioning.hcl
           [ -z "${{ inputs.bst-flow-version }}" ]          || echo "bst-flow-version=\"${{ inputs.bst-flow-version }}\""                   >> local-versioning.hcl
+          [ -z "${{ inputs.actions-runner-version }}" ]          || echo "actions-runner-image=\"ghcr.io/actions/actions-runner:${{ inputs.actions-runner-version }}\""                   >> local-versioning.hcl
           echo "DEPS_TAG=\"${{ inputs.scilus-dependencies-tag }}\"" >> local-versioning.hcl
           [ "${{ inputs.target }}" == "scilus-flows" ] && echo "SCILUS_TAG=\"${{ inputs.scilus-for-scilus-flows-tag }}\"" >> local-versioning.hcl
           echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
