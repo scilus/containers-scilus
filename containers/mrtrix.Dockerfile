@@ -29,7 +29,7 @@ WORKDIR /mrtrix3
 RUN git fetch --tags && \
     git checkout tags/${MRTRIX_VERSION} -b ${MRTRIX_VERSION}
 
-RUN ./configure -nogui -openmp && \
+RUN ./configure -nogui && \
     [ -z "$MRTRIX_BUILD_NTHREADS" ] && \
         { NUMBER_OF_PROCESSORS=$(nproc --all) ./build; } || \
         { NUMBER_OF_PROCESSORS=${MRTRIX_BUILD_NTHREADS} ./build; } && \
