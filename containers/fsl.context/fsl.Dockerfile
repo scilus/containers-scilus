@@ -35,10 +35,10 @@ RUN python fslinstaller.py \
         -d ${FSL_INSTALL_PATH} \
         -V ${FSL_VERSION} \
         --manifest manifest.json \
-        -n -o || (cd /root && cat $(ls | grep fsl_installation) && exit 1) && \
-    rm -rf ${FSL_INSTALL_PATH}/cmake \
+        -n -o || (cd /root && cat $(ls | grep fsl_installation) && exit 1)
+
+RUN rm -rf ${FSL_INSTALL_PATH}/cmake \
            ${FSL_INSTALL_PATH}/compiler_compat \
-           ${FSL_INSTALL_PATH}/conda-meta \
            ${FSL_INSTALL_PATH}/config \
            ${FSL_INSTALL_PATH}/doc \
            ${FSL_INSTALL_PATH}/docs \
