@@ -7,7 +7,7 @@ actions-runner-image="ghcr.io/actions/actions-runner:2.319.1"
 dmriqcpy-revision="0.1.7"
 scilpy-revision="2.0.2"
 
-ants-version="2.4.3"
+ants-revision="2.4.3"
 cmake-revision="3.16.3"
 fsl-version="6.0.6.4"
 fsl-installer-version="3.14.0"
