@@ -1,6 +1,7 @@
 name: Build scilus/actions-runner image
 
 on:
+    workflow_dispatch:
     schedule:
         - cron: "0 2 * * *" # Runs at 02:00 every day
 
