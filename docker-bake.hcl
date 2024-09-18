@@ -12,14 +12,19 @@ variable "base-build-image" {
     default = "ubuntu:22.04"
 }
 
-variable "ants-version" {
-    default = "2.3.4"
-}
-variable "cmake-version" {
-    default = "3.16.3"
+variable "actions-runner-image" {
+    default = "ghcr.io/actions/actions-runner:2.312.0"
 }
 
-variable "dmriqcpy-version" {
+variable "ants-revision" {
+    default = "v2.3.4"
+}
+
+variable "cmake-revision" {
+    default = "v3.16.3"
+}
+
+variable "dmriqcpy-revision" {
     default = "0.1.6"
 }
 
@@ -31,11 +36,11 @@ variable "fsl-installer-version" {
     default = "3.14.0"
 }
 
-variable "mrtrix-version" {
+variable "mrtrix-revision" {
     default = "3.0_RC3"
 }
 
-variable "scilpy-version" {
+variable "scilpy-revision" {
     default = "master"
 }
 
@@ -111,6 +116,14 @@ variable "dockerhub-user-pull" {
     default = "scilus"
 }
 
+variable "python-wheels-local-version" {
+    default = "scilus"
+}
+
+variable "wheelhouse-path" {
+    default = "/wheelhouse"
+}
+
 variable "DEPS_TAG" {
 }
 
@@ -118,6 +131,9 @@ variable "SCILUS_TAG" {
 }
 
 variable "FLOWS_TAG" {
+}
+
+variable "ACR_TAG" {
 }
 
 # ==============================================================================
@@ -132,6 +148,10 @@ function "stamp_tag" {
 # ==============================================================================
 # DOCKER BUILDX BAKE TARGETS
 # ==============================================================================
+
+group "actions-runner" {
+    targets = ["actions-runner"]
+}
 
 group "scilus-flows" {
     targets = ["scilus-flows"]
@@ -195,6 +215,47 @@ target "dmriqcpy-test" {
 
 target "pytest-base" {
     dockerfile-inline = "FROM test-base\nCOPY /tests /tests\nWORKDIR /tests\nRUN python3 -m pip install pytest pytest_console_scripts && python3 -m pytest"
+    output = ["type=cacheonly"]
+}
+
+# ==============================================================================
+# ACTION RUNNER TARGETS
+# ==============================================================================
+
+target "actions-runner" {
+    dockerfile = "actions-runner.Dockerfile"
+    context = "./containers"
+    target = "actions-runner"
+    contexts = {
+        actions-runner-base = "target:actions-runner-vtk"
+    }
+    args = {
+        CONTAINER_INSTALL_USER = "root"
+        CONTAINER_RUN_USER = "runner"
+    }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:actions-runner",
+        "type=registry,ref=scilus/build-cache:actions-runner"
+    ]
+    output = ["type=docker"]
+    tags = notequal("", ACR_TAG) ? stamp_tag("scilus/actions-runner:${ACR_TAG}", timestamp()) : ["actions-runner:local"]
+}
+
+target "actions-runner-vtk" {
+    inherits = ["vtk"]
+    contexts = {
+        vtk-base = "docker-image://${actions-runner-image}"
+    }
+    args = {
+        CONTAINER_INSTALL_USER = "root"
+        CONTAINER_RUN_USER = "runner"
+    }
+    cache-from = [
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:actions-runner-vtk",
+        "type=registry,ref=scilus/build-cache:actions-runner-vtk",
+        "type=registry,ref=${dockerhub-user-pull}/build-cache:vtk",
+        "type=registry,ref=scilus/build-cache:vtk"
+    ]
     output = ["type=cacheonly"]
 }
 
@@ -270,7 +331,7 @@ target "scilus" {
         scilus-base = "target:scilus-scilpy"
     }
     args = {
-        SCILPY_VERSION = "${scilpy-version}"
+        SCILPY_REVISION = "${scilpy-revision}"
         ITK_NUM_THREADS = "${itk-num-threads}"
     }
     tags = notequal("", SCILUS_TAG) ? stamp_tag("scilus/scilus:${SCILUS_TAG}", timestamp()) : ["scilus:local"]
@@ -341,9 +402,8 @@ target "scilus-base" {
     }
     args = {
         PYTHON_VERSION = "${python-version}"
-        SCILPY_VERSION = "${scilpy-version}"
+        SCILPY_REVISION = "${scilpy-revision}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
-        VTK_VERSION = "${vtk-version}"
         PYTHON_PACKAGE_DIR = "dist-packages"
     }
     cache-from = [
@@ -376,9 +436,8 @@ target "scilpy-base" {
     }
     args = {
         PYTHON_VERSION = "${python-version}"
-        SCILPY_VERSION = "${scilpy-version}"
+        SCILPY_REVISION = "${scilpy-revision}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
-        VTK_VERSION = "${vtk-version}"
         PYTHON_PACKAGE_DIR = "dist-packages"
     }
     output = ["type=cacheonly"]
@@ -391,9 +450,8 @@ target "dmriqcpy-base" {
         dmriqcpy-base = "target:vtk"
     }
     args = {
-        DMRIQCPY_VERSION = "${dmriqcpy-version}"
+        DMRIQCPY_REVISION = "${dmriqcpy-revision}"
         PYTHON_VERSION = "${python-version}"
-        VTK_VERSION = "${vtk-version}"
         PYTHON_PACKAGE_DIR = "dist-packages"
     }
     output = ["type=cacheonly"]
@@ -428,7 +486,7 @@ target "mrtrix" {
     }
     args = {
         MRTRIX_BUILD_NTHREADS = "6"
-        MRTRIX_VERSION = "${mrtrix-version}"
+        MRTRIX_REVISION = "${mrtrix-revision}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:mrtrix",
@@ -447,7 +505,7 @@ target "ants" {
     }
     args = {
         ANTS_BUILD_NTHREADS = "6"
-        ANTS_VERSION = "${ants-version}"
+        ANTS_REVISION = "${ants-revision}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:ants",
@@ -470,6 +528,8 @@ target "vtk" {
         VTK_BUILD_NTHREADS = "6"
         VTK_PYTHON_VERSION = "${python-version}"
         VTK_VERSION = "${vtk-version}"
+        VTK_WHEEL_VERSION_LOCAL = "${python-wheels-local-version}osmesa"
+        WHEELHOUSE_PATH = "${wheelhouse-path}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:vtk",
@@ -487,7 +547,7 @@ target "cmake" {
     }
     args = {
         CMAKE_BUILD_NTHREADS = "6"
-        CMAKE_VERSION = "${cmake-version}"
+        CMAKE_REVISION = "${cmake-revision}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:cmake",

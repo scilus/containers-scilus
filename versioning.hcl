@@ -2,15 +2,16 @@
 
 base-install-image="nvidia/cuda:11.7.1-runtime-ubuntu22.04"
 base-build-image="ubuntu:jammy-20230301"
+actions-runner-image="ghcr.io/actions/actions-runner:2.319.1"
 
-dmriqcpy-version="0.1.7"
-scilpy-version="2.0.2"
+dmriqcpy-revision="0.1.7"
+scilpy-revision="2.0.2"
 
-ants-version="2.4.3"
-cmake-version="3.16.3"
+ants-revision="2.4.3"
+cmake-revision="3.16.3"
 fsl-version="6.0.6.4"
 fsl-installer-version="3.14.0"
-mrtrix-version="3.0.4"
+mrtrix-revision="3.0.4"
 mesa-version="22.0.5"
 vtk-version="9.2.6"
 python-version="3.10"

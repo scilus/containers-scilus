@@ -1,14 +1,14 @@
-# syntax=docker.io/docker/dockerfile:1.5.0
+# syntax=docker.io/docker/dockerfile:1.6.0
 
 FROM ants-builder as ants
 
 ARG ANTS_BUILD_NTHREADS
 ARG ANTS_INSTALL_PATH
-ARG ANTS_VERSION
+ARG ANTS_REVISION
 
 ENV ANTS_BUILD_NTHREADS=${ANTS_BUILD_NTHREADS:-""}
 ENV ANTS_INSTALL_PATH=${ANTS_INSTALL_PATH:-/ants}
-ENV ANTS_VERSION=${ANTS_VERSION:-2.3.4}
+ENV ANTS_REVISION=${ANTS_REVISION:-v2.3.4}
 
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
@@ -17,15 +17,15 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
-RUN mkdir ants_build && \
-    git clone https://github.com/ANTsX/ANTs.git
+ADD https://github.com/ANTsX/ANTs.git#${ANTS_REVISION} /ants_build
 
-WORKDIR /ANTs
-RUN git fetch --tags && \
-    git checkout tags/v${ANTS_VERSION} -b v${ANTS_VERSION}
 
 WORKDIR /ants_build
-RUN cmake -DBUILD_SHARED_LIBS=OFF \
+RUN mkdir build
+
+WORKDIR /ants_build/build
+RUN ls && mkdir build && \
+    cmake -DBUILD_SHARED_LIBS=OFF \
           -DUSE_VTK=OFF \
           -DSuperBuild_ANTS_USE_GIT_PROTOCOL=OFF \
           -DBUILD_TESTING=OFF \
@@ -34,21 +34,21 @@ RUN cmake -DBUILD_SHARED_LIBS=OFF \
           -DSuperBuild_ANTS_C_OPTIMIZATION_FLAGS="-mtune=native -march=x86-64" \
           -DSuperBuild_ANTS_CXX_OPTIMIZATION_FLAGS="-mtune=native -march=x86-64" \
           -DCMAKE_INSTALL_PREFIX=${ANTS_INSTALL_PATH} \
-          ../ANTs && \
+          .. && \
     [ -z "$ANTS_BUILD_NTHREADS" ] && \
         { make -j $(nproc --all); } || \
         { make -j ${ANTS_BUILD_NTHREADS}; }
 
-WORKDIR /ants_build/ANTS-build
+WORKDIR /ants_build/build
 RUN make install
 
 FROM ants-base as ants-install
 
 ARG ANTS_INSTALL_PATH
-ARG ANTS_VERSION
+ARG ANTS_REVISION
 
 ENV ANTS_INSTALL_PATH=${ANTS_INSTALL_PATH:-/ants}
-ENV ANTS_VERSION=${ANTS_VERSION:-2.3.4}
+ENV ANTS_REVISION=${ANTS_REVISION:-v2.3.4}
 
 ENV ANTSPATH=${ANTS_INSTALL_PATH}/bin/
 ENV PATH=$PATH:$ANTSPATH
@@ -62,4 +62,4 @@ COPY --from=ants --link ${ANTS_INSTALL_PATH} ${ANTS_INSTALL_PATH}
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
-    echo "ANTs => ${ANTS_VERSION}\n" >> VERSION
+    echo "ANTs => ${ANTS_REVISION}\n" >> VERSION

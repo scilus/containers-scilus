@@ -1,12 +1,12 @@
-# syntax=docker.io/docker/dockerfile:1.5.0
+# syntax=docker.io/docker/dockerfile:1.6.0
 
 FROM mrtrix-builder as mrtrix
 
 ARG MRTRIX_BUILD_NTHREADS
-ARG MRTRIX_VERSION
+ARG MRTRIX_REVISION
 
 ENV MRTRIX_BUILD_NTHREADS=${MRTRIX_BUILD_NTHREADS:-""}
-ENV MRTRIX_VERSION=${MRTRIX_VERSION:-3.0_RC3}
+ENV MRTRIX_REVISION=${MRTRIX_REVISION:-3.0_RC3}
 
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
@@ -23,7 +23,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
-RUN git clone https://github.com/MRtrix3/mrtrix3.git
+ADD https://github.com/MRtrix3/mrtrix3.git#${MRTRIX_REVISION} /mrtrix3
 
 WORKDIR /mrtrix3
 RUN git fetch --tags && \
@@ -71,10 +71,10 @@ RUN ./configure -nogui && \
 FROM mrtrix-base as mrtrix-install
 
 ARG MRTRIX_INSTALL_PATH
-ARG MRTRIX_VERSION
+ARG MRTRIX_REVISION
 
 ENV MRTRIX_INSTALL_PATH=${MRTRIX_INSTALL_PATH:-/mrtrix3_install}
-ENV MRTRIX_VERSION=${MRTRIX_VERSION:-3.0_RC3}
+ENV MRTRIX_REVISION=${MRTRIX_REVISION:-3.0_RC3}
 
 ENV PATH=${MRTRIX_INSTALL_PATH}/bin:$PATH
 
@@ -93,4 +93,4 @@ COPY --from=mrtrix --link /mrtrix3 ${MRTRIX_INSTALL_PATH}
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
-    echo "Mrtrix => ${MRTRIX_VERSION}\n" >> VERSION
+    echo "Mrtrix => ${MRTRIX_REVISION}\n" >> VERSION
