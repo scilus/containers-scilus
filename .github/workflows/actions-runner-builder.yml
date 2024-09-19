@@ -16,19 +16,18 @@ jobs:
             # From : https://github.com/actions/actions-runner-controller/blob/0bfa57ac504dfc818128f7185fc82830cbdb83f1/.github/workflows/arc-update-runners-scheduled.yaml#L14
             - name: actions-runner version
               id: github-runner
+              env:
+                GH_TOKEN: ${{ github.token }}
               run: |
-                CURRENT_VERSION=$(echo -n $(cat runner/VERSION | grep 'RUNNER_VERSION=' | cut -d '=' -f2))
+                CURRENT_VERSION=$(echo -n $(cat /VERSION | grep 'runner =>' | cut -d '>' -f2 | tr -d '\n' | tr -d ' '))
                 LATEST_VERSION=$(gh release list --exclude-drafts --exclude-pre-releases --limit 1 -R actions/runner | grep -oP '(?<=v)[0-9.]+' | head -1)
-                echo ::set-output name=current_version::$CURRENT_VERSION"
-                echo ::set-output name=latest_version::$LATEST_VERSION"
-
+                echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+                echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
             - name: VTK version
               id: vtk-version
               run: |
-                version=$(cat versioning.hcl | grep vtk-version | sed 's/vtk-version="\(.*\)"/\1/')
+                version=$(echo -n $(cat /VERSION | grep 'vtk =>' | cut -d '>' -f2 | tr -d '\n' | tr -d ' '))
                 echo "version=$version" >> $GITHUB_OUTPUT
-
-            
 
             - name: build
               if: ${{ steps.github-runner.outputs.current_version }} != ${{ steps.github-runner.outputs.latest_version }}
