@@ -12,6 +12,8 @@ jobs:
         steps:
             - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
             - uses: actions4gh/setup-gh@44a12005484c53be5bf51bebe8c985b4be8ba8de # v1.0.2
+              with:
+                token: ""
 
             - name: VTK version
               id: vtk-version
