@@ -7,7 +7,8 @@ on:
 
 jobs:
     build-action-runner:
-        runs-on: ubuntu-latest
+        runs-on:
+            group: scilus-org-runners
 
         steps:
             - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
@@ -18,18 +19,21 @@ jobs:
                 version=$(cat versioning.hcl | grep vtk-version | sed 's/vtk-version="\(.*\)"/\1/')
                 echo "::set-output name=version::$version"
 
+            # From : https://github.com/actions/actions-runner-controller/blob/0bfa57ac504dfc818128f7185fc82830cbdb83f1/.github/workflows/arc-update-runners-scheduled.yaml#L14
             - name: actions-runner version
               id: github-runner
-              uses: docker://ghcr.io/scilus/actions-runner:latest
-              with:
-                entrypoint: /bin/bash
-                args: -c "echo ::set-output name=version::$(cat /version.txt)"
+              run: |
+                CURRENT_VERSION=$(echo -n $(cat runner/VERSION | grep 'RUNNER_VERSION=' | cut -d '=' -f2))
+                LATEST_VERSION=$(gh release list --exclude-drafts --exclude-pre-releases --limit 1 -R actions/runner | grep -oP '(?<=v)[0-9.]+' | head -1)
+                echo ::set-output name=current_version::$CURRENT_VERSION"
+                echo ::set-output name=latest_version::$LATEST_VERSION"
 
             - name: build
+              if: ${{ steps.github-runner.outputs.current_version }} != ${{ steps.github-runner.outputs.latest_version }}
               uses: ./docker-builder.yml
               with:
                 target: actions-runner
-                tag: ${{ steps.github-runner.outputs.version }}-vtk${{ steps.vtk-version.outputs.version }}
+                tag: ${{ steps.github-runner.outputs.latest_version }}-vtk${{ steps.vtk-version.outputs.version }}
                 update-latest: true
                 disable-builddate-tag: true
-                actions-runner-version: ${{ steps.github-runner.outputs.version }}
+                actions-runner-version: ${{ steps.github-runner.outputs.latest_version }}
