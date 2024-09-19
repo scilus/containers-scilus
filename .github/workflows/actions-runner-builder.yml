@@ -10,9 +10,7 @@ jobs:
         runs-on: scilus-org-runners
 
         steps:
-            - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
             - uses: ksivamuthu/actions-setup-gh-cli@v3
-
             # From : https://github.com/actions/actions-runner-controller/blob/0bfa57ac504dfc818128f7185fc82830cbdb83f1/.github/workflows/arc-update-runners-scheduled.yaml#L14
             - name: actions-runner version
               id: github-runner
@@ -23,6 +21,7 @@ jobs:
                 LATEST_VERSION=$(gh release list --exclude-drafts --exclude-pre-releases --limit 1 -R actions/runner | grep -oP '(?<=v)[0-9.]+' | head -1)
                 echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
                 echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+
             - name: VTK version
               id: vtk-version
               run: |
@@ -38,3 +37,4 @@ jobs:
                 update-latest: true
                 disable-builddate-tag: true
                 actions-runner-version: ${{ steps.github-runner.outputs.latest_version }}
+              secrets: inherit
