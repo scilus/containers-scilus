@@ -6,6 +6,10 @@ variable "dockerhub-user-push" {
     default = "scilus"
 }
 
+target "actions-runner-vtk" {
+    cache-to = ["type=registry,mode=max,ref=${dockerhub-user-push}/build-cache:actions-runner-vtk"]
+}
+
 target "scilus" {
     cache-to = ["type=registry,mode=max,ref=${dockerhub-user-push}/build-cache:scilus"]
 }
