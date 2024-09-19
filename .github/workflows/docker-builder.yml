@@ -135,7 +135,8 @@ on:
 
 jobs:
   build-container:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: scilus-docker-builders
     steps:
       -
         name: Validate input parameters
