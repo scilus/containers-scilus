@@ -7,16 +7,11 @@ on:
 
 jobs:
     build-action-runner:
-        permissions:
-          packages: read
-
         runs-on: scilus-org-runners
 
         steps:
             - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-            - uses: actions4gh/setup-gh@44a12005484c53be5bf51bebe8c985b4be8ba8de # v1.0.2
-              with:
-                token: ${{ secrets.GITHUB_TOKEN }}
+            - uses: ksivamuthu/actions-setup-gh-cli@v3
 
             # From : https://github.com/actions/actions-runner-controller/blob/0bfa57ac504dfc818128f7185fc82830cbdb83f1/.github/workflows/arc-update-runners-scheduled.yaml#L14
             - name: actions-runner version
