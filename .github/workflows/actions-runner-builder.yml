@@ -7,19 +7,16 @@ on:
 
 jobs:
     build-action-runner:
+        permissions:
+          packages: read
+
         runs-on: scilus-org-runners
 
         steps:
             - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
             - uses: actions4gh/setup-gh@44a12005484c53be5bf51bebe8c985b4be8ba8de # v1.0.2
               with:
-                token: ""
-
-            - name: VTK version
-              id: vtk-version
-              run: |
-                version=$(cat versioning.hcl | grep vtk-version | sed 's/vtk-version="\(.*\)"/\1/')
-                echo "version=$version" >> $GITHUB_OUTPUT
+                token: ${{ secrets.GITHUB_TOKEN }}
 
             # From : https://github.com/actions/actions-runner-controller/blob/0bfa57ac504dfc818128f7185fc82830cbdb83f1/.github/workflows/arc-update-runners-scheduled.yaml#L14
             - name: actions-runner version
@@ -29,6 +26,14 @@ jobs:
                 LATEST_VERSION=$(gh release list --exclude-drafts --exclude-pre-releases --limit 1 -R actions/runner | grep -oP '(?<=v)[0-9.]+' | head -1)
                 echo ::set-output name=current_version::$CURRENT_VERSION"
                 echo ::set-output name=latest_version::$LATEST_VERSION"
+
+            - name: VTK version
+              id: vtk-version
+              run: |
+                version=$(cat versioning.hcl | grep vtk-version | sed 's/vtk-version="\(.*\)"/\1/')
+                echo "version=$version" >> $GITHUB_OUTPUT
+
+            
 
             - name: build
               if: ${{ steps.github-runner.outputs.current_version }} != ${{ steps.github-runner.outputs.latest_version }}
