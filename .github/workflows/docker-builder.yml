@@ -135,8 +135,7 @@ on:
 
 jobs:
   build-container:
-    runs-on:
-      group: scilus-docker-builders
+    runs-on: scilus-docker-builders
     steps:
       -
         name: Validate input parameters
