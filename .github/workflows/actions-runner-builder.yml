@@ -31,7 +31,7 @@ jobs:
 
             - name: build
               if: ${{ steps.github-runner.outputs.current_version }} != ${{ steps.github-runner.outputs.latest_version }}
-              uses: ./docker-builder.yml
+              uses: ./.github/workflows/docker-builder.yml
               with:
                 target: actions-runner
                 tag: ${{ steps.github-runner.outputs.latest_version }}-vtk${{ steps.vtk-version.outputs.version }}
