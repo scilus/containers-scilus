@@ -26,19 +26,12 @@ jobs:
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
 
-      - name: VTK version
-        id: vtk-version
-        run: |
-          version=$(echo -n $(cat /VERSION | grep 'vtk =>' | cut -d '>' -f2 | tr -d '\n' | tr -d ' '))
-          echo "version=$version" >> $GITHUB_OUTPUT
-
   build-runner-image:
     needs: [compute-dependencies-versions]
     if: ${{ (needs.compute-dependencies-versions.outputs.runner_current_version != needs.compute-dependencies-versions.outputs.runner_latest_version) }}
     uses: ./.github/workflows/docker-builder.yml
     with:
       target: actions-runner
-      tag: ${{ needs.compute-dependencies-versions.outputs.runner_latest_version }}-vtk${{ needs.compute-dependencies-versions.outputs.vtk_version }}
       update-latest: true
       disable-builddate-tag: true
       actions-runner-version: ${{ needs.compute-dependencies-versions.outputs.runner_latest_version }}

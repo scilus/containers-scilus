@@ -60,7 +60,7 @@ on:
         required: true
         type: string
       tag:
-        required: true
+        required: false
         type: string
       update-latest:
         required: false
@@ -179,6 +179,11 @@ jobs:
           [ "${{ inputs.target }}" == "scilus-flows" ] && \
               version "${{ inputs.scilus-for-scilus-flows-tag }}" SCILUS_TAG
 
+          vtk_version = "$(cat versioning.hcl | grep 'vtk-version' | cut -d '=' -f2)"
+          vtk_version = "$(echo $vtk_version | tr -d ' ' | tr -d '\"')"
+          ACR_TAG=${{ inputs.tag }}-vtk${vtk_version}
+          [ -z "${{ inputs.actions-runner-version }}" ] || version $ACR_TAG ACR_TAG
+
           echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
       -
         name: Set output image tags and registry to publish to
@@ -188,19 +193,15 @@ jobs:
         run: |
           touch tag-publishing
           echo "${{ inputs.target }}.output=type=registry" >> tag-publishing
-          echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:${{ inputs.tag }}" >> tag-publishing
+
+          [ -z ${{ inputs.tag }} ] ||
+              echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:${{ inputs.tag }}" >> tag-publishing
 
           [ "${{ inputs.disable-builddate-tag }}" != "true" ] && \
               echo "${{ inputs.target }}.tags=${{ env.IMAGE }}-$(date +'%Y%m%d')" >> tag-publishing
 
           [ "${{ inputs.update-latest }}" == "true" ] && \
               echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:latest" >> tag-publishing
-
-          vtk_version = "$(cat versioning.hcl | grep 'vtk-version' | cut -d '=' -f2)"
-          vtk_version = "$(echo $vtk_version | tr -d ' ' | tr -d '\"')"
-          ACR_TAG=${{ inputs.tag }}-vtk${vtk_version}
-          [ -z "${{ inputs.actions-runner-version }}" ] || \
-              echo "ACR_TAG=\"$ACR_TAG\"" >> tag-publishing 
 
           DELIM="$(echo $RANDOM | base64 | head -c 3; echo)"
           echo "tags-file=$PWD/tag-publishing" >> $GITHUB_OUTPUT
