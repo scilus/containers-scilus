@@ -155,7 +155,7 @@ jobs:
         id: local-versioning
         run: |
           touch local-versioning.hcl
-          function version () { [ -z "$1" ] || echo "${2}=\"${1}\"" >> local-versioning.hcl }
+          function version () { [ -z "$1" ] || { echo "${2}=\"${1}\"" >> local-versioning.hcl } }
 
           echo "dockerhub-user-pull=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
           echo "dockerhub-user-push=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
@@ -176,13 +176,14 @@ jobs:
           version "${{ inputs.actions-runner-version }}" actions-runner-version
 
           echo "DEPS_TAG=\"${{ inputs.scilus-dependencies-tag }}\"" >> local-versioning.hcl
-          [ "${{ inputs.target }}" == "scilus-flows" ] && \
+          [ "${{ inputs.target }}" == "scilus-flows" ] && {
               version "${{ inputs.scilus-for-scilus-flows-tag }}" SCILUS_TAG
+          }
 
           vtk_version = "$(cat versioning.hcl | grep 'vtk-version' | cut -d '=' -f2)"
           vtk_version = "$(echo $vtk_version | tr -d ' ' | tr -d '\"')"
           ACR_TAG=${{ inputs.tag }}-vtk${vtk_version}
-          [ -z "${{ inputs.actions-runner-version }}" ] || version $ACR_TAG ACR_TAG
+          [ -z "${{ inputs.actions-runner-version }}" ] || { version $ACR_TAG ACR_TAG }
 
           echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
       -
@@ -194,14 +195,17 @@ jobs:
           touch tag-publishing
           echo "${{ inputs.target }}.output=type=registry" >> tag-publishing
 
-          [ -z ${{ inputs.tag }} ] ||
+          [ -z ${{ inputs.tag }} ] || {
               echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:${{ inputs.tag }}" >> tag-publishing
+          }
 
-          [ "${{ inputs.disable-builddate-tag }}" != "true" ] && \
+          [ "${{ inputs.disable-builddate-tag }}" != "true" ] && {
               echo "${{ inputs.target }}.tags=${{ env.IMAGE }}-$(date +'%Y%m%d')" >> tag-publishing
+          }
 
-          [ "${{ inputs.update-latest }}" == "true" ] && \
+          [ "${{ inputs.update-latest }}" == "true" ] && {
               echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:latest" >> tag-publishing
+          }
 
           DELIM="$(echo $RANDOM | base64 | head -c 3; echo)"
           echo "tags-file=$PWD/tag-publishing" >> $GITHUB_OUTPUT
