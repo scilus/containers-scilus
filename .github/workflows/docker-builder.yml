@@ -176,14 +176,18 @@ jobs:
           version "${{ inputs.actions-runner-version }}" actions-runner-version
 
           echo "DEPS_TAG=\"${{ inputs.scilus-dependencies-tag }}\"" >> local-versioning.hcl
-          [ "${{ inputs.target }}" == "scilus-flows" ] && {
+          if [ "${{ inputs.target }}" == "scilus-flows" ]
+          then
               version "${{ inputs.scilus-for-scilus-flows-tag }}" SCILUS_TAG
-          }
+          fi
 
           vtk_version=$(cat versioning.hcl | grep vtk-version | cut -d "=" -f2)
           vtk_version=$(echo $vtk_version | tr -d " " | tr -d "\"")
           ACR_TAG=${{ inputs.actions-runner-version }}-vtk${vtk_version}
-          [ -z "${{ inputs.actions-runner-version }}" ] || { version "$ACR_TAG" ACR_TAG }
+          if [ -n "${{ inputs.actions-runner-version }}" ]
+          then
+              version "$ACR_TAG" ACR_TAG
+          fi
 
           echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
       -
