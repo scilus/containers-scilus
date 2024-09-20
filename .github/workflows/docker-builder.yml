@@ -208,7 +208,7 @@ jobs:
 
           if [ "${{ inputs.update-latest }}" == "true" ]
           then
-              TAGLINE=${{ env.IMAGE }}:latest
+              echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:latest" >> tag-publishing
               if [ "${{ inputs.target }}" == "actions-runner" ]
               then
                   if [ -n "${{ inputs.actions-runner-version }}" ]
@@ -216,10 +216,9 @@ jobs:
                       vtk_version=$(cat versioning.hcl | grep vtk-version | cut -d "=" -f2)
                       vtk_version=$(echo $vtk_version | tr -d " " | tr -d "\"")
                       ACR_TAG=${{ inputs.actions-runner-version }}-vtk${vtk_version}
-                      TAGLINE="[\"${{ env.IMAGE }}:$ACR_TAG\",\"$TAGLINE\"]"
+                      echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:$ACR_TAG" >> tag-publishing
                   fi
               fi
-              echo "${{ inputs.target }}.tags=$TAGLINE" >> tag-publishing
           fi
 
           DELIM="$(echo $RANDOM | base64 | head -c 3; echo)"
