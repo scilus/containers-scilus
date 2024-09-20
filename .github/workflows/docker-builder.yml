@@ -196,6 +196,12 @@ jobs:
           [ "${{ inputs.update-latest }}" == "true" ] && \
               echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:latest" >> tag-publishing
 
+          vtk_version = "$(cat versioning.hcl | grep 'vtk-version' | cut -d '=' -f2)"
+          vtk_version = "$(echo $vtk_version | tr -d ' ' | tr -d '\"')"
+          ACR_TAG=${{ inputs.tag }}-vtk${vtk_version}
+          [ -z "${{ inputs.actions-runner-version }}" ] || \
+              echo "ACR_TAG=\"$ACR_TAG\"" >> tag-publishing 
+
           DELIM="$(echo $RANDOM | base64 | head -c 3; echo)"
           echo "tags-file=$PWD/tag-publishing" >> $GITHUB_OUTPUT
           echo "tags-string<<$DELIM" >> $GITHUB_OUTPUT
