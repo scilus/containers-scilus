@@ -180,10 +180,10 @@ jobs:
               version "${{ inputs.scilus-for-scilus-flows-tag }}" SCILUS_TAG
           }
 
-          vtk_version = "$(cat versioning.hcl | grep 'vtk-version' | cut -d '=' -f2)"
-          vtk_version = "$(echo $vtk_version | tr -d ' ' | tr -d '\"')"
+          vtk_version=$(cat versioning.hcl | grep vtk-version | cut -d "=" -f2)
+          vtk_version=$(echo $vtk_version | tr -d " " | tr -d "\"")
           ACR_TAG=${{ inputs.tag }}-vtk${vtk_version}
-          [ -z "${{ inputs.actions-runner-version }}" ] || { version $ACR_TAG ACR_TAG }
+          [ -z "${{ inputs.actions-runner-version }}" ] || { version "$ACR_TAG" ACR_TAG }
 
           echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
       -
