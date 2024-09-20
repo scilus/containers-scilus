@@ -216,7 +216,7 @@ jobs:
                       vtk_version=$(cat versioning.hcl | grep vtk-version | cut -d "=" -f2)
                       vtk_version=$(echo $vtk_version | tr -d " " | tr -d "\"")
                       ACR_TAG=${{ inputs.actions-runner-version }}-vtk${vtk_version}
-                      TAGLINE="[\"$ACR_TAG\",\"$TAGLINE\"]"
+                      TAGLINE="[\"${{ env.IMAGE }}:$ACR_TAG\",\"$TAGLINE\"]"
                   fi
               fi
               echo "${{ inputs.target }}.tags=$TAGLINE" >> tag-publishing
