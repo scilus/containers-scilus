@@ -155,7 +155,7 @@ jobs:
         id: local-versioning
         run: |
           touch local-versioning.hcl
-          function version () { [ -z "$1" ] || { echo "${2}=\"${1}\"" >> local-versioning.hcl } }
+          version () { if [ -n "$1" ]; then echo "${2}=\"${1}\"" >> local-versioning.hcl; fi }
 
           echo "dockerhub-user-pull=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
           echo "dockerhub-user-push=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
