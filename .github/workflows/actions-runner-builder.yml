@@ -34,4 +34,5 @@ jobs:
       update-latest: true
       disable-builddate-tag: true
       actions-runner-version: ${{ needs.compute-dependencies-versions.outputs.runner_latest_version }}
+      build-system-ref: feat/github_runner
     secrets: inherit
