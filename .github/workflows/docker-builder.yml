@@ -146,7 +146,7 @@ jobs:
           fi
       -
         name: Checkout build system
-        uses: actions/checkout@v3
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           repository: ${{ github.repository_owner }}/containers-scilus
           ref: ${{ inputs.build-system-ref }}
@@ -197,7 +197,6 @@ jobs:
           IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}
         run: |
           touch tag-publishing
-          echo "${{ inputs.target }}.output=type=registry" >> tag-publishing
 
           [ -z ${{ inputs.tag }} ] || {
               echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:${{ inputs.tag }}" >> tag-publishing
@@ -207,9 +206,21 @@ jobs:
               echo "${{ inputs.target }}.tags=${{ env.IMAGE }}-$(date +'%Y%m%d')" >> tag-publishing
           }
 
-          [ "${{ inputs.update-latest }}" == "true" ] && {
-              echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:latest" >> tag-publishing
-          }
+          if [ "${{ inputs.update-latest }}" == "true" ]
+          then
+              TAGLINE=${{ env.IMAGE }}:latest
+              if [ "${{ inputs.target }}" == "actions-runner" ]
+              then
+                  if [ -n "${{ inputs.actions-runner-version }}" ]
+                  then
+                      vtk_version=$(cat versioning.hcl | grep vtk-version | cut -d "=" -f2)
+                      vtk_version=$(echo $vtk_version | tr -d " " | tr -d "\"")
+                      ACR_TAG=${{ inputs.actions-runner-version }}-vtk${vtk_version}
+                      TAGLINE="[\"$ACR_TAG\",\"$TAGLINE\"]"
+                  fi
+              fi
+              echo "${{ inputs.target }}.tags=$TAGLINE" >> tag-publishing
+          fi
 
           DELIM="$(echo $RANDOM | base64 | head -c 3; echo)"
           echo "tags-file=$PWD/tag-publishing" >> $GITHUB_OUTPUT
@@ -219,7 +230,7 @@ jobs:
           echo "git-output=$GITHUB_OUTPUT" >> $GITHUB_OUTPUT
       -
         name: Upload versioning and caching hcl as artifacts
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: HCL artifacts
           path: |
@@ -228,21 +239,17 @@ jobs:
             ${{ steps.dockerhub-tags.outputs.git-output }}
       -
         name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          version: v0.11.0
-          driver-opts: |
-            image=moby/buildkit:v0.11.6
+        uses: docker/setup-buildx-action@988b5a0280414f521da01fcc63a27aeeb4b104db # v3.6.1
       -
         name: Build container
         id: container-build
-        uses: docker/bake-action@v3.1.0
+        uses: docker/bake-action@76cc8060bdff6d632a465001e4cf300684c5472c # v5.7.0
         with:
           targets: |
             ${{ inputs.target }}
@@ -260,7 +267,7 @@ jobs:
           echo "metadata=$PWD/container-metadata.json" >> $GITHUB_OUTPUT
       -
         name: Upload bake definition
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: Baking artifacts
           path: |
