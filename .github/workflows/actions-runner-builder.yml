@@ -1,40 +1,45 @@
 name: Build scilus/actions-runner image
 
 on:
-    workflow_dispatch:
-    schedule:
-        - cron: "0 2 * * *" # Runs at 02:00 every day
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *" # Runs at 02:00 every day
 
 jobs:
-    build-action-runner:
-        runs-on: scilus-org-runners
+  compute-dependencies-versions:
+    runs-on: scilus-org-runners
+    outputs:
+      runner_current_version: ${{ steps.github-runner.outputs.current_version }}
+      runner_latest_version: ${{ steps.github-runner.outputs.latest_version }}
+      vtk_version: ${{ steps.vtk-version.outputs.version }}
 
-        steps:
-            - uses: ksivamuthu/actions-setup-gh-cli@v3
-            # From : https://github.com/actions/actions-runner-controller/blob/0bfa57ac504dfc818128f7185fc82830cbdb83f1/.github/workflows/arc-update-runners-scheduled.yaml#L14
-            - name: actions-runner version
-              id: github-runner
-              env:
-                GH_TOKEN: ${{ github.token }}
-              run: |
-                CURRENT_VERSION=$(echo -n $(cat /VERSION | grep 'runner =>' | cut -d '>' -f2 | tr -d '\n' | tr -d ' '))
-                LATEST_VERSION=$(gh release list --exclude-drafts --exclude-pre-releases --limit 1 -R actions/runner | grep -oP '(?<=v)[0-9.]+' | head -1)
-                echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-                echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+    steps:
+      - uses: ksivamuthu/actions-setup-gh-cli@v3
+      # From : https://github.com/actions/actions-runner-controller/blob/0bfa57ac504dfc818128f7185fc82830cbdb83f1/.github/workflows/arc-update-runners-scheduled.yaml#L14
+      - name: actions-runner version
+        id: github-runner
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CURRENT_VERSION=$(echo -n $(cat /VERSION | grep 'runner =>' | cut -d '>' -f2 | tr -d '\n' | tr -d ' '))
+          LATEST_VERSION=$(gh release list --exclude-drafts --exclude-pre-releases --limit 1 -R actions/runner | grep -oP '(?<=v)[0-9.]+' | head -1)
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
 
-            - name: VTK version
-              id: vtk-version
-              run: |
-                version=$(echo -n $(cat /VERSION | grep 'vtk =>' | cut -d '>' -f2 | tr -d '\n' | tr -d ' '))
-                echo "version=$version" >> $GITHUB_OUTPUT
+      - name: VTK version
+        id: vtk-version
+        run: |
+          version=$(echo -n $(cat /VERSION | grep 'vtk =>' | cut -d '>' -f2 | tr -d '\n' | tr -d ' '))
+          echo "version=$version" >> $GITHUB_OUTPUT
 
-            - name: build
-              if: ${{ steps.github-runner.outputs.current_version }} != ${{ steps.github-runner.outputs.latest_version }}
-              uses: ./.github/workflows/docker-builder.yml
-              with:
-                target: actions-runner
-                tag: ${{ steps.github-runner.outputs.latest_version }}-vtk${{ steps.vtk-version.outputs.version }}
-                update-latest: true
-                disable-builddate-tag: true
-                actions-runner-version: ${{ steps.github-runner.outputs.latest_version }}
-              secrets: inherit
+  build-runner-image:
+    needs: [compute-dependencies-versions]
+    if: ${{ (needs.compute-dependencies-versions.outputs.runner_current_version != needs.compute-dependencies-versions.outputs.runner_latest_version) }}
+    uses: ./.github/workflows/docker-builder.yml
+    with:
+      target: actions-runner
+      tag: ${{ needs.compute-dependencies-versions.outputs.runner_latest_version }}-vtk${{ needs.compute-dependencies-versions.outputs.vtk_version }}
+      update-latest: true
+      disable-builddate-tag: true
+      actions-runner-version: ${{ needs.compute-dependencies-versions.outputs.runner_latest_version }}
+    secrets: inherit

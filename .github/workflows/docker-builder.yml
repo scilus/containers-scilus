@@ -155,34 +155,47 @@ jobs:
         id: local-versioning
         run: |
           touch local-versioning.hcl
+          function version () { [ -z "$1" ] || echo "${2}=\"${1}\"" >> local-versioning.hcl }
+
           echo "dockerhub-user-pull=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
           echo "dockerhub-user-push=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
-          [ -z "${{ inputs.scilpy-version }}" ]            || echo "scilpy-version=\"${{ inputs.scilpy-version }}\""                       >> local-versioning.hcl
-          [ -z "${{ inputs.dmriqcpy-version }}" ]          || echo "dmriqcpy-version=\"${{ inputs.dmriqcpy-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.nextflow-version }}" ]          || echo "nextflow-version=\"${{ inputs.nextflow-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.tractoflow-version }}" ]        || echo "tractoflow-version=\"${{ inputs.tractoflow-version }}\""               >> local-versioning.hcl
-          [ -z "${{ inputs.dmriqc-flow-version }}" ]       || echo "dmriqc-flow-version=\"${{ inputs.dmriqc-flow-version }}\""             >> local-versioning.hcl
-          [ -z "${{ inputs.extractor-flow-version }}" ]    || echo "extractor-flow-version=\"${{ inputs.extractor-flow-version }}\""       >> local-versioning.hcl
-          [ -z "${{ inputs.rbx-flow-version }}" ]          || echo "rbx-flow-version=\"${{ inputs.rbx-flow-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.tractometry-flow-version }}" ]  || echo "tractometry-flow-version=\"${{ inputs.tractometry-flow-version }}\""   >> local-versioning.hcl
-          [ -z "${{ inputs.register-flow-version }}" ]     || echo "register-flow-version=\"${{ inputs.register-flow-version }}\""         >> local-versioning.hcl
-          [ -z "${{ inputs.disconets-flow-version }}" ]    || echo "disconets-flow-version=\"${{ inputs.disconets-flow-version }}\""       >> local-versioning.hcl
-          [ -z "${{ inputs.freewater-flow-version }}" ]    || echo "freewater-flow-version=\"${{ inputs.freewater-flow-version }}\""       >> local-versioning.hcl
-          [ -z "${{ inputs.noddi-flow-version }}" ]        || echo "noddi-flow-version=\"${{ inputs.noddi-flow-version }}\""               >> local-versioning.hcl
-          [ -z "${{ inputs.bst-flow-version }}" ]          || echo "bst-flow-version=\"${{ inputs.bst-flow-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.actions-runner-version }}" ]          || echo "actions-runner-image=\"ghcr.io/actions/actions-runner:${{ inputs.actions-runner-version }}\""                   >> local-versioning.hcl
+
+          version "${{ inputs.scilpy-version }}" scilpy-version
+          version "${{ inputs.dmriqcpy-version }}" dmriqcpy-version
+          version "${{ inputs.nextflow-version }}" nextflow-version
+          version "${{ inputs.tractoflow-version }}" tractoflow-version
+          version "${{ inputs.dmriqc-flow-version }}" dmriqc-flow-version
+          version "${{ inputs.extractor-flow-version }}" extractor-flow-version
+          version "${{ inputs.rbx-flow-version }}" rbx-flow-version
+          version "${{ inputs.tractometry-flow-version }}" tractometry-flow-version
+          version "${{ inputs.register-flow-version }}" register-flow-version
+          version "${{ inputs.disconets-flow-version }}" disconets-flow-version
+          version "${{ inputs.freewater-flow-version }}" freewater-flow-version
+          version "${{ inputs.noddi-flow-version }}" noddi-flow-version
+          version "${{ inputs.bst-flow-version }}" bst-flow-version
+          version "${{ inputs.actions-runner-version }}" actions-runner-version
+
           echo "DEPS_TAG=\"${{ inputs.scilus-dependencies-tag }}\"" >> local-versioning.hcl
-          [ "${{ inputs.target }}" == "scilus-flows" ] && echo "SCILUS_TAG=\"${{ inputs.scilus-for-scilus-flows-tag }}\"" >> local-versioning.hcl
+          [ "${{ inputs.target }}" == "scilus-flows" ] && \
+              version "${{ inputs.scilus-for-scilus-flows-tag }}" SCILUS_TAG
+
           echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
       -
         name: Set output image tags and registry to publish to
         id: dockerhub-tags
+        env:
+          IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}
         run: |
           touch tag-publishing
           echo "${{ inputs.target }}.output=type=registry" >> tag-publishing
-          echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:${{ inputs.tag }}" >> tag-publishing
-          [ "${{ inputs.disable-builddate-tag }}" != "true" ] && echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:${{ inputs.tag }}-$(date +'%Y%m%d')" >> tag-publishing
-          [ "${{ inputs.update-latest }}" == "true" ] && echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:latest" >> tag-publishing
+          echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:${{ inputs.tag }}" >> tag-publishing
+
+          [ "${{ inputs.disable-builddate-tag }}" != "true" ] && \
+              echo "${{ inputs.target }}.tags=${{ env.IMAGE }}-$(date +'%Y%m%d')" >> tag-publishing
+
+          [ "${{ inputs.update-latest }}" == "true" ] && \
+              echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:latest" >> tag-publishing
+
           DELIM="$(echo $RANDOM | base64 | head -c 3; echo)"
           echo "tags-file=$PWD/tag-publishing" >> $GITHUB_OUTPUT
           echo "tags-string<<$DELIM" >> $GITHUB_OUTPUT
