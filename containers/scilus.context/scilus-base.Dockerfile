@@ -1,4 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1.6.0
+# syntax=docker.io/docker/dockerfile:1.10.0
 
 FROM scilus-image-base AS scilus-base
 

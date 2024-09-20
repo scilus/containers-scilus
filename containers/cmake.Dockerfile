@@ -1,4 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1.6.0
+# syntax=docker.io/docker/dockerfile:1.10.0
 
 FROM cmake-builder AS cmake
 
@@ -16,17 +16,16 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         wget && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /tmp
-ADD https://github.com/Kitware/CMake.git#${CMAKE_REVISION} /tmp/cmake
+ADD https://github.com/Kitware/CMake.git#${CMAKE_REVISION} /cmake
 
-WORKDIR /tmp/cmake
+WORKDIR /cmake
 RUN ./bootstrap && \
     [ -z "$CMAKE_BUILD_NTHREADS" ] && \
         { make -j $(nproc --all); } || \
         { make -j ${CMAKE_BUILD_NTHREADS}; } && \
     make install
 
-WORKDIR /tmp
+WORKDIR /
 RUN rm -rf cmake
 
 WORKDIR /
