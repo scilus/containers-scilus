@@ -28,8 +28,7 @@ jobs:
 
   build-runner-image:
     needs: [compute-dependencies-versions]
-    if: ${{ (needs.compute-dependencies-versions.outputs.runner_current_version != needs.compute-dependencies-versions.outputs.runner_latest_version) }}
-    uses: ./.github/workflows/docker-builder.yml
+    uses: scilus/containers-scilus/.github/workflows/docker-builder.yml@feat/github_runner
     with:
       target: actions-runner
       update-latest: true
