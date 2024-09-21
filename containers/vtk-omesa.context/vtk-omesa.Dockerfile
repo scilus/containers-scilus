@@ -1,6 +1,6 @@
 # syntax=docker.io/docker/dockerfile:1.10.0
 
-FROM vtk-builder AS src
+FROM scratch AS src
 
 ARG MESA_VERSION
 ARG VTK_VERSION
@@ -8,17 +8,9 @@ ARG VTK_VERSION
 ENV MESA_VERSION=${MESA_VERSION:-19.0.8}
 ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 
-ADD https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz /mesa.tar.xz
-ADD https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz /vtk.tar.gz
-
-WORKDIR /
-RUN tar -xJf mesa.tar.xz && \
-    tar -xzf vtk.tar.gz && \
-    rm mesa.tar.xz vtk.tar.gz
-
-ADD patches/vtk-${VTK_VERSION}/setup.py.in /vtk-v${VTK_VERSION}/CMake/setup.py.in
-ADD patches/vtk-${VTK_VERSION}/vtkWheelPreparation.cmake /vtk-v${VTK_VERSION}/CMake/vtkWheelPreparation.cmake
-
+ADD https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz /mesa/mesa.tar.xz
+ADD https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz /vtk/vtk.tar.gz
+ADD patches/vtk-${VTK_VERSION}/ /vtk_patches/
 
 FROM vtk-builder AS vtk
 
@@ -71,8 +63,11 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         xorg-dev && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /mesa-${MESA_VERSION}
-RUN --mount=type=bind,rw,from=src,source=/mesa-${MESA_VERSION},target=/mesa-${MESA_VERSION} \
+WORKDIR /mesa
+RUN --mount=type=bind,rw,from=src,source=/mesa,target=/mesa \
+    tar -xJf mesa.tar.xz && \
+    rm mesa.tar.xz && \
+    cd mesa-${MESA_VERSION} && \
     mkdir build && \
     echo "[binaries]\nllvm-config = '/usr/bin/llvm-config'" >> llvm.ini && \
     meson setup \
@@ -105,7 +100,13 @@ RUN --mount=type=bind,rw,from=src,source=/mesa-${MESA_VERSION},target=/mesa-${ME
 ENV LD_LIBRARY_PATH=${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:${MESA_INSTALL_PATH}/lib:$LD_LIBRARY_PATH
 
 WORKDIR ${VTK_BUILD_PATH}
-RUN --mount=type=bind,rw,from=src,source=/vtk-v${VTK_VERSION},target=${VTK_BUILD_PATH}/vtk-v${VTK_VERSION} \
+RUN --mount=type=bind,rw,from=src,source=/vtk,target=${VTK_BUILD_PATH} \
+    --mount=type=bind,rw,from=src,source=/vtk_patches,target=/vtk_patches \
+    tar -xzf vtk.tar.gz && \
+    rm vtk.tar.gz && \
+    cd vtk-v${VTK_VERSION} && \
+    cp /vtk_patches/vtkWheelPreparation.cmake CMake/. && \
+    cp /vtk_patches/vtkWheelPreparation.cmake CMake/vtkWheelPreparation.cmake && \
     if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
     cmake -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
