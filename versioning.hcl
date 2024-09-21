@@ -9,7 +9,7 @@ dmriqcpy-revision="0.1.7"
 scilpy-revision="2.0.2"
 
 ants-revision="2.4.3"
-cmake-revision="v3.16.3"
+cmake-revision="v3.21.6"
 fsl-version="6.0.6.4"
 fsl-installer-version="3.14.0"
 mrtrix-revision="3.0.4"
