@@ -104,9 +104,8 @@ RUN --mount=type=bind,rw,from=src,source=/vtk,target=${VTK_BUILD_PATH} \
     --mount=type=bind,rw,from=src,source=/vtk_patches,target=/vtk_patches \
     tar -xzf vtk.tar.gz && \
     rm vtk.tar.gz && \
-    cd vtk-v${VTK_VERSION} && \
-    cp /vtk_patches/vtkWheelPreparation.cmake CMake/. && \
-    cp /vtk_patches/vtkWheelPreparation.cmake CMake/vtkWheelPreparation.cmake && \
+    cp /vtk_patches/vtkWheelPreparation.cmake vtk-v${VTK_VERSION}/CMake/. && \
+    cp /vtk_patches/setup.py.in vtk-v${VTK_VERSION}/CMake/. && \
     if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
     cmake -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
