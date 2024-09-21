@@ -63,8 +63,8 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         xorg-dev && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /mesa
-RUN --mount=type=bind,rw,from=src,source=/mesa,target=/mesa \
+WORKDIR /mesa_source
+RUN --mount=type=bind,rw,from=src,source=/mesa,target=/mesa_source \
     tar -xJf mesa.tar.xz && \
     rm mesa.tar.xz && \
     cd mesa-${MESA_VERSION} && \
