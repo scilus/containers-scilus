@@ -3,7 +3,7 @@ name: Build scilus/actions-runner image
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 2 * * *" # Runs at 02:00 every day
+    - cron: "0 7 * * *" # Runs at 02:00-EST (7:00-UTC) every day 
 
 jobs:
   compute-dependencies-versions:
@@ -11,7 +11,6 @@ jobs:
     outputs:
       runner_current_version: ${{ steps.github-runner.outputs.current_version }}
       runner_latest_version: ${{ steps.github-runner.outputs.latest_version }}
-      vtk_version: ${{ steps.vtk-version.outputs.version }}
 
     steps:
       - uses: ksivamuthu/actions-setup-gh-cli@v3
@@ -28,11 +27,11 @@ jobs:
 
   build-runner-image:
     needs: [compute-dependencies-versions]
-    uses: scilus/containers-scilus/.github/workflows/docker-builder.yml@feat/github_runner
+    if: ${{ needs.compute-dependencies-versions.outputs.runner_current_version != needs.compute-dependencies-versions.outputs.runner_latest_version }}
+    uses: ./.github/workflows/docker-builder.yml
     with:
       target: actions-runner
       update-latest: true
       disable-builddate-tag: true
       actions-runner-version: ${{ needs.compute-dependencies-versions.outputs.runner_latest_version }}
-      build-system-ref: feat/github_runner
     secrets: inherit
