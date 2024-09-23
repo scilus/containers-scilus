@@ -12,8 +12,8 @@ variable "base-build-image" {
     default = "ubuntu:22.04"
 }
 
-variable "actions-runner-image" {
-    default = "ghcr.io/actions/actions-runner:2.312.0"
+variable "actions-runner-version" {
+    default = "2.319.1"
 }
 
 variable "ants-revision" {
@@ -230,6 +230,7 @@ target "actions-runner" {
         actions-runner-base = "target:actions-runner-vtk"
     }
     args = {
+        RUNNER_VERSION = "${actions-runner-version}"
         CONTAINER_INSTALL_USER = "root"
         CONTAINER_RUN_USER = "runner"
     }
@@ -244,7 +245,7 @@ target "actions-runner" {
 target "actions-runner-vtk" {
     inherits = ["vtk"]
     contexts = {
-        vtk-base = "docker-image://${actions-runner-image}"
+        vtk-base = "docker-image://ghcr.io/actions/actions-runner:${actions-runner-version}"
     }
     args = {
         CONTAINER_INSTALL_USER = "root"

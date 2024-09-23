@@ -1,35 +1,37 @@
 name: Build scilus/actions-runner image
 
 on:
-    workflow_dispatch:
-    schedule:
-        - cron: "0 2 * * *" # Runs at 02:00 every day
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * *" # Runs at 02:00-EST (7:00-UTC) every day 
 
 jobs:
-    build-action-runner:
-        runs-on: ubuntu-latest
+  compute-dependencies-versions:
+    runs-on: scilus-org-runners
+    outputs:
+      runner_current_version: ${{ steps.github-runner.outputs.current_version }}
+      runner_latest_version: ${{ steps.github-runner.outputs.latest_version }}
 
-        steps:
-            - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    steps:
+      - uses: ksivamuthu/actions-setup-gh-cli@v3
+      # From : https://github.com/actions/actions-runner-controller/blob/0bfa57ac504dfc818128f7185fc82830cbdb83f1/.github/workflows/arc-update-runners-scheduled.yaml#L14
+      - name: actions-runner version
+        id: github-runner
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CURRENT_VERSION=$(echo -n $(cat /VERSION | grep 'runner =>' | cut -d '>' -f2 | tr -d '\n' | tr -d ' '))
+          LATEST_VERSION=$(gh release list --exclude-drafts --exclude-pre-releases --limit 1 -R actions/runner | grep -oP '(?<=v)[0-9.]+' | head -1)
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
 
-            - name: VTK version
-              id: vtk-version
-              run: |
-                version=$(cat versioning.hcl | grep vtk-version | sed 's/vtk-version="\(.*\)"/\1/')
-                echo "::set-output name=version::$version"
-
-            - name: actions-runner version
-              id: github-runner
-              uses: docker://ghcr.io/scilus/actions-runner:latest
-              with:
-                entrypoint: /bin/bash
-                args: -c "echo ::set-output name=version::$(cat /version.txt)"
-
-            - name: build
-              uses: ./docker-builder.yml
-              with:
-                target: actions-runner
-                tag: ${{ steps.github-runner.outputs.version }}-vtk${{ steps.vtk-version.outputs.version }}
-                update-latest: true
-                disable-builddate-tag: true
-                actions-runner-version: ${{ steps.github-runner.outputs.version }}
+  build-runner-image:
+    needs: [compute-dependencies-versions]
+    if: ${{ needs.compute-dependencies-versions.outputs.runner_current_version != needs.compute-dependencies-versions.outputs.runner_latest_version }}
+    uses: ./.github/workflows/docker-builder.yml
+    with:
+      target: actions-runner
+      update-latest: true
+      disable-builddate-tag: true
+      actions-runner-version: ${{ needs.compute-dependencies-versions.outputs.runner_latest_version }}
+    secrets: inherit

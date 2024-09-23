@@ -1,6 +1,18 @@
-# syntax=docker.io/docker/dockerfile:1.6.0
+# syntax=docker.io/docker/dockerfile:1.10.0
 
-FROM vtk-builder as vtk
+FROM scratch AS src
+
+ARG MESA_VERSION
+ARG VTK_VERSION
+
+ENV MESA_VERSION=${MESA_VERSION:-19.0.8}
+ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
+
+ADD --link https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz /mesa/mesa.tar.xz
+ADD --link https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz /vtk/vtk.tar.gz
+ADD --chmod=644 --link patches/vtk-${VTK_VERSION}/ /vtk_patches/
+
+FROM vtk-builder AS vtk
 
 ARG MESA_BUILD_NTHREADS
 ARG MESA_INSTALL_PATH
@@ -22,9 +34,8 @@ ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
 ENV VTK_PYTHON_VERSION=${VTK_PYTHON_VERSION:-3.10}
 ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 ENV VTK_WHEEL_VERSION_LOCAL=${VTK_WHEEL_VERSION_LOCAL:-scilosmesa}
-env WHEELHOUSE_PATH=${WHEELHOUSE_PATH:-/wheelhouse}
+ENV WHEELHOUSE_PATH=${WHEELHOUSE_PATH:-/wheelhouse}
 
-WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
     mkdir ${MESA_INSTALL_PATH} ${VTK_INSTALL_PATH} ${VTK_BUILD_PATH} ${WHEELHOUSE_PATH} && \
@@ -52,13 +63,12 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         xorg-dev && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /
-ADD https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz mesa.tar.xz
-RUN tar -xJf mesa.tar.xz && \
-    rm mesa.tar.xz
-
-WORKDIR /mesa-${MESA_VERSION}
-RUN mkdir build && \
+WORKDIR /mesa_source
+RUN --mount=type=bind,rw,from=src,source=/mesa,target=/mesa_source \
+    tar -xJf mesa.tar.xz && \
+    rm mesa.tar.xz && \
+    cd mesa-${MESA_VERSION} && \
+    mkdir build && \
     echo "[binaries]\nllvm-config = '/usr/bin/llvm-config'" >> llvm.ini && \
     meson setup \
         --native-file llvm.ini \
@@ -90,16 +100,13 @@ RUN mkdir build && \
 ENV LD_LIBRARY_PATH=${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:${MESA_INSTALL_PATH}/lib:$LD_LIBRARY_PATH
 
 WORKDIR ${VTK_BUILD_PATH}
-ADD https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz vtk.tar.gz
-RUN tar -xzf vtk.tar.gz && \
-    rm vtk.tar.gz
-
-WORKDIR ${VTK_BUILD_PATH}/vtk-v${VTK_VERSION}
-ADD patches/vtk-${VTK_VERSION}/setup.py.in CMake/setup.py.in
-ADD patches/vtk-${VTK_VERSION}/vtkWheelPreparation.cmake CMake/vtkWheelPreparation.cmake
-
-WORKDIR ${VTK_BUILD_PATH}
-RUN if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
+RUN --mount=type=bind,rw,from=src,source=/vtk,target=${VTK_BUILD_PATH} \
+    --mount=type=bind,rw,from=src,source=/vtk_patches,target=/vtk_patches \
+    tar -xzf vtk.tar.gz && \
+    rm vtk.tar.gz && \
+    cp /vtk_patches/vtkWheelPreparation.cmake vtk-v${VTK_VERSION}/CMake/. && \
+    cp /vtk_patches/setup.py.in vtk-v${VTK_VERSION}/CMake/. && \
+    if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
     cmake -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS:BOOL=ON \
@@ -147,9 +154,7 @@ RUN if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && 
     [ -z "$VTK_BUILD_NTHREADS" ] && \
         { ninja -j $(nproc --all); } || \
         { ninja -j ${VTK_BUILD_NTHREADS}; } && \
-    ninja install
-    
-RUN if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
+    ninja install && \
     python${PYTHON_MAJOR} setup.py bdist_wheel && \
     cp dist/vtk-${VTK_VERSION}+${VTK_WHEEL_VERSION_LOCAL}-cp310-cp310-linux_x86_64.whl ${WHEELHOUSE_PATH}/.
 
@@ -157,6 +162,7 @@ ENV VTK_DIR=${VTK_INSTALL_PATH}
 ENV VTKPYTHONPATH=${VTK_DIR}/lib/python${VTK_PYTHON_VERSION}/site-packages:${VTK_DIR}/lib
 ENV LD_LIBRARY_PATH=${VTK_DIR}/lib:$LD_LIBRARY_PATH
 ENV PYTHONPATH=${PYTHONPATH}:${VTKPYTHONPATH}
+
 
 FROM vtk-base as vtk-install
 
@@ -180,7 +186,7 @@ ENV PYTHONNOUSERSITE=true
 ENV VTK_DIR=${VTK_INSTALL_PATH}/build
 ENV VTKPYTHONPATH=${VTK_DIR}/vtkmodules
 
-ENV LD_LIBRARY_PATH=${VTK_DIR}/lib.linux-x86_64-${VTK_PYTHON_VERSION}/vtkmodules:${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=${VTK_DIR}/lib.linux-x86_64-${VTK_PYTHON_VERSION}/vtkmodules:${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH 
 ENV PYTHONPATH=${PYTHONPATH}:${VTKPYTHONPATH}
 
 USER ${CONTAINER_INSTALL_USER:-0}

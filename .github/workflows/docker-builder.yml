@@ -60,7 +60,7 @@ on:
         required: true
         type: string
       tag:
-        required: true
+        required: false
         type: string
       update-latest:
         required: false
@@ -135,8 +135,7 @@ on:
 
 jobs:
   build-container:
-    runs-on:
-      group: scilus-docker-builders
+    runs-on: scilus-docker-builders
     steps:
       -
         name: Validate input parameters
@@ -147,7 +146,7 @@ jobs:
           fi
       -
         name: Checkout build system
-        uses: actions/checkout@v3
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           repository: ${{ github.repository_owner }}/containers-scilus
           ref: ${{ inputs.build-system-ref }}
@@ -156,34 +155,72 @@ jobs:
         id: local-versioning
         run: |
           touch local-versioning.hcl
+          version () { if [ -n "$1" ]; then echo "${2}=\"${1}\"" >> local-versioning.hcl; fi }
+
           echo "dockerhub-user-pull=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
           echo "dockerhub-user-push=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
-          [ -z "${{ inputs.scilpy-version }}" ]            || echo "scilpy-version=\"${{ inputs.scilpy-version }}\""                       >> local-versioning.hcl
-          [ -z "${{ inputs.dmriqcpy-version }}" ]          || echo "dmriqcpy-version=\"${{ inputs.dmriqcpy-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.nextflow-version }}" ]          || echo "nextflow-version=\"${{ inputs.nextflow-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.tractoflow-version }}" ]        || echo "tractoflow-version=\"${{ inputs.tractoflow-version }}\""               >> local-versioning.hcl
-          [ -z "${{ inputs.dmriqc-flow-version }}" ]       || echo "dmriqc-flow-version=\"${{ inputs.dmriqc-flow-version }}\""             >> local-versioning.hcl
-          [ -z "${{ inputs.extractor-flow-version }}" ]    || echo "extractor-flow-version=\"${{ inputs.extractor-flow-version }}\""       >> local-versioning.hcl
-          [ -z "${{ inputs.rbx-flow-version }}" ]          || echo "rbx-flow-version=\"${{ inputs.rbx-flow-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.tractometry-flow-version }}" ]  || echo "tractometry-flow-version=\"${{ inputs.tractometry-flow-version }}\""   >> local-versioning.hcl
-          [ -z "${{ inputs.register-flow-version }}" ]     || echo "register-flow-version=\"${{ inputs.register-flow-version }}\""         >> local-versioning.hcl
-          [ -z "${{ inputs.disconets-flow-version }}" ]    || echo "disconets-flow-version=\"${{ inputs.disconets-flow-version }}\""       >> local-versioning.hcl
-          [ -z "${{ inputs.freewater-flow-version }}" ]    || echo "freewater-flow-version=\"${{ inputs.freewater-flow-version }}\""       >> local-versioning.hcl
-          [ -z "${{ inputs.noddi-flow-version }}" ]        || echo "noddi-flow-version=\"${{ inputs.noddi-flow-version }}\""               >> local-versioning.hcl
-          [ -z "${{ inputs.bst-flow-version }}" ]          || echo "bst-flow-version=\"${{ inputs.bst-flow-version }}\""                   >> local-versioning.hcl
-          [ -z "${{ inputs.actions-runner-version }}" ]          || echo "actions-runner-image=\"ghcr.io/actions/actions-runner:${{ inputs.actions-runner-version }}\""                   >> local-versioning.hcl
+
+          version "${{ inputs.scilpy-version }}" scilpy-version
+          version "${{ inputs.dmriqcpy-version }}" dmriqcpy-version
+          version "${{ inputs.nextflow-version }}" nextflow-version
+          version "${{ inputs.tractoflow-version }}" tractoflow-version
+          version "${{ inputs.dmriqc-flow-version }}" dmriqc-flow-version
+          version "${{ inputs.extractor-flow-version }}" extractor-flow-version
+          version "${{ inputs.rbx-flow-version }}" rbx-flow-version
+          version "${{ inputs.tractometry-flow-version }}" tractometry-flow-version
+          version "${{ inputs.register-flow-version }}" register-flow-version
+          version "${{ inputs.disconets-flow-version }}" disconets-flow-version
+          version "${{ inputs.freewater-flow-version }}" freewater-flow-version
+          version "${{ inputs.noddi-flow-version }}" noddi-flow-version
+          version "${{ inputs.bst-flow-version }}" bst-flow-version
+          version "${{ inputs.actions-runner-version }}" actions-runner-version
+
           echo "DEPS_TAG=\"${{ inputs.scilus-dependencies-tag }}\"" >> local-versioning.hcl
-          [ "${{ inputs.target }}" == "scilus-flows" ] && echo "SCILUS_TAG=\"${{ inputs.scilus-for-scilus-flows-tag }}\"" >> local-versioning.hcl
+          if [ "${{ inputs.target }}" == "scilus-flows" ]
+          then
+              version "${{ inputs.scilus-for-scilus-flows-tag }}" SCILUS_TAG
+          fi
+
+          vtk_version=$(cat versioning.hcl | grep vtk-version | cut -d "=" -f2)
+          vtk_version=$(echo $vtk_version | tr -d " " | tr -d "\"")
+          ACR_TAG=${{ inputs.actions-runner-version }}-vtk${vtk_version}
+          if [ -n "${{ inputs.actions-runner-version }}" ]
+          then
+              version "$ACR_TAG" ACR_TAG
+          fi
+
           echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
       -
         name: Set output image tags and registry to publish to
         id: dockerhub-tags
+        env:
+          IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}
         run: |
           touch tag-publishing
-          echo "${{ inputs.target }}.output=type=registry" >> tag-publishing
-          echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:${{ inputs.tag }}" >> tag-publishing
-          [ "${{ inputs.disable-builddate-tag }}" != "true" ] && echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:${{ inputs.tag }}-$(date +'%Y%m%d')" >> tag-publishing
-          [ "${{ inputs.update-latest }}" == "true" ] && echo "${{ inputs.target }}.tags=${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}:latest" >> tag-publishing
+
+          [ -z ${{ inputs.tag }} ] || {
+              echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:${{ inputs.tag }}" >> tag-publishing
+          }
+
+          [ "${{ inputs.disable-builddate-tag }}" != "true" ] && {
+              echo "${{ inputs.target }}.tags=${{ env.IMAGE }}-$(date +'%Y%m%d')" >> tag-publishing
+          }
+
+          if [ "${{ inputs.update-latest }}" == "true" ]
+          then
+              echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:latest" >> tag-publishing
+              if [ "${{ inputs.target }}" == "actions-runner" ]
+              then
+                  if [ -n "${{ inputs.actions-runner-version }}" ]
+                  then
+                      vtk_version=$(cat versioning.hcl | grep vtk-version | cut -d "=" -f2)
+                      vtk_version=$(echo $vtk_version | tr -d " " | tr -d "\"")
+                      ACR_TAG=${{ inputs.actions-runner-version }}-vtk${vtk_version}
+                      echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:$ACR_TAG" >> tag-publishing
+                  fi
+              fi
+          fi
+
           DELIM="$(echo $RANDOM | base64 | head -c 3; echo)"
           echo "tags-file=$PWD/tag-publishing" >> $GITHUB_OUTPUT
           echo "tags-string<<$DELIM" >> $GITHUB_OUTPUT
@@ -192,7 +229,7 @@ jobs:
           echo "git-output=$GITHUB_OUTPUT" >> $GITHUB_OUTPUT
       -
         name: Upload versioning and caching hcl as artifacts
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: HCL artifacts
           path: |
@@ -201,21 +238,17 @@ jobs:
             ${{ steps.dockerhub-tags.outputs.git-output }}
       -
         name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          version: v0.11.0
-          driver-opts: |
-            image=moby/buildkit:v0.11.6
+        uses: docker/setup-buildx-action@988b5a0280414f521da01fcc63a27aeeb4b104db # v3.6.1
       -
         name: Build container
         id: container-build
-        uses: docker/bake-action@v3.1.0
+        uses: docker/bake-action@76cc8060bdff6d632a465001e4cf300684c5472c # v5.7.0
         with:
           targets: |
             ${{ inputs.target }}
@@ -224,7 +257,8 @@ jobs:
             ./versioning.hcl
             ./docker-bake.hcl
           set: ${{ steps.dockerhub-tags.outputs.tags-string }}
-          push: true
+          pull: true
+          push: false
       -
         name: Save output container metadata to file
         id: container-metadata
@@ -233,7 +267,7 @@ jobs:
           echo "metadata=$PWD/container-metadata.json" >> $GITHUB_OUTPUT
       -
         name: Upload bake definition
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: Baking artifacts
           path: |

@@ -1,4 +1,13 @@
-# syntax=docker.io/docker/dockerfile:1.6.0
+# syntax=docker.io/docker/dockerfile:1.10.0
+
+FROM scratch as clone
+
+ARG CMAKE_REVISION
+
+ENV CMAKE_REVISION=${CMAKE_REVISION:-v3.16.3}
+
+ADD https://github.com/Kitware/CMake.git#${CMAKE_REVISION} /cmake
+
 
 FROM cmake-builder AS cmake
 
@@ -16,18 +25,13 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         wget && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /tmp
-ADD https://github.com/Kitware/CMake.git#${CMAKE_REVISION} /tmp/cmake
-
-WORKDIR /tmp/cmake
-RUN ./bootstrap && \
+WORKDIR /cmake
+RUN --mount=type=bind,rw,from=clone,source=/cmake,target=/cmake \
+    ./bootstrap && \
     [ -z "$CMAKE_BUILD_NTHREADS" ] && \
         { make -j $(nproc --all); } || \
         { make -j ${CMAKE_BUILD_NTHREADS}; } && \
     make install
-
-WORKDIR /tmp
-RUN rm -rf cmake
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
