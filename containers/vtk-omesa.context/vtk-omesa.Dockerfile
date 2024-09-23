@@ -8,9 +8,9 @@ ARG VTK_VERSION
 ENV MESA_VERSION=${MESA_VERSION:-19.0.8}
 ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 
-ADD https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz /mesa/mesa.tar.xz
-ADD https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz /vtk/vtk.tar.gz
-ADD patches/vtk-${VTK_VERSION}/ /vtk_patches/
+ADD --link https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz /mesa/mesa.tar.xz
+ADD --link https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz /vtk/vtk.tar.gz
+ADD --chmod=644 --link patches/vtk-${VTK_VERSION}/ /vtk_patches/
 
 FROM vtk-builder AS vtk
 
