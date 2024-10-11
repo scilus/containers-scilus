@@ -258,7 +258,7 @@ jobs:
             ./docker-bake.hcl
           set: ${{ steps.dockerhub-tags.outputs.tags-string }}
           pull: true
-          push: false
+          push: true
       -
         name: Save output container metadata to file
         id: container-metadata
