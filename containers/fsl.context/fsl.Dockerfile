@@ -1,15 +1,6 @@
 # syntax=docker.io/docker/dockerfile:1.10.0
 
 
-FROM fsl-builder as fsl-staging
-
-ARG FSL_INSTALLER_VERSION
-
-ENV FSL_INSTALLER_VERSION=${FSL_INSTALLER_VERSION:-3.14.0}
-
-WORKDIR /installer
-ADD --link https://git.fmrib.ox.ac.uk/fsl/conda/installer/-/raw/${FSL_INSTALLER_VERSION}/fsl/installer/fslinstaller.py /installer/fslinstaller.py
-
 FROM fsl-builder as fsl
 
 ARG FSL_INSTALL_PATH
@@ -35,9 +26,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         git \
     && rm -rf /var/lib/apt/lists/*
 
-RUN locale-gen "en_US.UTF-8" && \
-    update-locale LANG=en_US.UTF-8 && \
-    mkdir -p /fsl_build
+RUN echo "en_US.UTF-8 UTF-8" | tee -a /etc/locale.gen && locale-gen
 
 ADD --link https://git.fmrib.ox.ac.uk/fsl/conda/installer/-/raw/${FSL_INSTALLER_VERSION}/fsl/installer/fslinstaller.py /fsl_build/fslinstaller.py
 
