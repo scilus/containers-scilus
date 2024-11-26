@@ -29,7 +29,7 @@ RUN locale-gen "en_US.UTF-8" && \
     update-locale LANG=en_US.UTF-8
 
 COPY --link --chmod=666 manifest.json /manifest.json
-ADD https://git.fmrib.ox.ac.uk/fsl/conda/installer/-/raw/${FSL_INSTALLER_VERSION}/fsl/installer/fslinstaller.py fslinstaller.py
+ADD --link https://git.fmrib.ox.ac.uk/fsl/conda/installer/-/raw/${FSL_INSTALLER_VERSION}/fsl/installer/fslinstaller.py fslinstaller.py
 
 RUN python fslinstaller.py \
         -d ${FSL_INSTALL_PATH} \

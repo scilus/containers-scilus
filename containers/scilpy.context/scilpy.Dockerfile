@@ -40,7 +40,7 @@ RUN locale-gen "en_US.UTF-8" && \
     update-locale LANG=en_US.UTF-8
 
 WORKDIR /
-ADD https://github.com/scilus/scilpy.git#${SCILPY_REVISION} /scilpy
+ADD --link https://github.com/scilus/scilpy.git#${SCILPY_REVISION} /scilpy
 
 WORKDIR /scilpy
 RUN python${PYTHON_VERSION} -m pip install "packaging<22.0" "setuptools<=70.0" && \

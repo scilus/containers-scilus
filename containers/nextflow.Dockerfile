@@ -18,7 +18,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     mkdir -p /nextflow/.nextflow/plugins && \
     chmod -R ugo+rx /nextflow
 
-ADD https://github.com/nextflow-io/nextflow/releases/download/v${NEXTFLOW_VERSION}/nextflow-${NEXTFLOW_VERSION}-all /nextflow/nextflow
+ADD --link https://github.com/nextflow-io/nextflow/releases/download/v${NEXTFLOW_VERSION}/nextflow-${NEXTFLOW_VERSION}-all /nextflow/nextflow
 
 WORKDIR /nextflow
 RUN bash nextflow && \

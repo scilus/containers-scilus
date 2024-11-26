@@ -1,10 +1,5 @@
 # syntax=docker.io/docker/dockerfile:1.10.0
 
-FROM alpine as scilus-staging
-
-ADD --chmod=666 human-data_master_1d3abfb.tar.bz2 /human-data
-
-
 FROM scilus-base as scilus
 
 LABEL maintainer=SCIL
@@ -19,7 +14,7 @@ ENV PYTHON_VERSION=${PYTHON_VERSION:-3.10}
 
 ENV NVIDIA_DISABLE_REQUIRE=1
 
-COPY --from=scilus-staging --link /human-data /human-data
+ADD --link --chmod=666 human-data_master_1d3abfb.tar.bz2 /human-data
 
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \

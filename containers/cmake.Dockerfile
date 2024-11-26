@@ -6,7 +6,7 @@ ARG CMAKE_REVISION
 
 ENV CMAKE_REVISION=${CMAKE_REVISION:-v3.16.3}
 
-ADD https://github.com/Kitware/CMake.git#${CMAKE_REVISION} /cmake
+ADD --link https://github.com/Kitware/CMake.git#${CMAKE_REVISION} /cmake
 
 
 FROM cmake-builder AS cmake

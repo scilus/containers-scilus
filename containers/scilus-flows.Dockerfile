@@ -32,16 +32,16 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     rm -rf /var/lib/apt/lists/* && \
     mkdir scilus_flows
 
-ADD https://github.com/scilus/tractoflow/archive/${TRACTOFLOW_VERSION}.zip /scilus_flows/tractoflow.zip
-ADD https://github.com/scilus/dmriqc_flow/archive/${DMRIQCFLOW_VERSION}.zip /scilus_flows/dmriqc-flow.zip
-ADD https://github.com/scilus/extractor_flow/archive/${EXTRACTORFLOW_VERSION}.zip /scilus_flows/extractor-flow.zip
-ADD https://github.com/scilus/rbx_flow/archive/${RBXFLOW_VERSION}.zip /scilus_flows/rbx-flow.zip
-ADD https://github.com/scilus/tractometry_flow/archive/${TRACTOMETRYFLOW_VERSION}.zip /scilus_flows/tractometry-flow.zip
-ADD https://github.com/scilus/register_flow/archive/${REGISTERFLOW_VERSION}.zip /scilus_flows/register-flow.zip
-ADD https://github.com/scilus/disconets_flow/archive/${DISCONETSFLOW_VERSION}.zip /scilus_flows/disconets-flow.zip
-ADD https://github.com/scilus/freewater_flow/archive/${FREEWATERFLOW_VERSION}.zip /scilus_flows/freewater-flow.zip
-ADD https://github.com/scilus/noddi_flow/archive/${NODDIFLOW_VERSION}.zip /scilus_flows/noddi-flow.zip
-ADD https://github.com/scilus/bst_flow/archive/${BSTFLOW_VERSION}.zip /scilus_flows/bst-flow.zip
+ADD --link https://github.com/scilus/tractoflow/archive/${TRACTOFLOW_VERSION}.zip /scilus_flows/tractoflow.zip
+ADD --link https://github.com/scilus/dmriqc_flow/archive/${DMRIQCFLOW_VERSION}.zip /scilus_flows/dmriqc-flow.zip
+ADD --link https://github.com/scilus/extractor_flow/archive/${EXTRACTORFLOW_VERSION}.zip /scilus_flows/extractor-flow.zip
+ADD --link https://github.com/scilus/rbx_flow/archive/${RBXFLOW_VERSION}.zip /scilus_flows/rbx-flow.zip
+ADD --link https://github.com/scilus/tractometry_flow/archive/${TRACTOMETRYFLOW_VERSION}.zip /scilus_flows/tractometry-flow.zip
+ADD --link https://github.com/scilus/register_flow/archive/${REGISTERFLOW_VERSION}.zip /scilus_flows/register-flow.zip
+ADD --link https://github.com/scilus/disconets_flow/archive/${DISCONETSFLOW_VERSION}.zip /scilus_flows/disconets-flow.zip
+ADD --link https://github.com/scilus/freewater_flow/archive/${FREEWATERFLOW_VERSION}.zip /scilus_flows/freewater-flow.zip
+ADD --link https://github.com/scilus/noddi_flow/archive/${NODDIFLOW_VERSION}.zip /scilus_flows/noddi-flow.zip
+ADD --link https://github.com/scilus/bst_flow/archive/${BSTFLOW_VERSION}.zip /scilus_flows/bst-flow.zip
 
 WORKDIR /scilus_flows
 RUN unzip tractoflow.zip && \

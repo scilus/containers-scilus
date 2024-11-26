@@ -22,7 +22,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-ADD https://github.com/MRtrix3/mrtrix3.git#${MRTRIX_REVISION} /mrtrix3
+ADD --link https://github.com/MRtrix3/mrtrix3.git#${MRTRIX_REVISION} /mrtrix3
 
 WORKDIR /mrtrix3
 RUN ./configure -nogui && \

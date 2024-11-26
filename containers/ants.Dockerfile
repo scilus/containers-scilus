@@ -17,7 +17,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
-ADD https://github.com/ANTsX/ANTs.git#${ANTS_REVISION} /ants_build
+ADD --link https://github.com/ANTsX/ANTs.git#${ANTS_REVISION} /ants_build
 
 
 WORKDIR /ants_build
@@ -58,8 +58,6 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
         zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
-
-
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
