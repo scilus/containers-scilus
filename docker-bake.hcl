@@ -214,7 +214,7 @@ target "dmriqcpy-test" {
 }
 
 target "pytest-base" {
-    dockerfile-inline = "FROM test-base\nCOPY /tests /tests\nWORKDIR /tests\nRUN python3 -m pip install pytest pytest_console_scripts && python3 -m pytest"
+    dockerfile-inline = "FROM test-base\nWORKDIR /tests\nRUN --mount=type=bind,source=./tests,target=/tests --mount=type=cache,sharing=locked,target=/root/.cache/pip python3 -m pip install pytest pytest_console_scripts && python3 -m pytest"
     output = ["type=cacheonly"]
 }
 

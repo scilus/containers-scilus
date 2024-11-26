@@ -30,13 +30,12 @@ ENV LC_ALL="en_US.UTF-8"
 ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US.UTF-8"
 
-RUN locale-gen "en_US.UTF-8" && \
-    update-locale LANG=en_US.UTF-8
-
 WORKDIR /tmp
 RUN wget https://github.com/scilus/scilpy/releases/download/${SCILPY_VERSION}/requirements.${SCILPY_VERSION}.frozen; \
     exit 0
-RUN if [ -f requirements.${SCILPY_VERSION}.frozen ]; \
+RUN --mount=type=cache,sharing=locked,target=/root/.cache/pip \
+    echo "en_US.UTF-8 UTF-8" | tee -a /etc/locale.gen && locale-gen && \
+    if [ -f requirements.${SCILPY_VERSION}.frozen ]; \
     then \
         python${PYTHON_VERSION} -m pip install -r requirements.${SCILPY_VERSION}.frozen && \
         rm requirements.${SCILPY_VERSION}.frozen; \

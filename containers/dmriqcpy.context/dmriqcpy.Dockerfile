@@ -29,10 +29,9 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         python3-dev && \
     rm -rf /var/lib/apt/lists/*
 
-RUN locale-gen en_US.UTF-8 && \
-    update-locale LANG=en_US.UTF-8
-
-RUN python${PYTHON_VERSION} -m pip install \
+RUN --mount=type=cache,sharing=locked,target=/root/.cache/pip \
+    echo "en_US.UTF-8 UTF-8" | tee -a /etc/locale.gen && locale-gen && \
+    python${PYTHON_VERSION} -m pip install \
         git+https://github.com/scilus/dmriqcpy.git@${DMRIQCPY_REVISION} && \
     python${PYTHON_VERSION} -m pip cache purge && \
     sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/${PYTHON_PACKAGE_DIR}/matplotlib/mpl-data/matplotlibrc && \

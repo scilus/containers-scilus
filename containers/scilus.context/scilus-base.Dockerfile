@@ -9,6 +9,7 @@ ENV PYTHON_VERSION=${PYTHON_VERSION:-3.10}
 
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    --mount=type=cache,sharing=locked,target=/root/.cache/pip \
     export PYTHON_MAJOR=${PYTHON_VERSION%%.*} && \
     if [ "$PYTHON_MAJOR" = "3" ]; then export PYTHON_MOD=3; fi && \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \

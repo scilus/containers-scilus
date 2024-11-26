@@ -209,7 +209,8 @@ COPY --from=vtk --link ${VTK_INSTALL_PATH} ${VTK_INSTALL_PATH}
 COPY --from=vtk --link ${WHEELHOUSE_PATH} ${WHEELHOUSE_PATH}
 
 WORKDIR /
-RUN python${VTK_PYTHON_VERSION} -m pip config --global set install.find-links ${WHEELHOUSE_PATH} && \
+RUN --mount=type=cache,sharing=locked,target=/root/.cache/pip \
+    python${VTK_PYTHON_VERSION} -m pip config --global set install.find-links ${WHEELHOUSE_PATH} && \
     python${VTK_PYTHON_VERSION} -m pip install vtk==${VTK_VERSION}
 
 
