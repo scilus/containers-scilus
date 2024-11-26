@@ -8,7 +8,7 @@ actions-runner-version="2.319.1"
 dmriqcpy-revision="0.1.7"
 scilpy-revision="2.0.2"
 
-ants-revision="2.4.3"
+ants-revision="v2.4.3"
 cmake-revision="v3.21.6"
 fsl-version="6.0.6.4"
 fsl-installer-version="3.14.0"

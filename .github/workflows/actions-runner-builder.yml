@@ -7,7 +7,9 @@ on:
 
 jobs:
   compute-dependencies-versions:
-    runs-on: scilus-org-runners
+    runs-on: ubuntu-latest
+    container:
+      image: scilus/actions-runner:latest
     outputs:
       runner_current_version: ${{ steps.github-runner.outputs.current_version }}
       runner_latest_version: ${{ steps.github-runner.outputs.latest_version }}

@@ -19,6 +19,8 @@ ENV LC_ALL="en_US.UTF-8"
 ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US.UTF-8"
 
+ENV SETUPTOOLS_USE_DISTUTILS=stdlib
+
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -41,8 +43,9 @@ WORKDIR /
 ADD https://github.com/scilus/scilpy.git#${SCILPY_REVISION} /scilpy
 
 WORKDIR /scilpy
-RUN SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install -e . && \
-    python${PYTHON_VERSION} -m pip install pyopencl==2023.1.3 && \
+RUN python${PYTHON_VERSION} -m pip install "packaging<22.0" "setuptools<=70.0" && \
+    SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install \
+        pyopencl==2023.1.3 -e . && \
     python${PYTHON_VERSION} -m pip cache purge
 
 RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/${PYTHON_PACKAGE_DIR}/matplotlib/mpl-data/matplotlibrc && \

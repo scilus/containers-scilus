@@ -125,6 +125,10 @@ on:
         required: false
         type: string
         default: main
+      runner-image:
+        required: false
+        type: string
+        default: ubuntu-latest
     secrets:
       DOCKER_USERNAME:
         description: 'Image repository on dockerhub to which to push'
@@ -135,7 +139,7 @@ on:
 
 jobs:
   build-container:
-    runs-on: scilus-docker-builders
+    runs-on: ${{ inputs.runner-image && inputs.runner-image || 'ubuntu-latest' }}
     steps:
       -
         name: Validate input parameters

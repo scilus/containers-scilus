@@ -24,8 +24,7 @@ WORKDIR /ants_build
 RUN mkdir build
 
 WORKDIR /ants_build/build
-RUN ls && mkdir build && \
-    cmake -DBUILD_SHARED_LIBS=OFF \
+RUN cmake -DBUILD_SHARED_LIBS=OFF \
           -DUSE_VTK=OFF \
           -DSuperBuild_ANTS_USE_GIT_PROTOCOL=OFF \
           -DBUILD_TESTING=OFF \
@@ -39,7 +38,7 @@ RUN ls && mkdir build && \
         { make -j $(nproc --all); } || \
         { make -j ${ANTS_BUILD_NTHREADS}; }
 
-WORKDIR /ants_build/build
+WORKDIR /ants_build/build/ANTS-build
 RUN make install
 
 FROM ants-base as ants-install
@@ -53,12 +52,14 @@ ENV ANTS_REVISION=${ANTS_REVISION:-v2.3.4}
 ENV ANTSPATH=${ANTS_INSTALL_PATH}/bin/
 ENV PATH=$PATH:$ANTSPATH
 
+COPY --from=ants --link ${ANTS_INSTALL_PATH} ${ANTS_INSTALL_PATH}
+
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
         zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --from=ants --link ${ANTS_INSTALL_PATH} ${ANTS_INSTALL_PATH}
+
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \

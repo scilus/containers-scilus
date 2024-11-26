@@ -22,13 +22,9 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /
 ADD https://github.com/MRtrix3/mrtrix3.git#${MRTRIX_REVISION} /mrtrix3
 
 WORKDIR /mrtrix3
-RUN git fetch --tags && \
-    git checkout tags/${MRTRIX_VERSION} -b ${MRTRIX_VERSION}
-
 RUN ./configure -nogui && \
     [ -z "$MRTRIX_BUILD_NTHREADS" ] && \
         { NUMBER_OF_PROCESSORS=$(nproc --all) ./build; } || \
