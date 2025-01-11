@@ -60,7 +60,7 @@
         }
     },
     "versions": {
-        "6.0.6.4": [
+        "6.0.6.4.scilus.lean": [
             {
                 "base_packages": [
                     "boost-cpp",
@@ -76,7 +76,7 @@
                     "vtk",
                     "zlib"
                 ],
-                "environment": "https://raw.githubusercontent.com/scilus/containers-scilus/main/containers/fsl.context/conda_environments/fsl-6.0.6.4_linux64.yml",
+                "environment": "https://raw.githubusercontent.com/AlexVCaron/containers-scilus/feat/eddy2401.2/containers/fsl.context/conda_environments/fsl-scilus.6.0.6.4.lean_linux64.yml",
                 "output": {
                     "install": {
                         "value": "621",
@@ -85,6 +85,33 @@
                 },
                 "platform": "linux-64",
                 "sha256": "a92d6d8eb88ac0f4d51e393c1c44f166020961e2c9fdad58e83ce036494634e6"
+            }
+        ],
+        "6.0.6.4.scilus.eddy.2401.2.lean": [
+            {
+                "base_packages": [
+                    "boost-cpp",
+                    "fslpy",
+                    "fsl-base",
+                    "fsl_sub",
+                    "fsl_sub_plugin_sge",
+                    "fsl_sub_plugin_slurm",
+                    "libopenblas",
+                    "numpy",
+                    "python",
+                    "tk",
+                    "vtk",
+                    "zlib"
+                ],
+                "environment": "https://raw.githubusercontent.com/AlexVCaron/containers-scilus/feat/eddy2401.2/containers/fsl.context/conda_environments/fsl-scilus.6.0.6.4.eddy.2401.2.lean_linux64.yml",
+                "output": {
+                    "install": {
+                        "value": "621",
+                        "version": "2"
+                    }
+                },
+                "platform": "linux-64",
+                "sha256": "cec2e13d48783d2f9fa6d47595427935c88cfa5db225e5f2ad0322ff0f8e956c"
             }
         ]
     }
