@@ -15,7 +15,7 @@ dependencies:
  - fsl-cprob 2111.0
  - fsl-miscmaths 2203.2
  - fsl-newimage 2203.5
- - fsl-utils 2412.0
+ - fsl-utils 2203.5
  - fsl-warpfns 2203.0
  - fsl-znzlib 2111.0
  - fsl-avwutils 2209.3
