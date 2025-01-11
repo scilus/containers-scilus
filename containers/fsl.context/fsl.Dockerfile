@@ -26,7 +26,8 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         git \
     && rm -rf /var/lib/apt/lists/*
 
-ADD --link https://git.fmrib.ox.ac.uk/fsl/conda/installer/-/raw/${FSL_INSTALLER_VERSION}/fsl/installer/fslinstaller.py /fsl_build/fslinstaller.py
+# ADD --link https://git.fmrib.ox.ac.uk/fsl/conda/installer/-/raw/${FSL_INSTALLER_VERSION}/fsl/installer/fslinstaller.py /fsl_build/fslinstaller.py
+ADD --link https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py /fsl_build/fslinstaller.py
 
 WORKDIR /fsl_build
 RUN --mount=type=bind,source=./manifest.json,target=/fsl_build/manifest.json \
