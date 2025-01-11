@@ -5,11 +5,9 @@ FROM fsl-builder as fsl
 
 ARG FSL_INSTALL_PATH
 ARG FSL_VERSION
-ARG FSL_INSTALLER_VERSION
 
 ENV FSL_INSTALL_PATH=${FSL_INSTALL_PATH:-/fsl}
 ENV FSL_VERSION=${FSL_VERSION:-6.0.6.4}
-ENV FSL_INSTALLER_VERSION=${FSL_INSTALLER_VERSION:-3.14.0}
 ENV MINICONDA_VERSION=${MINICONDA_VERSION:-22.11.1-4}
 
 ENV LC_CTYPE="en_US.UTF-8"
@@ -26,7 +24,6 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         git \
     && rm -rf /var/lib/apt/lists/*
 
-# ADD --link https://git.fmrib.ox.ac.uk/fsl/conda/installer/-/raw/${FSL_INSTALLER_VERSION}/fsl/installer/fslinstaller.py /fsl_build/fslinstaller.py
 ADD --link https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py /fsl_build/fslinstaller.py
 
 WORKDIR /fsl_build
