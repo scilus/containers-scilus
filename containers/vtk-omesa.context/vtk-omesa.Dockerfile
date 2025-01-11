@@ -60,8 +60,8 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         python${VTK_PYTHON_VERSION}-dev \
         clang \
         wget \
-        xorg-dev && \
-        imagemagick \
+        xorg-dev \
+        imagemagick && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /mesa_source
