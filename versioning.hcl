@@ -10,7 +10,7 @@ scilpy-revision="2.0.2"
 
 ants-revision="v2.4.3"
 cmake-revision="v3.21.6"
-fsl-version="6.0.6.4"
+fsl-version="6.0.7.16"
 fsl-installer-version="3.14.0"
 mrtrix-revision="3.0.4"
 mesa-version="22.0.5"

@@ -61,6 +61,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         clang \
         wget \
         xorg-dev && \
+        imagemagick \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /mesa_source
