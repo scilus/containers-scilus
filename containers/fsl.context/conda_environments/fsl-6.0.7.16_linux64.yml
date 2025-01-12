@@ -14,7 +14,7 @@ dependencies:
  - fsl-basisfield 2203.1
  - fsl-cprob 2111.0
  - fsl-miscmaths 2203.2
- - fsl-newimage 2203.5
+ - fsl-newimage 2203.12
  - fsl-utils 2203.5
  - fsl-warpfns 2203.0
  - fsl-znzlib 2111.0
@@ -35,9 +35,9 @@ dependencies:
  - numpy 1.26.*
  - openslide-python v1.1.2
  - pkg-config
- - python 3.10.*
+ - python 3.12.*
  - tk 8.6.* xft_*
- - vtk 9.1
+ - vtk 9.3
  - wxpython 4.2.*
  - zlib 1.2.*
  - fsl-cudabasisfield-cuda-10.2 1.1.1

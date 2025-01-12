@@ -10,7 +10,7 @@ ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 
 ADD --link https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz /mesa/mesa.tar.xz
 ADD --link https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz /vtk/vtk.tar.gz
-ADD --chmod=644 --link patches/vtk-${VTK_VERSION}/ /vtk_patches/
+# ADD --chmod=644 --link patches/vtk-${VTK_VERSION}/ /vtk_patches/
 
 FROM vtk-builder AS vtk
 
@@ -102,11 +102,8 @@ ENV LD_LIBRARY_PATH=${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:${MESA_INSTALL_PAT
 
 WORKDIR ${VTK_BUILD_PATH}
 RUN --mount=type=bind,rw,from=src,source=/vtk,target=${VTK_BUILD_PATH} \
-    --mount=type=bind,rw,from=src,source=/vtk_patches,target=/vtk_patches \
     tar -xzf vtk.tar.gz && \
     rm vtk.tar.gz && \
-    cp /vtk_patches/vtkWheelPreparation.cmake vtk-v${VTK_VERSION}/CMake/. && \
-    cp /vtk_patches/setup.py.in vtk-v${VTK_VERSION}/CMake/. && \
     if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
     cmake -GNinja \
         -DCMAKE_BUILD_TYPE=Release \

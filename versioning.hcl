@@ -1,7 +1,7 @@
 # scilus-versioning.hcl
 
-base-install-image="nvidia/cuda:11.7.1-runtime-ubuntu22.04"
-base-build-image="ubuntu:jammy-20230301"
+base-install-image="nvidia/cuda:12.6.3-runtime-ubuntu24.04"
+base-build-image="ubuntu:noble-20241118.1"
 
 actions-runner-version="2.319.1"
 
@@ -13,8 +13,8 @@ cmake-revision="v3.21.6"
 fsl-version="6.0.7.16"
 mrtrix-revision="3.0.4"
 mesa-version="22.0.5"
-vtk-version="9.2.6"
-python-version="3.10"
+vtk-version="9.3.1"
+python-version="3.12"
 
 java-version="11"
 nextflow-version="21.04.3"
