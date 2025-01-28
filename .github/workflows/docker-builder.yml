@@ -161,8 +161,8 @@ jobs:
           touch local-versioning.hcl
           version () { if [ -n "$1" ]; then echo "${2}=\"${1}\"" >> local-versioning.hcl; fi }
 
-          echo "dockerhub-user-pull=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
-          echo "dockerhub-user-push=\"${{ secrets.DOCKER_USERNAME }}\"" >> local-versioning.hcl
+          echo "dockerhub-user-pull=\"${{ secrets.DOCKER_ORGNAME }}\"" >> local-versioning.hcl
+          echo "dockerhub-user-push=\"${{ secrets.DOCKER_ORGNAME }}\"" >> local-versioning.hcl
 
           version "${{ inputs.scilpy-version }}" scilpy-version
           version "${{ inputs.dmriqcpy-version }}" dmriqcpy-version
