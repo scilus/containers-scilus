@@ -11,6 +11,7 @@ ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 ADD --link https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz /mesa/mesa.tar.xz
 ADD --link https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz /vtk/vtk.tar.gz
 ADD --chmod=644 --link patches/vtk-${VTK_VERSION}/ /vtk_patches/
+ADD --chmod=755 https://apt.llvm.org/llvm.sh /llvm/llvm.sh
 
 FROM vtk-builder AS vtk
 
@@ -50,7 +51,6 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         llvm-14-runtime \
         libboost-all-dev \
         libopenmpi-dev \
-        meson \
         ninja-build \
         pkg-config \
         python${PYTHON_MAJOR}-mako \
@@ -65,6 +65,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
 
 WORKDIR /mesa_source
 RUN --mount=type=bind,rw,from=src,source=/mesa,target=/mesa_source \
+    python${VTK_PYTHON_VERSION} -m pip install "meson>=1.1.0" && \
     tar -xJf mesa.tar.xz && \
     rm mesa.tar.xz && \
     cd mesa-${MESA_VERSION} && \
@@ -87,8 +88,6 @@ RUN --mount=type=bind,rw,from=src,source=/mesa,target=/mesa_source \
         -Dosmesa=true \
         -Dgallium-va=disabled \
         -Dgallium-vdpau=disabled \
-        -Dgallium-xvmc=disabled \
-        -Ddri-drivers=[] \
         -Dvulkan-drivers=[] \
         -Dplatforms=[] \
         -Dgallium-drivers=swrast \
@@ -97,7 +96,7 @@ RUN --mount=type=bind,rw,from=src,source=/mesa,target=/mesa_source \
         { ninja -C build/ -j $(nproc --all) install; } || \
         { ninja -C build/ -j ${MESA_BUILD_NTHREADS} install; }
 
-ENV LD_LIBRARY_PATH=${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:${MESA_INSTALL_PATH}/lib:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=${MESA_INSTALL_PATH}/lib/gallium:${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:${MESA_INSTALL_PATH}/lib:$LD_LIBRARY_PATH
 
 WORKDIR ${VTK_BUILD_PATH}
 RUN --mount=type=bind,rw,from=src,source=/vtk,target=${VTK_BUILD_PATH} \
