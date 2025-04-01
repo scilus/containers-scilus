@@ -258,9 +258,9 @@ jobs:
           targets: |
             ${{ inputs.target }}
           files: |
-            ${{ steps.local-versioning.outputs.bake-file }}
-            ./versioning.hcl
             ./docker-bake.hcl
+            ./versioning.hcl
+            ${{ steps.local-versioning.outputs.bake-file }}
           set: ${{ steps.dockerhub-tags.outputs.tags-string }}
           pull: true
           push: true
