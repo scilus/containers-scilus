@@ -198,7 +198,7 @@ jobs:
         name: Set output image tags and registry to publish to
         id: dockerhub-tags
         env:
-          IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ inputs.target }}
+          IMAGE: ${{ secrets.DOCKER_ORGNAME }}/${{ inputs.target }}
         run: |
           touch tag-publishing
 
