@@ -44,7 +44,7 @@ RUN --mount=type=cache,sharing=locked,target=/root/.cache/pip \
     echo "en_US.UTF-8 UTF-8" | tee -a /etc/locale.gen && locale-gen && \
     python${PYTHON_VERSION} -m pip install "packaging<22.0" "setuptools<=70.0" && \
     SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install \
-        pyopencl==2023.1.3 -e . && \
+        pyopencl==2023.1.3 torch==2.1.2 -e . && \
     python${PYTHON_VERSION} -m pip cache purge
 
 RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/${PYTHON_PACKAGE_DIR}/matplotlib/mpl-data/matplotlibrc && \
