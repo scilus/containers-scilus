@@ -8,7 +8,7 @@ ARG VTK_VERSION
 ENV MESA_VERSION=${MESA_VERSION:-19.0.8}
 ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 
-ADD --link https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz /mesa/mesa.tar.xz
+ADD --link https://archive.mesa3d.org/older-versions/22.x/mesa-${MESA_VERSION}.tar.xz /mesa/mesa.tar.xz
 ADD --link https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz /vtk/vtk.tar.gz
 ADD --chmod=644 --link patches/vtk-${VTK_VERSION}/ /vtk_patches/
 
@@ -60,7 +60,8 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         python${VTK_PYTHON_VERSION}-dev \
         clang \
         wget \
-        xorg-dev && \
+        xorg-dev \
+        imagemagick && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /mesa_source
