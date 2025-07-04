@@ -173,6 +173,10 @@ group "dmriqcpy" {
     targets = ["dmriqcpy", "dmriqcpy-test"]
 }
 
+group "vtk-osmesa" {
+    targets = [ "vtk" ]
+}
+
 # ==============================================================================
 # TEST TARGETS
 # ==============================================================================
@@ -332,7 +336,6 @@ target "scilus" {
         scilus-base = "target:scilus-scilpy"
     }
     args = {
-        SCILPY_REVISION = "${scilpy-revision}"
         ITK_NUM_THREADS = "${itk-num-threads}"
     }
     tags = notequal("", SCILUS_TAG) ? stamp_tag("scilus/scilus:${SCILUS_TAG}", timestamp()) : ["scilus:local"]
@@ -403,9 +406,6 @@ target "scilus-base" {
     }
     args = {
         PYTHON_VERSION = "${python-version}"
-        SCILPY_REVISION = "${scilpy-revision}"
-        BLAS_NUM_THREADS = "${blas-num-threads}"
-        PYTHON_PACKAGE_DIR = "dist-packages"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-base",
@@ -433,13 +433,13 @@ target "scilpy-base" {
     dockerfile = "scilpy.Dockerfile"
     context = "./containers/scilpy.context"
     contexts = {
-        scilpy-base = "target:vtk"
+        scilpy-base = "docker-image://${base-install-image}"
     }
     args = {
+        VTK_VERSION = "${vtk-version}"
         PYTHON_VERSION = "${python-version}"
         SCILPY_REVISION = "${scilpy-revision}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
-        PYTHON_PACKAGE_DIR = "dist-packages"
     }
     output = ["type=cacheonly"]
 }
@@ -526,6 +526,7 @@ target "vtk" {
     args = {
         MESA_BUILD_NTHREADS = "6"
         MESA_VERSION = "${mesa-version}"
+        MESA_ONLINE_BASE_PATH = split(".", mesa-version)[0] <  23 ? "older_versions/${split(".", mesa-version)[0]}.x" : "."
         VTK_BUILD_NTHREADS = "6"
         VTK_PYTHON_VERSION = "${python-version}"
         VTK_VERSION = "${vtk-version}"

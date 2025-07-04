@@ -3,12 +3,14 @@
 FROM scratch AS src
 
 ARG MESA_VERSION
+ARG MESA_ONLINE_BASE_PATH
 ARG VTK_VERSION
 
 ENV MESA_VERSION=${MESA_VERSION:-19.0.8}
+ENV MESA_ONLINE_BASE_PATH=${MESA_ONLINE_BASE_PATH:-older-versions/19.x/}
 ENV VTK_VERSION=${VTK_VERSION:-8.2.0}
 
-ADD --link https://archive.mesa3d.org/mesa-${MESA_VERSION}.tar.xz /mesa/mesa.tar.xz
+ADD --link https://archive.mesa3d.org/${MESA_ONLINE_BASE_PATH}/mesa-${MESA_VERSION}.tar.xz /mesa/mesa.tar.xz
 ADD --link https://gitlab.kitware.com/vtk/vtk/-/archive/v${VTK_VERSION}/vtk-v${VTK_VERSION}.tar.gz /vtk/vtk.tar.gz
 ADD --chmod=644 --link patches/vtk-${VTK_VERSION}/ /vtk_patches/
 ADD --chmod=755 https://apt.llvm.org/llvm.sh /llvm/llvm.sh
@@ -60,7 +62,8 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         python${VTK_PYTHON_VERSION}-dev \
         clang \
         wget \
-        xorg-dev && \
+        xorg-dev \
+        imagemagick && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /mesa_source
