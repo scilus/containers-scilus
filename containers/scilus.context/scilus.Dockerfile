@@ -20,12 +20,12 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \
         bc \
         git \
+        imagemagick \
         jq \
         less \
         locales \
         unzip \
         wget \
-        imagemagick \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LC_CTYPE="en_US.UTF-8"

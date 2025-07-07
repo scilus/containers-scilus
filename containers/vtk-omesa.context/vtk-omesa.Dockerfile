@@ -177,6 +177,7 @@ ARG VTK_PYTHON_VERSION
 ARG VTK_VERSION
 ARG WHEELHOUSE_PATH
 
+ENV USER=${USER:-root}
 ENV MESA_INSTALL_PATH=${MESA_INSTALL_PATH:-/mesa}
 ENV MESA_VERSION=${MESA_VERSION:-19.0.8}
 ENV VTK_INSTALL_PATH=${VTK_INSTALL_PATH:-/vtk}
@@ -191,13 +192,14 @@ ENV VTKPYTHONPATH=${VTK_DIR}/vtkmodules
 ENV LD_LIBRARY_PATH=${VTK_DIR}/lib.linux-x86_64-${VTK_PYTHON_VERSION}/vtkmodules:${MESA_INSTALL_PATH}/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH 
 ENV PYTHONPATH=${PYTHONPATH}:${VTKPYTHONPATH}
 
-USER ${CONTAINER_INSTALL_USER:-0}
+USER ${CONTAINER_INSTALL_USER:-$USER}
 
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     if [ "${VTK_PYTHON_VERSION%%.*}" = "3" ]; then export PYTHON_MAJOR=3; fi && \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
-        llvm-14-runtime \
+        libdrm-dev \
         libopenmpi-dev \
+        llvm-14-runtime \
         python${PYTHON_MAJOR}-mako \
         python${PYTHON_MAJOR}-pip \
         python${PYTHON_MAJOR}-setuptools \
@@ -221,4 +223,4 @@ RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Mesa => ${MESA_VERSION}\n" >> VERSION && \
     echo "VTK => ${VTK_VERSION}\n" >> VERSION
 
-USER ${CONTAINER_RUN_USER:-0}
+USER ${CONTAINER_RUN_USER:-$USER}
