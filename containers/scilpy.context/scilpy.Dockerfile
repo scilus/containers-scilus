@@ -27,8 +27,10 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         clinfo \
         git \
         libblas-dev \
+        libgl1-mesa-dev \
         libfreetype6-dev \
         liblapack-dev \
+        libosmesa6-dev \
         locales \
         python3.10 \
         python3-dev \
@@ -44,9 +46,8 @@ WORKDIR /scilpy
 RUN --mount=type=cache,sharing=locked,target=/root/.cache/pip \
     echo "en_US.UTF-8 UTF-8" | tee -a /etc/locale.gen && locale-gen && \
     python${PYTHON_VERSION} -m pip install "packaging<22.0" "setuptools<=70.0" && \
-    SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install \
-        pyopencl==2023.1.3 torch==2.1.2 -e . && \
-    python${PYTHON_VERSION} -m pip install --extra-index-url https://wheels.vtk.org vtk[omesa]==$VTK_VERSION && \
+    SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install pyopencl==2023.1.3 torch==2.1.2 -e . && \
+    python${PYTHON_VERSION} -m pip install --extra-index-url https://wheels.vtk.org vtk-osmesa==$VTK_VERSION && \
     python${PYTHON_VERSION} -m pip cache purge
 
 RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/dist-packages/matplotlib/mpl-data/matplotlibrc && \

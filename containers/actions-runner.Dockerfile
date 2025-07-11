@@ -20,6 +20,8 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         gawk \
         git \
         libfreetype6-dev \
+        libgl1-mesa-dev \
+        libosmesa6-dev \
         locales && \
     rm -rf /var/lib/apt/lists/*
 
