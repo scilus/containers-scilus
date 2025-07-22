@@ -1,0 +1,13 @@
+name: Keep container build cron-jobs alive
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight
+jobs:
+  keep-cron-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gautamkrisnar/keepalive-workflow@v2
+        with:
+          workflow_files: "actions-runner.builder.yml"
+          time_elapsed: "0"
