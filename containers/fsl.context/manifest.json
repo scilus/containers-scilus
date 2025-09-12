@@ -103,7 +103,7 @@
                     "vtk",
                     "zlib"
                 ],
-                "environment": "https://raw.githubusercontent.com/arnaudbore/containers-scilus/update_to_2.2.0/containers/fsl.context/conda_environments/fsl-scilus.6.0.6.4.eddy.2401.2.lean_linux64.yml",
+                "environment": "https://raw.githubusercontent.com/scilus/containers-scilus/main/containers/fsl.context/conda_environments/fsl-scilus.6.0.6.4.eddy.2401.2.lean_linux64.yml",
                 "output": {
                     "install": {
                         "value": "621",
@@ -130,7 +130,7 @@
                     "vtk",
                     "zlib"
                 ],
-                "environment": "https://raw.githubusercontent.com/scilus/containers-scilus/main/containers/fsl.context/conda_environments/fsl-scilus.6.0.7.18.lean_linux64.yml",
+                "environment": "https://raw.githubusercontent.com/arnaudbore/containers-scilus/update_to_2.2.0/containers/fsl.context/conda_environments/fsl-scilus.6.0.7.18.lean_linux64.yml",
                 "output": {
                     "install": {
                         "value": "621",
