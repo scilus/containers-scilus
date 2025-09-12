@@ -16,7 +16,7 @@ mrtrix-revision="3.0.7"
 mesa-version="23.1.0"
 vtk-version="9.3.1"
 python-version="3.12"
-miniconda-version="25.7.0-2"
+miniconda-version="24.3.0-0"
 
 java-version="11"
 nextflow-version="21.04.3"

@@ -34,7 +34,7 @@ dependencies:
  - numpy 2.1.*
  - openblas 0.3.29
  - openslide-python v1.1.2
- - pkg-config 0
+ - pkg-config
  - python 3.12.*
  - tk 8.6.*
  - wxpython 4.2.2
