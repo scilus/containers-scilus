@@ -19,8 +19,6 @@ ENV LC_ALL="en_US.UTF-8"
 ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US.UTF-8"
 
-ENV SETUPTOOLS_USE_DISTUTILS=stdlib
-
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -32,7 +30,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         liblapack-dev \
         libosmesa6-dev \
         locales \
-        python3.10 \
+        python3.12 \
         python3-dev \
         python3-pip \
         unzip \
@@ -45,13 +43,13 @@ ADD --link https://github.com/scilus/scilpy.git#${SCILPY_REVISION} /scilpy
 WORKDIR /scilpy
 RUN --mount=type=cache,sharing=locked,target=/root/.cache/pip \
     echo "en_US.UTF-8 UTF-8" | tee -a /etc/locale.gen && locale-gen && \
-    python${PYTHON_VERSION} -m pip install "packaging<22.0" "setuptools<=70.0" && \
-    SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install pyopencl==2023.1.3 torch==2.1.2 -e . && \
-    python${PYTHON_VERSION} -m pip install --extra-index-url https://wheels.vtk.org vtk-osmesa==$VTK_VERSION && \
+    python${PYTHON_VERSION} -m pip install --break-system-packages "packaging<22.0" "setuptools<=70.0" && \
+    SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install --break-system-packages pyopencl==2023.1.3 torch==2.2.* -e . && \
+    python${PYTHON_VERSION} -m pip install --break-system-packages --extra-index-url https://wheels.vtk.org vtk-osmesa==$VTK_VERSION && \
     python${PYTHON_VERSION} -m pip cache purge
 
 RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/dist-packages/matplotlib/mpl-data/matplotlibrc && \
-    cp -r /scilpy/data /usr/local/lib/python${PYTHON_VERSION}/dist-packages/ && \
+    cp -r /scilpy/src/scilpy/data /usr/local/lib/python${PYTHON_VERSION}/dist-packages/ && \
     apt-get -y remove \
         git \
         wget \

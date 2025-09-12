@@ -5,111 +5,111 @@
 # ==============================================================================
 
 variable "base-install-image" {
-    default = "ubuntu:22.04"
+    default = null
 }
 
 variable "base-build-image" {
-    default = "ubuntu:22.04"
+    default = null
 }
 
 variable "actions-runner-version" {
-    default = "2.319.1"
+    default = null
 }
 
 variable "ants-revision" {
-    default = "v2.3.4"
+    default = null
 }
 
 variable "cmake-revision" {
-    default = "v3.16.3"
+    default = null
 }
 
 variable "dmriqcpy-revision" {
-    default = "0.1.6"
+    default = null
 }
 
 variable "fsl-version" {
-    default = "6.0.6.4"
+    default = null
 }
 
 variable "fsl-installer-version" {
-    default = "3.14.0"
+    default = null
 }
 
 variable "mrtrix-revision" {
-    default = "3.0_RC3"
+    default = null
 }
 
 variable "scilpy-revision" {
-    default = "master"
+    default = null
 }
 
 variable "mesa-version" {
-    default = "19.0.8"
+    default = null
 }
 
 variable "vtk-version" {
-    default = "8.2.0"
+    default = null
 }
 
 variable "python-version" {
-    default = "3.10"
+    default = null
 }
 
 variable "nextflow-version" {
-    default = "21.04.3"
+    default = null
 }
 
 variable "java-version" {
-    default = "11"
+    default = null
 }
 
 variable "itk-num-threads" {
-    default = "8"
+    default = null
 }
 
 variable "blas-num-threads" {
-    default = "1"
+    default = null
 }
 
 variable "tractoflow-version" {
-    default = "2.3.0"
+    default = null
 }
 
 variable "dmriqc-flow-version" {
-    default = "0.1.0"
+    default = null
 }
 
 variable "extractor-flow-version" {
-    default = "master"
+    default = null
 }
 
 variable "rbx-flow-version" {
-    default = "1.1.0"
+    default = null
 }
 
 variable "tractometry-flow-version" {
-    default = "1.0.0"
+    default = null
 }
 
 variable "register-flow-version" {
-    default = "main"
+    default = null
 }
 
 variable "disconets-flow-version" {
-    default = "0.1.0-rc1"
+    default = null
 }
 
 variable "freewater-flow-version" {
-    default = "1.0.0"
+    default = null
 }
 
 variable "noddi-flow-version" {
-    default = "1.0.0"
+    default = null
 }
 
 variable "bst-flow-version" {
-    default = "1.0.0-rc1"
+    default = null
 }
 
 variable "dockerhub-user-pull" {

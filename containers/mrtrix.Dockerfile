@@ -6,7 +6,7 @@ ARG MRTRIX_BUILD_NTHREADS
 ARG MRTRIX_REVISION
 
 ENV MRTRIX_BUILD_NTHREADS=${MRTRIX_BUILD_NTHREADS:-""}
-ENV MRTRIX_REVISION=${MRTRIX_REVISION:-3.0_RC3}
+ENV MRTRIX_REVISION=${MRTRIX_REVISION:-3.0.7}
 
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && apt-get -y install \

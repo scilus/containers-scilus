@@ -113,6 +113,33 @@
                 "platform": "linux-64",
                 "sha256": "e82001c08b65cfabe34a7ec79a19db7fb9a0bd80faa302f8f99a7ae4a4cbd555"
             }
+        ],
+        "6.0.7.18.scilus.lean": [
+            {
+                "base_packages": [
+                    "boost-cpp",
+                    "fslpy",
+                    "fsl-base",
+                    "fsl_sub",
+                    "fsl_sub_plugin_sge",
+                    "fsl_sub_plugin_slurm",
+                    "libopenblas",
+                    "numpy",
+                    "python",
+                    "tk",
+                    "vtk",
+                    "zlib"
+                ],
+                "environment": "https://raw.githubusercontent.com/scilus/containers-scilus/main/containers/fsl.context/conda_environments/fsl-scilus.6.0.7.18.lean_linux64.yml",
+                "output": {
+                    "install": {
+                        "value": "621",
+                        "version": "2"
+                    }
+                },
+                "platform": "linux-64",
+                "sha256": "e82001c08b65cfabe34a7ec79a19db7fb9a0bd80faa302f8f99a7ae4a4cbd555"
+            }
         ]
     }
 }
