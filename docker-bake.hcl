@@ -36,6 +36,10 @@ variable "fsl-installer-version" {
     default = null
 }
 
+variable "miniconda-version" {
+    default = null
+}
+
 variable "mrtrix-revision" {
     default = null
 }
@@ -443,6 +447,7 @@ target "fsl" {
     args = {
         FSL_VERSION = "${fsl-version}"
         FSL_INSTALLER_VERSION = "${fsl-installer-version}"
+        MINICONDA_VERSION = "${miniconda-version}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:fsl",
