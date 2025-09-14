@@ -10,6 +10,7 @@ ARG SCILPY_REVISION
 ARG VTK_VERSION
 
 ENV PYTHON_VERSION=${PYTHON_VERSION:-3.10}
+ENV UV_VERSION=${UV_VERSION:-0.8.17}
 ENV SCILPY_REVISION=${SCILPY_REVISION:-master}
 ENV OPENBLAS_NUM_THREADS=${BLAS_NUM_THREADS:-1}
 ENV VTK_VERSION=${VTK_VERSION:-9.2.6}
@@ -22,6 +23,7 @@ ENV LANGUAGE="en_US.UTF-8"
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        curl \
         clinfo \
         git \
         libblas-dev \
@@ -37,22 +39,36 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         wget && \
     rm -rf /var/lib/apt/lists/*
 
-
 ADD --link https://github.com/scilus/scilpy.git#${SCILPY_REVISION} /scilpy
+
+# Run the installer then remove it
+ADD https://astral.sh/uv/${UV_VERSION}/install.sh /uv-installer.sh
+
+# Run the installer then remove it
+RUN sh /uv-installer.sh && rm /uv-installer.sh
+
+# Ensure the installed binary is on the `PATH`
+ENV PATH="/root/.local/bin/:$PATH"
+
+RUN uv venv /opt/venvs/scilpy --python ${PYTHON_VERSION}
+
+# Activate the environment
+ENV PATH="/opt/venvs/scilpy/bin:$PATH"
 
 WORKDIR /scilpy
 RUN --mount=type=cache,sharing=locked,target=/root/.cache/pip \
     echo "en_US.UTF-8 UTF-8" | tee -a /etc/locale.gen && locale-gen && \
-    python${PYTHON_VERSION} -m pip install --break-system-packages "packaging<22.0" "setuptools<=70.0" && \
-    SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True python${PYTHON_VERSION} -m pip install --break-system-packages pyopencl==2023.1.3 torch==2.2.* -e . && \
-    python${PYTHON_VERSION} -m pip install --break-system-packages --extra-index-url https://wheels.vtk.org vtk-osmesa==$VTK_VERSION && \
-    python${PYTHON_VERSION} -m pip cache purge
+    uv pip install "packaging<22.0" "setuptools<=70.0" && \
+    SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True uv pip install pyopencl==2023.1.3 torch==2.2.* -e . && \
+    uv pip install --extra-index-url https://wheels.vtk.org vtk-osmesa==$VTK_VERSION && \
+    pip cache purge
 
-RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/dist-packages/matplotlib/mpl-data/matplotlibrc && \
-    cp -r /scilpy/src/scilpy/data /usr/local/lib/python${PYTHON_VERSION}/dist-packages/ && \
+#RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/dist-packages/matplotlib/mpl-data/matplotlibrc && \
+RUN cp -r /scilpy/src/scilpy/data /usr/local/lib/python${PYTHON_VERSION}/dist-packages/ && \
     apt-get -y remove \
         git \
         wget \
+        curl \
         unzip && \
     apt-get -y autoremove
 

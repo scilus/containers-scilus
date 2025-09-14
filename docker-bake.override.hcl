@@ -6,7 +6,7 @@ base-build-image="ubuntu:noble-20250805"
 actions-runner-version="2.319.1"
 
 dmriqcpy-revision="0.1.7"
-scilpy-revision="master"
+scilpy-revision="2.2.0"
 
 ants-revision="v2.6.2"
 cmake-revision="v3.21.6"
@@ -16,6 +16,7 @@ mrtrix-revision="3.0.7"
 mesa-version="23.1.0"
 vtk-version="9.3.1"
 python-version="3.12"
+uv-version="0.8.17"
 miniconda-version="24.3.0-0"
 
 java-version="11"

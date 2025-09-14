@@ -60,6 +60,11 @@ variable "python-version" {
     default = null
 }
 
+variable "uv-version" {
+    default = null
+}
+
+
 variable "nextflow-version" {
     default = null
 }
@@ -218,7 +223,7 @@ target "dmriqcpy-test" {
 }
 
 target "pytest-base" {
-    dockerfile-inline = "FROM test-base\nWORKDIR /tests\nRUN --mount=type=bind,source=./tests,target=/tests --mount=type=cache,sharing=locked,target=/root/.cache/pip python3 -m pip install pytest pytest_console_scripts && python3 -m pip list && python3 -m pytest"
+    dockerfile-inline = "FROM test-base\nWORKDIR /tests\nRUN --mount=type=bind,source=./tests,target=/tests uv pip install pytest-xdist && uv run --active pytest --dist=loadgroup /scilpy"
     output = ["type=cacheonly"]
 }
 
@@ -415,6 +420,7 @@ target "scilpy-base" {
     args = {
         VTK_VERSION = "${vtk-version}"
         PYTHON_VERSION = "${python-version}"
+        UV_VERSION = "${uv-version}"
         SCILPY_REVISION = "${scilpy-revision}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
     }
