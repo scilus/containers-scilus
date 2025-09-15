@@ -9,17 +9,21 @@ ARG PYTHON_VERSION
 ARG SCILPY_REVISION
 ARG VTK_VERSION
 ARG UV_VERSION
+ARG PYOPENCL_COMPILER_OUTPUT
+ARG GPU
 
 ENV PYTHON_VERSION=${PYTHON_VERSION:-3.10}
 ENV UV_VERSION=${UV_VERSION:-0.8.17}
 ENV SCILPY_REVISION=${SCILPY_REVISION:-master}
 ENV OPENBLAS_NUM_THREADS=${BLAS_NUM_THREADS:-1}
 ENV VTK_VERSION=${VTK_VERSION:-9.2.6}
+ENV GPU=${GPU:-False}
 
 ENV LC_CTYPE="en_US.UTF-8"
 ENV LC_ALL="en_US.UTF-8"
 ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US.UTF-8"
+ENV PYOPENCL_COMPILER_OUTPUT="1"
 
 WORKDIR /
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
@@ -60,8 +64,17 @@ WORKDIR /scilpy
 RUN --mount=type=cache,sharing=locked,target=/root/.cache/pip \
     echo "en_US.UTF-8 UTF-8" | tee -a /etc/locale.gen && locale-gen && \
     uv pip install "packaging<22.0" "setuptools<=70.0" && \
-    SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True uv pip install pyopencl==2023.1.3 torch==2.2.* -e . && \
     uv pip install --extra-index-url https://wheels.vtk.org vtk-osmesa==$VTK_VERSION && \
+    uv pip install pyopencl==2023.1.3
+
+RUN if [ "$GPU" = "true" ] ; then \
+    uv pip install torch==2.2.*; \
+else \
+    uv pip install torch==2.2.* --index-url https://download.pytorch.org/whl/cpu; \
+fi
+
+RUN SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True && \
+    uv pip install -e . && \
     pip cache purge
 
 #RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/dist-packages/matplotlib/mpl-data/matplotlibrc && \
@@ -76,6 +89,12 @@ RUN cp -r /scilpy/src/scilpy/data /usr/local/lib/python${PYTHON_VERSION}/dist-pa
 WORKDIR /
 RUN mkdir -p /etc/OpenCL/vendors && \
     echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
+
+# Set up Numba cache
+# https://github.com/numba/numba/issues/4032
+WORKDIR /
+ENV NUMBA_CACHE_DIR=/numba_cache
+RUN mkdir $NUMBA_CACHE_DIR && chmod 777 $NUMBA_CACHE_DIR
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \

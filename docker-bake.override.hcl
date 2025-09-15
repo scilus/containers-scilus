@@ -1,6 +1,8 @@
 # scilus-versioning.hcl
 
-base-install-image="nvidia/cuda:12.6.3-runtime-ubuntu24.04"
+base-gpu-install-image="nvidia/cuda:12.6.3-runtime-ubuntu24.04"
+base-cpu-install-image="ubuntu:noble-20250805"
+
 base-build-image="ubuntu:noble-20250805"
 
 actions-runner-version="2.319.1"
@@ -18,6 +20,7 @@ vtk-version="9.3.1"
 python-version="3.12"
 uv-version="0.8.17"
 miniconda-version="24.3.0-0"
+gpu=true
 
 java-version="11"
 nextflow-version="21.04.3"

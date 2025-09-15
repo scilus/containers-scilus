@@ -4,7 +4,11 @@
 # BUILD VARIABLES
 # ==============================================================================
 
-variable "base-install-image" {
+variable "base-gpu-install-image" {
+    default = null
+}
+
+variable "base-cpu-install-image" {
     default = null
 }
 
@@ -64,6 +68,9 @@ variable "uv-version" {
     default = null
 }
 
+variable "gpu" {
+    default = false
+}
 
 variable "nextflow-version" {
     default = null
@@ -384,10 +391,11 @@ target "scilus-base" {
     dockerfile = "scilus-base.Dockerfile"
     context = "./containers/scilus.context"
     contexts = {
-        scilus-image-base = "docker-image://${base-install-image}"
+        scilus-image-base = "docker-image://${base-gpu-install-image}"
     }
     args = {
         PYTHON_VERSION = "${python-version}"
+        GPU = "${gpu}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-base",
@@ -415,12 +423,13 @@ target "scilpy-base" {
     dockerfile = "scilpy.Dockerfile"
     context = "./containers/scilpy.context"
     contexts = {
-        scilpy-base = "docker-image://${base-install-image}"
+        scilpy-base = gpu ? "docker-image://${base-gpu-install-image}" : "docker-image://${base-cpu-install-image}"
     }
     args = {
         VTK_VERSION = "${vtk-version}"
         PYTHON_VERSION = "${python-version}"
         UV_VERSION = "${uv-version}"
+        GPU = "${gpu}"
         SCILPY_REVISION = "${scilpy-revision}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
     }
@@ -431,7 +440,7 @@ target "dmriqcpy-base" {
     dockerfile = "dmriqcpy.Dockerfile"
     context = "./containers/dmriqcpy.context"
     contexts = {
-        dmriqcpy-base = "docker-image://${base-install-image}"
+        dmriqcpy-base = "docker-image://${base-gpu-install-image}"
     }
     args = {
         DMRIQCPY_REVISION = "${dmriqcpy-revision}"
@@ -447,7 +456,7 @@ target "fsl" {
     context = "./containers/fsl.context"
     target = "fsl-install"
     contexts = {
-        fsl-base = "docker-image://${base-install-image}"
+        fsl-base = "docker-image://${base-gpu-install-image}"
         fsl-builder = "docker-image://${base-build-image}"
     }
     args = {
@@ -467,7 +476,7 @@ target "mrtrix" {
     context = "./containers"
     target = "mrtrix-install"
     contexts = {
-        mrtrix-base = "docker-image://${base-install-image}"
+        mrtrix-base = "docker-image://${base-gpu-install-image}"
         mrtrix-builder = "docker-image://${base-build-image}"
     }
     args = {
@@ -486,7 +495,7 @@ target "ants" {
     context = "./containers"
     target = "ants-install"
     contexts = {
-        ants-base = "docker-image://${base-install-image}"
+        ants-base = "docker-image://${base-gpu-install-image}"
         ants-builder = "target:cmake"
     }
     args = {
