@@ -190,7 +190,7 @@ target "scilus-test" {
     name = "scilus-test-${tgt}"
     inherits = ["pytest-base"]
     matrix = {
-        tgt = ["scilus", "scilpy"]
+        tgt = ["scilus", "scilpy", "dmriqcpy"]
     }
     context = "./containers/${tgt}.context"
     contexts = {
@@ -333,6 +333,9 @@ target "scilus" {
 
 target "scilus-scilpy" {
     inherits = ["scilpy-base"]
+    contexts = {
+        scilpy-base = notequal("", DEPS_TAG) ? "docker-image://${dockerhub-user-pull}/scilus-deps:${DEPS_TAG}" : "target:scilus-fsl"
+    }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilpy",
         "type=registry,ref=scilus/build-cache:scilpy"

@@ -74,5 +74,9 @@ RUN cp -r /scilpy/src/scilpy/data /usr/local/lib/python${PYTHON_VERSION}/dist-pa
     apt-get -y autoremove
 
 WORKDIR /
+RUN mkdir -p /etc/OpenCL/vendors && \
+    echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
+
+WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
     echo "Scilpy => ${SCILPY_REVISION}\n" >> VERSION
