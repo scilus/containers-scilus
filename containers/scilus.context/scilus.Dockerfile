@@ -1,6 +1,6 @@
 # syntax=docker.io/docker/dockerfile:1.10.0
 
-FROM scilus-base as scilus
+FROM scilus-base AS scilus
 
 LABEL maintainer=SCIL
 
@@ -48,8 +48,8 @@ RUN --mount=type=cache,sharing=locked,target=/root/.cache/pip \
     echo "en_US.UTF-8 UTF-8" | tee -a /etc/locale.gen && locale-gen && \
     if [ -f requirements.${SCILPY_REVISION}.frozen ]; \
     then \
-        python${PYTHON_VERSION} -m pip install -r requirements.${SCILPY_REVISION}.frozen && \
-        python${PYTHON_VERSION} -m pip install --extra-index-url https://wheels.vtk.org vtk-osmesa==$VTK_VERSION && \
+        uv pip install -r requirements.${SCILPY_REVISION}.frozen && \
+        uv pip install --extra-index-url https://wheels.vtk.org vtk-osmesa==$VTK_VERSION && \
         rm requirements.${SCILPY_REVISION}.frozen; \
     fi
 

@@ -190,7 +190,7 @@ target "scilus-test" {
     name = "scilus-test-${tgt}"
     inherits = ["pytest-base"]
     matrix = {
-        tgt = ["scilus", "scilpy", "dmriqcpy"]
+        tgt = ["scilus", "scilpy"]
     }
     context = "./containers/${tgt}.context"
     contexts = {
@@ -333,9 +333,6 @@ target "scilus" {
 
 target "scilus-scilpy" {
     inherits = ["scilpy-base"]
-    contexts = {
-        scilpy-base = "target:scilus-dmriqcpy"
-    }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilpy",
         "type=registry,ref=scilus/build-cache:scilpy"
