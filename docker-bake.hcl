@@ -223,7 +223,7 @@ target "dmriqcpy-test" {
 }
 
 target "pytest-base" {
-    dockerfile-inline = "FROM test-base\nWORKDIR /tests\nRUN --mount=type=bind,source=./tests,target=/tests uv pip install pytest-xdist && uv run --active pytest --dist=loadgroup /scilpy"
+    dockerfile-inline = "FROM test-base\nWORKDIR /tests\nRUN --mount=type=bind,source=./tests,target=/tests uv pip install pytest-xdist && uv run --active pytest --html=/tmp/pytest.html --junit-xml=/tmp/junit.xml ."
     output = ["type=cacheonly"]
 }
 
