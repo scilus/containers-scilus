@@ -35,12 +35,6 @@ ENV LC_ALL="en_US.UTF-8"
 ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US.UTF-8"
 
-# Set up Numba cache
-# https://github.com/numba/numba/issues/4032
-WORKDIR /
-ENV NUMBA_CACHE_DIR=/numba_cache
-RUN mkdir $NUMBA_CACHE_DIR && chmod 777 $NUMBA_CACHE_DIR
-
 WORKDIR /tmp
 RUN wget https://github.com/scilus/scilpy/releases/download/${SCILPY_REVISION}/requirements.${SCILPY_REVISION}.frozen; \
     exit 0

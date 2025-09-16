@@ -64,7 +64,6 @@ WORKDIR /scilpy
 RUN --mount=type=cache,sharing=locked,target=/root/.cache/pip \
     echo "en_US.UTF-8 UTF-8" | tee -a /etc/locale.gen && locale-gen && \
     uv pip install "packaging<22.0" "setuptools<=70.0" && \
-    uv pip install --extra-index-url https://wheels.vtk.org vtk-osmesa==$VTK_VERSION && \
     uv pip install pyopencl==2023.1.3
 
 RUN if [ "$GPU" = "true" ] ; then \
@@ -73,8 +72,8 @@ else \
     uv pip install torch==2.2.* --index-url https://download.pytorch.org/whl/cpu; \
 fi
 
-RUN SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True && \
-    uv pip install -e . && \
+RUN uv pip install -e . && \
+    uv pip install --extra-index-url https://wheels.vtk.org vtk-osmesa==$VTK_VERSION && \
     pip cache purge
 
 #RUN sed -i '41s/.*/backend : Agg/' /usr/local/lib/python${PYTHON_VERSION}/dist-packages/matplotlib/mpl-data/matplotlibrc && \
