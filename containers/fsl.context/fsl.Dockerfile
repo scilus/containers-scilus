@@ -71,7 +71,7 @@ ENV FSLOUTPUTTYPE=NIFTI_GZ
 ENV FSLTCLSH=/usr/bin/tclsh
 ENV FSLWISH=/usr/bin/wish
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${FSLDIR}:${FSLDIR}/bin
-ENV PATH=${FSLDIR}/share/fsl/bin:$PATH
+ENV PATH=$PATH:${FSLDIR}/bin
 ENV POSSUMDIR=${FSLDIR}
 
 RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \

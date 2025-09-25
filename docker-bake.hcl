@@ -197,7 +197,7 @@ target "scilus-test" {
     name = "scilus-test-${tgt}"
     inherits = ["pytest-base"]
     matrix = {
-        tgt = ["scilus", "scilpy", "dmriqcpy"]
+        tgt = ["scilus", "scilpy"]
     }
     context = "./containers/${tgt}.context"
     contexts = {
@@ -583,13 +583,11 @@ target "scilus-cache" {
 target "scilus-base-cache" {
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-base",
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:dmriqcpy",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:fsl",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:mrtrix",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:ants",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:cmake",
         "type=registry,ref=scilus/build-cache:scilus-base",
-        "type=registry,ref=scilus/build-cache:dmriqcpy",
         "type=registry,ref=scilus/build-cache:fsl",
         "type=registry,ref=scilus/build-cache:mrtrix",
         "type=registry,ref=scilus/build-cache:ants",

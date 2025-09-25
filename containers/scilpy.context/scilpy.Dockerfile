@@ -50,10 +50,10 @@ ADD --link https://github.com/scilus/scilpy.git#${SCILPY_REVISION} /scilpy
 ADD https://astral.sh/uv/${UV_VERSION}/install.sh /uv-installer.sh
 
 # Run the installer then remove it
-RUN sh /uv-installer.sh && rm /uv-installer.sh
+RUN UV_INSTALL_DIR=/opt/bin/ sh /uv-installer.sh && rm /uv-installer.sh
 
 # Ensure the installed binary is on the `PATH`
-ENV PATH="/root/.local/bin/:$PATH"
+ENV PATH="/opt/bin/:$PATH"
 
 RUN uv venv /opt/venvs/scilpy --python ${PYTHON_VERSION}
 
