@@ -1,0 +1,43 @@
+name: FSL 6.0.7.18 lean
+channels:
+ - https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/
+ - conda-forge
+ - nodefaults
+dependencies:
+ - boost-cpp 1.84.*
+ - c-compiler
+ - ciftilib 1.6.0
+ - cxx-compiler
+ - fsl-armawrap 0.7.0
+ - fsl-avwutils 2209.3
+ - fsl-base 2504.3
+ - fsl-basisfield 2203.4
+ - fsl-bet2 2111.8
+ - fsl-cprob 2111
+ - fsl-deface 1.3.1
+ - fsl-eddy 2401.2
+ - fsl-eddy_qc v1.3.0
+ - fsl-cudabasisfield-cuda-11.0 1.1.2
+ - fsl-eddy-cuda-11.0 2401.2
+ - fsl-fast4 2111.3
+ - fsl-fastpdlib 2111.1
+ - fsl-miscmaths 2412.4
+ - fsl-newimage 2501.4
+ - fsl-newnifti 4.1.0
+ - fsl-topup 2203.5
+ - fsl-utils 2412.1
+ - fsl-warpfns 2501
+ - fsl-znzlib 2111
+ - hlsvdpropy 2.0.2
+ - make
+ - nibabel 5.*
+ - nidmresults 2.1.0
+ - nidmresults-fsl 2.2.0
+ - numpy 2.1.*
+ - openblas 0.3.29
+ - openslide-python v1.1.2
+ - pkg-config
+ - python 3.12.*
+ - tk 8.6.*
+ - wxpython 4.2.2
+ - zlib 1.3.*

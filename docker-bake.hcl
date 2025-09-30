@@ -4,112 +4,128 @@
 # BUILD VARIABLES
 # ==============================================================================
 
-variable "base-install-image" {
-    default = "ubuntu:22.04"
+variable "base-gpu-install-image" {
+    default = null
+}
+
+variable "base-cpu-install-image" {
+    default = null
 }
 
 variable "base-build-image" {
-    default = "ubuntu:22.04"
+    default = null
 }
 
 variable "actions-runner-version" {
-    default = "2.319.1"
+    default = null
 }
 
 variable "ants-revision" {
-    default = "v2.3.4"
+    default = null
 }
 
 variable "cmake-revision" {
-    default = "v3.16.3"
+    default = null
 }
 
 variable "dmriqcpy-revision" {
-    default = "0.1.6"
+    default = null
 }
 
 variable "fsl-version" {
-    default = "6.0.6.4"
+    default = null
 }
 
 variable "fsl-installer-version" {
-    default = "3.14.0"
+    default = null
+}
+
+variable "miniconda-version" {
+    default = null
 }
 
 variable "mrtrix-revision" {
-    default = "3.0_RC3"
+    default = null
 }
 
 variable "scilpy-revision" {
-    default = "master"
+    default = null
 }
 
 variable "mesa-version" {
-    default = "19.0.8"
+    default = null
 }
 
 variable "vtk-version" {
-    default = "8.2.0"
+    default = null
 }
 
 variable "python-version" {
-    default = "3.10"
+    default = null
+}
+
+variable "uv-version" {
+    default = null
+}
+
+variable "gpu" {
+    default = false
 }
 
 variable "nextflow-version" {
-    default = "21.04.3"
+    default = null
 }
 
 variable "java-version" {
-    default = "11"
+    default = null
 }
 
 variable "itk-num-threads" {
-    default = "8"
+    default = null
 }
 
 variable "blas-num-threads" {
-    default = "1"
+    default = null
 }
 
 variable "tractoflow-version" {
-    default = "2.3.0"
+    default = null
 }
 
 variable "dmriqc-flow-version" {
-    default = "0.1.0"
+    default = null
 }
 
 variable "extractor-flow-version" {
-    default = "master"
+    default = null
 }
 
 variable "rbx-flow-version" {
-    default = "1.1.0"
+    default = null
 }
 
 variable "tractometry-flow-version" {
-    default = "1.0.0"
+    default = null
 }
 
 variable "register-flow-version" {
-    default = "main"
+    default = null
 }
 
 variable "disconets-flow-version" {
-    default = "0.1.0-rc1"
+    default = null
 }
 
 variable "freewater-flow-version" {
-    default = "1.0.0"
+    default = null
 }
 
 variable "noddi-flow-version" {
-    default = "1.0.0"
+    default = null
 }
 
 variable "bst-flow-version" {
-    default = "1.0.0-rc1"
+    default = null
 }
 
 variable "dockerhub-user-pull" {
@@ -181,7 +197,7 @@ target "scilus-test" {
     name = "scilus-test-${tgt}"
     inherits = ["pytest-base"]
     matrix = {
-        tgt = ["scilus", "scilpy", "dmriqcpy"]
+        tgt = ["scilus", "scilpy"]
     }
     context = "./containers/${tgt}.context"
     contexts = {
@@ -214,7 +230,7 @@ target "dmriqcpy-test" {
 }
 
 target "pytest-base" {
-    dockerfile-inline = "FROM test-base\nWORKDIR /tests\nRUN --mount=type=bind,source=./tests,target=/tests --mount=type=cache,sharing=locked,target=/root/.cache/pip python3 -m pip install pytest pytest_console_scripts && python3 -m pip list && python3 -m pytest"
+    dockerfile-inline = "FROM test-base\nWORKDIR /tests\nRUN --mount=type=bind,source=./tests,target=/tests uv pip install pytest-xdist && uv run --active pytest --html=/tmp/pytest.html --junit-xml=/tmp/junit.xml ."
     output = ["type=cacheonly"]
 }
 
@@ -325,7 +341,7 @@ target "scilus" {
 target "scilus-scilpy" {
     inherits = ["scilpy-base"]
     contexts = {
-        scilpy-base = "target:scilus-dmriqcpy"
+        scilpy-base = notequal("", DEPS_TAG) ? "docker-image://${dockerhub-user-pull}/scilus-deps:${DEPS_TAG}" : "target:scilus-fsl"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilpy",
@@ -375,10 +391,11 @@ target "scilus-base" {
     dockerfile = "scilus-base.Dockerfile"
     context = "./containers/scilus.context"
     contexts = {
-        scilus-image-base = "docker-image://${base-install-image}"
+        scilus-image-base = "docker-image://${base-gpu-install-image}"
     }
     args = {
         PYTHON_VERSION = "${python-version}"
+        GPU = "${gpu}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-base",
@@ -406,11 +423,13 @@ target "scilpy-base" {
     dockerfile = "scilpy.Dockerfile"
     context = "./containers/scilpy.context"
     contexts = {
-        scilpy-base = "docker-image://${base-install-image}"
+        scilpy-base = gpu ? "docker-image://${base-gpu-install-image}" : "docker-image://${base-cpu-install-image}"
     }
     args = {
         VTK_VERSION = "${vtk-version}"
         PYTHON_VERSION = "${python-version}"
+        UV_VERSION = "${uv-version}"
+        GPU = "${gpu}"
         SCILPY_REVISION = "${scilpy-revision}"
         BLAS_NUM_THREADS = "${blas-num-threads}"
     }
@@ -421,7 +440,7 @@ target "dmriqcpy-base" {
     dockerfile = "dmriqcpy.Dockerfile"
     context = "./containers/dmriqcpy.context"
     contexts = {
-        dmriqcpy-base = "docker-image://${base-install-image}"
+        dmriqcpy-base = "docker-image://${base-gpu-install-image}"
     }
     args = {
         DMRIQCPY_REVISION = "${dmriqcpy-revision}"
@@ -437,12 +456,13 @@ target "fsl" {
     context = "./containers/fsl.context"
     target = "fsl-install"
     contexts = {
-        fsl-base = "docker-image://${base-install-image}"
+        fsl-base = "docker-image://${base-gpu-install-image}"
         fsl-builder = "docker-image://${base-build-image}"
     }
     args = {
         FSL_VERSION = "${fsl-version}"
         FSL_INSTALLER_VERSION = "${fsl-installer-version}"
+        MINICONDA_VERSION = "${miniconda-version}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:fsl",
@@ -456,7 +476,7 @@ target "mrtrix" {
     context = "./containers"
     target = "mrtrix-install"
     contexts = {
-        mrtrix-base = "docker-image://${base-install-image}"
+        mrtrix-base = "docker-image://${base-gpu-install-image}"
         mrtrix-builder = "docker-image://${base-build-image}"
     }
     args = {
@@ -475,7 +495,7 @@ target "ants" {
     context = "./containers"
     target = "ants-install"
     contexts = {
-        ants-base = "docker-image://${base-install-image}"
+        ants-base = "docker-image://${base-gpu-install-image}"
         ants-builder = "target:cmake"
     }
     args = {
@@ -563,13 +583,11 @@ target "scilus-cache" {
 target "scilus-base-cache" {
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-base",
-        "type=registry,ref=${dockerhub-user-pull}/build-cache:dmriqcpy",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:fsl",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:mrtrix",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:ants",
         "type=registry,ref=${dockerhub-user-pull}/build-cache:cmake",
         "type=registry,ref=scilus/build-cache:scilus-base",
-        "type=registry,ref=scilus/build-cache:dmriqcpy",
         "type=registry,ref=scilus/build-cache:fsl",
         "type=registry,ref=scilus/build-cache:mrtrix",
         "type=registry,ref=scilus/build-cache:ants",

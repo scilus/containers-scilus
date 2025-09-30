@@ -1,6 +1,6 @@
 # syntax=docker.io/docker/dockerfile:1.10.0
 
-FROM scilus-base as scilus
+FROM scilus-base AS scilus
 
 LABEL maintainer=SCIL
 
@@ -35,12 +35,6 @@ ENV LC_ALL="en_US.UTF-8"
 ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US.UTF-8"
 
-# Set up Numba cache
-# https://github.com/numba/numba/issues/4032
-WORKDIR /
-ENV NUMBA_CACHE_DIR=/numba_cache
-RUN mkdir $NUMBA_CACHE_DIR && chmod 777 $NUMBA_CACHE_DIR
-
 WORKDIR /tmp
 RUN wget https://github.com/scilus/scilpy/releases/download/${SCILPY_REVISION}/requirements.${SCILPY_REVISION}.frozen; \
     exit 0
@@ -48,8 +42,8 @@ RUN --mount=type=cache,sharing=locked,target=/root/.cache/pip \
     echo "en_US.UTF-8 UTF-8" | tee -a /etc/locale.gen && locale-gen && \
     if [ -f requirements.${SCILPY_REVISION}.frozen ]; \
     then \
-        python${PYTHON_VERSION} -m pip install -r requirements.${SCILPY_REVISION}.frozen && \
-        python${PYTHON_VERSION} -m pip install --extra-index-url https://wheels.vtk.org vtk-osmesa==$VTK_VERSION && \
+        uv pip install -r requirements.${SCILPY_REVISION}.frozen && \
+        uv pip install --extra-index-url https://wheels.vtk.org vtk-osmesa==$VTK_VERSION && \
         rm requirements.${SCILPY_REVISION}.frozen; \
     fi
 
