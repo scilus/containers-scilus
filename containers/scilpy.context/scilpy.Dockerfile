@@ -41,6 +41,9 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         python3-dev \
         python3-pip \
         unzip \
+        imagemagick \
+        parallel \
+        tmux \
         wget && \
     rm -rf /var/lib/apt/lists/*
 
@@ -92,8 +95,7 @@ RUN mkdir -p /etc/OpenCL/vendors && \
 # Set up Numba cache
 # https://github.com/numba/numba/issues/4032
 WORKDIR /
-ENV NUMBA_CACHE_DIR=/numba_cache
-RUN mkdir $NUMBA_CACHE_DIR && chmod 777 $NUMBA_CACHE_DIR
+ENV NUMBA_CACHE_DIR=/tmp
 
 WORKDIR /
 RUN ( [ -f "VERSION" ] || touch VERSION ) && \
