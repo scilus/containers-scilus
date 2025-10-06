@@ -44,6 +44,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
         imagemagick \
         parallel \
         tmux \
+        jq \
         wget && \
     rm -rf /var/lib/apt/lists/*
 
