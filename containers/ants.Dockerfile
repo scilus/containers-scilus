@@ -30,8 +30,8 @@ RUN cmake -DBUILD_SHARED_LIBS=OFF \
           -DBUILD_TESTING=OFF \
           -DRUN_LONG_TESTS=OFF \
           -DRUN_SHORT_TESTS=OFF \
-          -DSuperBuild_ANTS_C_OPTIMIZATION_FLAGS="-mtune=native -march=x86-64" \
-          -DSuperBuild_ANTS_CXX_OPTIMIZATION_FLAGS="-mtune=native -march=x86-64" \
+          -DSuperBuild_ANTS_C_OPTIMIZATION_FLAGS="-mtune=native -march=x86-64-v3" \
+          -DSuperBuild_ANTS_CXX_OPTIMIZATION_FLAGS="-mtune=native -march=x86-64-v3" \
           -DCMAKE_INSTALL_PREFIX=${ANTS_INSTALL_PATH} \
           .. && \
     [ -z "$ANTS_BUILD_NTHREADS" ] && \
