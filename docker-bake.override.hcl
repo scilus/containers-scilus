@@ -8,7 +8,7 @@ base-build-image="ubuntu:noble-20250805"
 actions-runner-version="2.319.1"
 
 dmriqcpy-revision="0.1.7"
-scilpy-revision="2.2.0"
+scilpy-revision="2.2.1"
 
 ants-revision="v2.6.2"
 cmake-revision="v3.21.6"

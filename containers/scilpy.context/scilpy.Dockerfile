@@ -68,7 +68,7 @@ WORKDIR /scilpy
 RUN --mount=type=cache,sharing=locked,target=/root/.cache/pip \
     echo "en_US.UTF-8 UTF-8" | tee -a /etc/locale.gen && locale-gen && \
     uv pip install "packaging<22.0" "setuptools<=70.0" && \
-    uv pip install pyopencl==2023.1.3
+    uv pip install pyopencl==2024.2
 
 RUN if [ "$GPU" = "true" ] ; then \
     uv pip install torch==2.2.*; \
