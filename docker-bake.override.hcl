@@ -11,6 +11,7 @@ dmriqcpy-revision="0.1.7"
 scilpy-revision="2.2.1"
 
 ants-revision="v2.6.2"
+ants-affine-syn-revision="1.1"
 cmake-revision="v3.21.6"
 fsl-version="6.0.7.18.scilus.lean"
 fsl-installer-version="3.14.0"

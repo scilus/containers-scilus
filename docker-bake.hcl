@@ -501,6 +501,7 @@ target "ants" {
     args = {
         ANTS_BUILD_NTHREADS = "6"
         ANTS_REVISION = "${ants-revision}"
+        ANTS_AFFINE_SYN_REVISION = "${ants-affine-syn-revision}"
     }
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:ants",
