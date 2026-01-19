@@ -189,6 +189,10 @@ group "dmriqcpy" {
     targets = ["dmriqcpy", "dmriqcpy-test"]
 }
 
+group "ants" {
+    targets = ["ants-deploy"]
+}
+
 # ==============================================================================
 # TEST TARGETS
 # ==============================================================================
@@ -315,6 +319,12 @@ target "scilpy" {
 target "dmriqcpy" {
     inherits = ["dmriqcpy-base", "dmriqcpy-cache"]
     tags = ["dmriqcpy:local"]
+    output = ["type=docker"]
+}
+
+target "ants-deploy" {
+    inherits = ["ants"]
+    tags = ["ants:local"]
     output = ["type=docker"]
 }
 
