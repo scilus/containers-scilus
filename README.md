@@ -12,6 +12,71 @@ available :
 
 ___
 
+## Release cycle
+
+> [!IMPORTANT]
+> The release cycle of containers **is not automated !!!** Follow the procedure below carefully, to the letter, to ensure proper versioning of the containers.
+
+Most containers follow the release cycles of their own dependencies - for example `scilpy` and `dmriQCpy` containers get pinned when their respective packages get new releases. They use their `version schemes` as is to tag the corresponding containers.
+
+```
+                  ┌──────────┐
+                  │ Release  │───────────┐
+                  └──────────┘           │
+                       ▲                 │
+                       │                 │
+                       │                 ▼
+    ┌────────┐    ┌──────────┐    ┌──────────────┐    ┌──────────────────────────┐
+    │ scilpy │───▶│ .git tag │───▶│ docker build │───▶│ scilpy:<.git tag> image  │
+    └────────┘    └──────────┘    └──────────────┘    └──────────────────────────┘
+```
+
+For the `scilus` container and its derivatives, its a bit different. Their content is too complex and interdependent to be tied to a single package release. However, crafting a relevant, humanly readable tag for them is still important. Concatenating all dependencies versions would be cumbersome, both in terms of maintenance and readability. Instead, we use a dual versioning scheme, involving both `date-based` and `semantic` branches.
+
+### Semantic branch
+
+The `semantic` branch is tied to the release cycle of the **main dependency** managed by the SCIL, `scilpy`. Aside those versions, a special `dev` tag is also maintained that tracks the latest changes brought by **any other dependencies** included in the container, since the last `scilpy` release. This way, new `scilpy` releases only need to be layered on top of the latest `dev` version to create a new stable release of `scilus`.
+
+```
+ ┌────────────┐       ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+ │ scilpy v1  │       │ dmriQCpy v+ │      │   ANTs v+   │      │ scilpy v2   │
+ └────────────┘       └─────────────┘      └─────────────┘      └─────────────┘
+       │                     │                    │                    │       
+       ▼                     ▼                    ▼                    ▼       
+┌──────────────┐       ┌────────────┐       ┌────────────┐       ┌────────────┐
+│ scilus:v1    │──────▶│ scilus:dev │──────▶│ scilus:dev │──────▶│ scilus:v2  │
+└──────────────┘       └────────────┘       └────────────┘       └────────────┘
+```
+
+### Date-based branch
+
+The `date-based` branch is updated on a regular basis, each time the `dev` version gets bumped. It keeps track of rolling updates to dependencies that do not warrant a new `scilpy` release, so that users can introspect their container when hitting problems or needing specific informations about the environment. The date-based tag uses the format `YYYYMMDD` (for example, `20240315` for March 15th, 2024).
+
+```
+           ┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+           │ dmriQCpy v+     │       │   ANTs v+       │       │ dmriQCpy v+     │
+           └─────────────────┘       └─────────────────┘       └─────────────────┘
+                    │                         │                         │       
+                    ▼                         ▼                         ▼       
+           ┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+    ──────▶│ scilus:dev      │──────▶│ scilus:dev      │──────▶│ scilus:dev      │──────▶
+           └─────────────────┘       └─────────────────┘       └─────────────────┘
+                    │                         │                         │       
+                    ▼                         ▼                         ▼
+           ┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+           │ scilus:20240301 │       │ scilus:20240401 │       │ scilus:20240501 │
+           └─────────────────┘       └─────────────────┘       └─────────────────┘
+```
+
+### Version ledger
+
+Since neither versioning branch reflects the dependencies versions, a `VERSIONS` file acts as a ledger for it. It is located at the root of each container, and lists the versions of
+all major dependencies installed in the it. Each versioning line is crafted using the following syntax :
+
+```
+<dependency name> => <version string>
+```
+
 ## First setup
 
 Before running any `docker` commands, ensure the following docker extensions are 
