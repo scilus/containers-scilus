@@ -24,6 +24,10 @@ variable "ants-revision" {
     default = null
 }
 
+variable "ants-affine-syn-revision" {
+    default = null
+}
+
 variable "cmake-revision" {
     default = null
 }
@@ -132,6 +136,10 @@ variable "dockerhub-user-pull" {
     default = "scilus"
 }
 
+variable "dockerhub-user-push" {
+    default = "scilus"
+}
+
 variable "python-wheels-local-version" {
     default = "scilus"
 }
@@ -141,15 +149,19 @@ variable "wheelhouse-path" {
 }
 
 variable "DEPS_TAG" {
+    default = ""
 }
 
 variable "SCILUS_TAG" {
+    default = ""
 }
 
 variable "FLOWS_TAG" {
+    default = ""
 }
 
 variable "ACR_TAG" {
+    default = ""
 }
 
 # ==============================================================================
@@ -238,11 +250,20 @@ target "pytest-base" {
     output = ["type=cacheonly"]
 }
 
+# Published targets inherit attestations while keeping local output behavior.
+target "published" {
+    attest = [
+        "type=provenance,mode=max",
+        "type=sbom"
+    ]
+}
+
 # ==============================================================================
 # ACTION RUNNER TARGETS
 # ==============================================================================
 
 target "actions-runner" {
+    inherits = ["published"]
     dockerfile = "actions-runner.Dockerfile"
     context = "./containers"
     target = "actions-runner"
@@ -259,7 +280,7 @@ target "actions-runner" {
         "type=registry,ref=scilus/build-cache:actions-runner"
     ]
     output = ["type=docker"]
-    tags = notequal("", ACR_TAG) ? stamp_tag("scilus/actions-runner:${ACR_TAG}", timestamp()) : ["actions-runner:local"]
+    tags = notequal("", ACR_TAG) ? stamp_tag("${dockerhub-user-push}/actions-runner:${ACR_TAG}", timestamp()) : ["actions-runner:local"]
 }
 
 # ==============================================================================
@@ -267,7 +288,7 @@ target "actions-runner" {
 # ==============================================================================
 
 target "scilus-flows" {
-    inherits = ["scilus-cache"]
+    inherits = ["scilus-cache", "published"]
     dockerfile = "scilus-flows.Dockerfile"
     context = "./containers"
     target = "scilus-flows"
@@ -286,7 +307,7 @@ target "scilus-flows" {
         NODDIFLOW_VERSION = "${noddi-flow-version}"
         BSTFLOW_VERSION = "${bst-flow-version}"
     }
-    tags = notequal("", FLOWS_TAG) ? stamp_tag("scilus/scilus-flows:${FLOWS_TAG}", timestamp()) : ["scilus-flows:local"]
+    tags = notequal("", FLOWS_TAG) ? stamp_tag("${dockerhub-user-push}/scilus-flows:${FLOWS_TAG}", timestamp()) : ["scilus-flows:local"]
     cache-from = [
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-flows",
         "type=registry,ref=scilus/build-cache:scilus-flows"
@@ -311,19 +332,19 @@ target "scilus-nextflow" {
 # ==============================================================================
 
 target "scilpy" {
-    inherits = ["scilpy-base", "scilpy-cache"]
+    inherits = ["scilpy-base", "scilpy-cache", "published"]
     tags = ["scilpy:local"]
     output = ["type=docker"]
 }
 
 target "dmriqcpy" {
-    inherits = ["dmriqcpy-base", "dmriqcpy-cache"]
+    inherits = ["dmriqcpy-base", "dmriqcpy-cache", "published"]
     tags = ["dmriqcpy:local"]
     output = ["type=docker"]
 }
 
 target "ants-deploy" {
-    inherits = ["ants"]
+    inherits = ["ants", "published"]
     tags = ["ants:local"]
     output = ["type=docker"]
 }
@@ -333,7 +354,7 @@ target "ants-deploy" {
 # ==============================================================================
 
 target "scilus" {
-    inherits = ["scilus-cache"]
+    inherits = ["scilus-cache", "published"]
     dockerfile = "scilus.Dockerfile"
     context = "./containers/scilus.context"
     contexts = {
@@ -344,7 +365,7 @@ target "scilus" {
         SCILPY_REVISION = "${scilpy-revision}"
         VTK_VERSION = "${vtk-version}"
     }
-    tags = notequal("", SCILUS_TAG) ? stamp_tag("scilus/scilus:${SCILUS_TAG}", timestamp()) : ["scilus:local"]
+    tags = notequal("", SCILUS_TAG) ? stamp_tag("${dockerhub-user-push}/scilus:${SCILUS_TAG}", timestamp()) : ["scilus:local"]
     output = ["type=docker"]
 }
 
@@ -371,7 +392,7 @@ target "scilus-dmriqcpy" {
 }
 
 target "scilus-fsl" {
-    inherits = ["fsl"]
+    inherits = ["fsl", "published"]
     contexts = {
         fsl-base = "target:scilus-mrtrix"
     }
@@ -379,7 +400,7 @@ target "scilus-fsl" {
         "type=registry,ref=${dockerhub-user-pull}/build-cache:scilus-deps",
         "type=registry,ref=scilus/build-cache:scilus-deps"
     ]
-    tags = notequal("", DEPS_TAG) ? stamp_tag("scilus/scilus-deps:${DEPS_TAG}", timestamp()) : []
+    tags = notequal("", DEPS_TAG) ? stamp_tag("${dockerhub-user-push}/scilus-deps:${DEPS_TAG}", timestamp()) : []
     output = ["type=docker"]
 }
 

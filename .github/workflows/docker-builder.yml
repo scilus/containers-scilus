@@ -9,6 +9,7 @@ on:
         type: choice
         options:
         - scilus
+        - scilus-deps
         - scilpy
         - dmriqcpy
         - scilus-flows
@@ -121,6 +122,14 @@ on:
       actions-runner-version:
         required: false
         type: string
+      scilus-dependencies-tag:
+        required: false
+        type: string
+        default: latest
+      scilus-for-scilus-flows-tag:
+        required: false
+        type: string
+        default: latest
       build-system-ref:
         required: false
         type: string
@@ -136,6 +145,9 @@ on:
       DOCKER_PASSWORD:
         description: 'Access token for dockerhub push'
         required: true
+      DOCKER_ORGNAME:
+        description: 'Docker Hub namespace for image tags'
+        required: false
 
 jobs:
   build-container:
@@ -143,11 +155,13 @@ jobs:
     steps:
       -
         name: Validate input parameters
+        env:
+          TARGET: ${{ inputs.target }}
         run: |
-          if [ "${{ inputs.target }}" = "scilus-base" ]
-          then
-            echo "::error file=docker-builder.yml,line=109,title=scilus-base build::Github builder does not support building scilus-base for now"
-          fi
+          case "$TARGET" in
+            scilus|scilus-deps|scilpy|dmriqcpy|scilus-flows|actions-runner) ;;
+            *) echo "::error::Unsupported image target: $TARGET"; exit 1 ;;
+          esac
       -
         name: Checkout build system
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
@@ -157,89 +171,155 @@ jobs:
       -
         name: Resolve versioning from workflow inputs
         id: local-versioning
+        env:
+          DOCKER_ORGNAME: ${{ secrets.DOCKER_ORGNAME }}
+          SCILPY_VERSION: ${{ inputs.scilpy-version }}
+          DMRIQCPY_VERSION: ${{ inputs.dmriqcpy-version }}
+          PYTHON_VERSION: ${{ inputs.python-version }}
+          VTK_VERSION: ${{ inputs.vtk-version }}
+          NEXTFLOW_VERSION: ${{ inputs.nextflow-version }}
+          BASE_INSTALL_IMAGE: ${{ inputs.base-install-image }}
+          TRACTOFLOW_VERSION: ${{ inputs.tractoflow-version }}
+          DMRIQCFLOW_VERSION: ${{ inputs.dmriqc-flow-version }}
+          EXTRACTORFLOW_VERSION: ${{ inputs.extractor-flow-version }}
+          RBXFLOW_VERSION: ${{ inputs.rbx-flow-version }}
+          TRACTOMETRYFLOW_VERSION: ${{ inputs.tractometry-flow-version }}
+          REGISTERFLOW_VERSION: ${{ inputs.register-flow-version }}
+          DISCONETSFLOW_VERSION: ${{ inputs.disconets-flow-version }}
+          FREEWATERFLOW_VERSION: ${{ inputs.freewater-flow-version }}
+          NODDIFLOW_VERSION: ${{ inputs.noddi-flow-version }}
+          BSTFLOW_VERSION: ${{ inputs.bst-flow-version }}
+          ACTIONS_RUNNER_VERSION: ${{ inputs.actions-runner-version }}
+          DEPS_TAG: ${{ inputs.scilus-dependencies-tag }}
+          SCILUS_TAG: ${{ inputs.scilus-for-scilus-flows-tag }}
+          TARGET: ${{ inputs.target }}
+          IMAGE_TAG: ${{ inputs.tag }}
         run: |
-          touch local-versioning.hcl
-          version () { if [ -n "$1" ]; then echo "${2}=\"${1}\"" >> local-versioning.hcl; fi }
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
 
-          echo "dockerhub-user-pull=\"${{ secrets.DOCKER_ORGNAME }}\"" >> local-versioning.hcl
-          echo "dockerhub-user-push=\"${{ secrets.DOCKER_ORGNAME }}\"" >> local-versioning.hcl
+          values = {
+              "dockerhub-user-pull": os.environ.get("DOCKER_ORGNAME") or "scilus",
+              "dockerhub-user-push": os.environ.get("DOCKER_ORGNAME") or "scilus",
+              "scilpy-revision": os.environ.get("SCILPY_VERSION", ""),
+              "dmriqcpy-revision": os.environ.get("DMRIQCPY_VERSION", ""),
+              "python-version": os.environ.get("PYTHON_VERSION", ""),
+              "vtk-version": os.environ.get("VTK_VERSION", ""),
+              "nextflow-version": os.environ.get("NEXTFLOW_VERSION", ""),
+              "tractoflow-version": os.environ.get("TRACTOFLOW_VERSION", ""),
+              "dmriqc-flow-version": os.environ.get("DMRIQCFLOW_VERSION", ""),
+              "extractor-flow-version": os.environ.get("EXTRACTORFLOW_VERSION", ""),
+              "rbx-flow-version": os.environ.get("RBXFLOW_VERSION", ""),
+              "tractometry-flow-version": os.environ.get("TRACTOMETRYFLOW_VERSION", ""),
+              "register-flow-version": os.environ.get("REGISTERFLOW_VERSION", ""),
+              "disconets-flow-version": os.environ.get("DISCONETSFLOW_VERSION", ""),
+              "freewater-flow-version": os.environ.get("FREEWATERFLOW_VERSION", ""),
+              "noddi-flow-version": os.environ.get("NODDIFLOW_VERSION", ""),
+              "bst-flow-version": os.environ.get("BSTFLOW_VERSION", ""),
+              "actions-runner-version": os.environ.get("ACTIONS_RUNNER_VERSION", ""),
+              "DEPS_TAG": os.environ.get("DEPS_TAG", ""),
+          }
+          base_image = os.environ.get("BASE_INSTALL_IMAGE", "")
+          if base_image:
+              values.update({
+                  "base-gpu-install-image": base_image,
+                  "base-cpu-install-image": base_image,
+                  "base-build-image": base_image,
+              })
+          if os.environ.get("TARGET") == "scilus-flows":
+              values["SCILUS_TAG"] = os.environ.get("SCILUS_TAG", "")
+              values["FLOWS_TAG"] = os.environ.get("IMAGE_TAG", "")
+          runner_version = values["actions-runner-version"]
+          if runner_version:
+              source = Path("docker-bake.override.hcl").read_text()
+              vtk_version = values["vtk-version"]
+              if not vtk_version:
+                  for line in source.splitlines():
+                      if line.lstrip().startswith("vtk-version"):
+                          vtk_version = line.split("=", 1)[1].strip().strip('"')
+                          break
+              if vtk_version:
+                  values["ACR_TAG"] = f"{runner_version}-vtk{vtk_version}"
 
-          version "${{ inputs.scilpy-version }}" scilpy-version
-          version "${{ inputs.dmriqcpy-version }}" dmriqcpy-version
-          version "${{ inputs.nextflow-version }}" nextflow-version
-          version "${{ inputs.tractoflow-version }}" tractoflow-version
-          version "${{ inputs.dmriqc-flow-version }}" dmriqc-flow-version
-          version "${{ inputs.extractor-flow-version }}" extractor-flow-version
-          version "${{ inputs.rbx-flow-version }}" rbx-flow-version
-          version "${{ inputs.tractometry-flow-version }}" tractometry-flow-version
-          version "${{ inputs.register-flow-version }}" register-flow-version
-          version "${{ inputs.disconets-flow-version }}" disconets-flow-version
-          version "${{ inputs.freewater-flow-version }}" freewater-flow-version
-          version "${{ inputs.noddi-flow-version }}" noddi-flow-version
-          version "${{ inputs.bst-flow-version }}" bst-flow-version
-          version "${{ inputs.actions-runner-version }}" actions-runner-version
-
-          echo "DEPS_TAG=\"${{ inputs.scilus-dependencies-tag }}\"" >> local-versioning.hcl
-          if [ "${{ inputs.target }}" == "scilus-flows" ]
-          then
-              version "${{ inputs.scilus-for-scilus-flows-tag }}" SCILUS_TAG
-          fi
-
-          vtk_version=$(cat versioning.hcl | grep vtk-version | cut -d "=" -f2)
-          vtk_version=$(echo $vtk_version | tr -d " " | tr -d "\"")
-          ACR_TAG=${{ inputs.actions-runner-version }}-vtk${vtk_version}
-          if [ -n "${{ inputs.actions-runner-version }}" ]
-          then
-              version "$ACR_TAG" ACR_TAG
-          fi
-
-          echo "bake-file=$PWD/local-versioning.hcl" >> $GITHUB_OUTPUT
+          lines = [
+              f"{name} = {json.dumps(value)}"
+              for name, value in values.items()
+              if value
+          ]
+          Path("local-versioning.hcl").write_text("\n".join(lines) + "\n")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"bake-file={Path('local-versioning.hcl').resolve()}\n")
+          PY
       -
         name: Set output image tags and registry to publish to
         id: dockerhub-tags
         env:
-          IMAGE: ${{ secrets.DOCKER_ORGNAME }}/${{ inputs.target }}
+          DOCKER_ORGNAME: ${{ secrets.DOCKER_ORGNAME }}
+          TARGET: ${{ inputs.target }}
+          IMAGE_TAG: ${{ inputs.tag }}
+          UPDATE_LATEST: ${{ inputs.update-latest }}
+          DISABLE_DATE_TAG: ${{ inputs.disable-builddate-tag }}
+          ACTIONS_RUNNER_VERSION: ${{ inputs.actions-runner-version }}
+          VTK_VERSION: ${{ inputs.vtk-version }}
         run: |
-          touch tag-publishing
-
-          [ -z ${{ inputs.tag }} ] || {
-              echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:${{ inputs.tag }}" >> tag-publishing
-          }
-
-          [ "${{ inputs.disable-builddate-tag }}" != "true" ] && {
-              echo "${{ inputs.target }}.tags=${{ env.IMAGE }}-$(date +'%Y%m%d')" >> tag-publishing
-          }
-
-          if [ "${{ inputs.update-latest }}" == "true" ]
-          then
-              echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:latest" >> tag-publishing
-              if [ "${{ inputs.target }}" == "actions-runner" ]
-              then
-                  if [ -n "${{ inputs.actions-runner-version }}" ]
-                  then
-                      vtk_version=$(cat versioning.hcl | grep vtk-version | cut -d "=" -f2)
-                      vtk_version=$(echo $vtk_version | tr -d " " | tr -d "\"")
-                      ACR_TAG=${{ inputs.actions-runner-version }}-vtk${vtk_version}
-                      echo "${{ inputs.target }}.tags=${{ env.IMAGE }}:$ACR_TAG" >> tag-publishing
-                  fi
-              fi
+          case "$TARGET" in
+            scilus|scilus-deps|scilpy|dmriqcpy|scilus-flows|actions-runner) ;;
+            *) echo "::error::Unsupported image target: $TARGET"; exit 1 ;;
+          esac
+          tag_re='^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$'
+          namespace_re='^[a-z0-9]+([._-][a-z0-9]+)*$'
+          org="${DOCKER_ORGNAME:-scilus}"
+          if [[ ! "$org" =~ $namespace_re ]]; then
+            echo "::error::Invalid Docker Hub namespace"
+            exit 1
           fi
-
-          DELIM="$(echo $RANDOM | base64 | head -c 3; echo)"
-          echo "tags-file=$PWD/tag-publishing" >> $GITHUB_OUTPUT
-          echo "tags-string<<$DELIM" >> $GITHUB_OUTPUT
-          echo "$(cat $PWD/tag-publishing)" >> $GITHUB_OUTPUT
-          echo "$DELIM" >> $GITHUB_OUTPUT
-          echo "git-output=$GITHUB_OUTPUT" >> $GITHUB_OUTPUT
-      -
-        name: Upload versioning and caching hcl as artifacts
-        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
-        with:
-          name: HCL artifacts
-          path: |
-            ${{ steps.local-versioning.outputs.bake-file }}
-            ${{ steps.dockerhub-tags.outputs.tags-file }}
-            ${{ steps.dockerhub-tags.outputs.git-output }}
+          if [ -n "$IMAGE_TAG" ] && [[ ! "$IMAGE_TAG" =~ $tag_re ]]; then
+            echo "::error::Invalid Docker image tag"
+            exit 1
+          fi
+          if [ -n "$ACTIONS_RUNNER_VERSION" ] && [[ ! "$ACTIONS_RUNNER_VERSION" =~ $tag_re ]]; then
+            echo "::error::Invalid actions-runner version tag"
+            exit 1
+          fi
+          if [ -n "$VTK_VERSION" ] && [[ ! "$VTK_VERSION" =~ $tag_re ]]; then
+            echo "::error::Invalid VTK version tag"
+            exit 1
+          fi
+          image="$org/$TARGET"
+          bake_target="$TARGET"
+          if [ "$TARGET" = "scilus-deps" ]; then
+            bake_target="scilus-fsl"
+          fi
+          : > tag-publishing
+          [ -z "$IMAGE_TAG" ] || echo "$bake_target.tags=$image:$IMAGE_TAG" >> tag-publishing
+          if [ "$DISABLE_DATE_TAG" != "true" ]; then
+            echo "$bake_target.tags=$image:$(date -u +'%Y%m%d')" >> tag-publishing
+          fi
+          if [ "$UPDATE_LATEST" = "true" ]; then
+            echo "$bake_target.tags=$image:latest" >> tag-publishing
+            if [ "$TARGET" = "actions-runner" ] && [ -n "$ACTIONS_RUNNER_VERSION" ]; then
+              vtk_version="${VTK_VERSION:-}"
+              if [ -z "$vtk_version" ]; then
+                vtk_version="$(awk -F '"' '/^vtk-version[[:space:]]*=/ { print $2; exit }' docker-bake.override.hcl)"
+              fi
+              if [ -n "$vtk_version" ]; then
+                acr_tag="${ACTIONS_RUNNER_VERSION}-vtk${vtk_version}"
+                if [[ ! "$acr_tag" =~ $tag_re ]]; then
+                  echo "::error::Invalid derived actions-runner tag"
+                  exit 1
+                fi
+                echo "$bake_target.tags=$image:$acr_tag" >> tag-publishing
+              fi
+            fi
+          fi
+          echo "$bake_target.output=type=registry" >> tag-publishing
+          {
+            echo "set<<EOF"
+            cat tag-publishing
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
       -
         name: Login to DockerHub
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
@@ -259,11 +339,10 @@ jobs:
             ${{ inputs.target }}
           files: |
             ./docker-bake.hcl
-            ./versioning.hcl
+            ./docker-bake.override.hcl
             ${{ steps.local-versioning.outputs.bake-file }}
-          set: ${{ steps.dockerhub-tags.outputs.tags-string }}
+          set: ${{ steps.dockerhub-tags.outputs.set }}
           pull: true
-          push: true
       -
         name: Save output container metadata to file
         id: container-metadata
