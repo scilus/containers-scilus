@@ -79,12 +79,11 @@ repository. It is pieced in 3 sections:
 
 ### Versioning
 
-Versioning is made possible using the variables and their overwritting behavior  
-when using multiple `.hcl` build files. For each of the containers of the Scilus 
-ecosystem exists a file in the `versioning/` directory, defining the versions of 
-the dependencies required to build it. Those variable can also be passed through 
-the command line call to `bake`, by setting them by name in the environment of 
-the build shell.
+Versioning is made possible using the variables and their overwritting behavior
+when using multiple `.hcl` build files. The repository defaults are assigned in
+`docker-bake.override.hcl`; caller-specific values can be supplied in a later
+HCL file or through Bake variables in the build environment. Use the main recipe
+first and the override file second so committed defaults are applied.
 
 ___
 
@@ -113,3 +112,37 @@ can be used. The one placed after the main build definition redefines the build
 targets, only modifying the `tags` parameter.
 
 ___
+
+Image attestations and vulnerability policy
+-------------------------------------------
+
+Published image targets inherit SBOM and maximum-mode provenance attestations
+from the `published` target. Local Bake builds keep their existing local or
+cache-only outputs. The reusable GitHub builder loads `docker-bake.hcl`,
+`docker-bake.override.hcl`, and generated caller overrides in that order, then
+selects the registry exporter for the requested image. The `scilus-deps` group
+publishes the `scilus/scilus-deps` image.
+
+The committed base-image versions are in `docker-bake.override.hcl`. Annotated
+Docker references in that file are extracted by `renovate.json`; Dockerfile
+dependency extraction is disabled because Dockerfile `FROM` names in this
+build system are Bake named contexts, not external registry references.
+Renovate PRs do not automerge and must be reviewed for scientific/runtime
+compatibility.
+
+The selected Scout rule is in `.scout/policy.json`. To report policy status for
+an image:
+
+```bash
+docker scout policy scilus/scilus:dev --policy-config .scout/policy.json
+```
+
+For candidate-versus-maintenance comparison, use
+`docker scout compare <candidate> --to <maintenance-image> --exit-on policy
+--policy-config .scout/policy.json`. The policy configuration checks fixable
+Critical and High vulnerabilities; it explicitly disables unrelated built-in
+checks. A report-only evaluation is not evidence that an image is clean, and
+`--exit-code` on `docker scout policy` enforces the full current threshold
+rather than only newly introduced findings. Docker Hub enrollment and hosted
+App installation are separate organization-admin tasks; this repository does
+not currently promote images automatically after a PR merge.

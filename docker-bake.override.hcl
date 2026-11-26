@@ -1,10 +1,14 @@
 # scilus-versioning.hcl
 
+# renovate: datasource=docker depName=nvidia/cuda
 base-gpu-install-image="nvidia/cuda:12.6.3-runtime-ubuntu24.04"
+# renovate: datasource=docker depName=ubuntu
 base-cpu-install-image="ubuntu:noble-20250805"
 
+# renovate: datasource=docker depName=ubuntu
 base-build-image="ubuntu:noble-20250805"
 
+# renovate: datasource=docker depName=ghcr.io/actions/actions-runner
 actions-runner-version="2.319.1"
 
 dmriqcpy-revision="0.1.7"

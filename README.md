@@ -187,12 +187,13 @@ repository :
 
 ```bash
 docker buildx bake \
-    -f versioning.hcl \
     -f docker-bake.hcl \
+    -f docker-bake.override.hcl \
     <target>
 ```
 
-with a target in : `dmriqcpy`, `scilpy`, `scilus`, `scilus-flows`. Follow
+with a target in : `scilus-deps`, `dmriqcpy`, `scilpy`, `scilus`,
+`scilus-flows`, `actions-runner`. Follow
 [this link](docker-bake.md) for more information on the build system.
 
 To prevent some parts of the build system to execute - conserve remote cache
@@ -224,15 +225,15 @@ steps :
 
 ```bash
 # Build dependencies and publish the image as scilus/scilus-deps:dev0
-DEPS_TAG=dev0 docker buildx bake -f versioning.hcl -f docker-bake.hcl scilus-deps
+DEPS_TAG=dev0 docker buildx bake -f docker-bake.hcl -f docker-bake.override.hcl scilus-deps
 docker push scilus/scilus-deps:dev0
 
 # Build scilus from scilus/scilus-deps:dev0 and publish the image as scilus/scilus:dev1
-DEPS_TAG=dev0 SCILUS_TAG=dev1 docker buildx bake -f versioning.hcl -f docker-bake.hcl scilus
+DEPS_TAG=dev0 SCILUS_TAG=dev1 docker buildx bake -f docker-bake.hcl -f docker-bake.override.hcl scilus
 docker push scilus/scilus:dev1
 
 # Build scilus-flows from scilus/scilus:dev1 and publish the image as scilus/scilus-flows:dev2
-SCILUS_TAG=dev1 FLOWS_TAG=dev2 docker buildx bake -f versioning.hcl -f docker-bake.hcl scilus-flows
+SCILUS_TAG=dev1 FLOWS_TAG=dev2 docker buildx bake -f docker-bake.hcl -f docker-bake.override.hcl scilus-flows
 docker push scilus/scilus-flows:dev2
 ```
 
@@ -246,6 +247,14 @@ images are available on [Dockerhub](https://hub.docker.com/u/scilus).
 `Singularity` images light enough to be stored on `Github` can be found in
 repositories releases. Follow [this link](container-update.md) for more
 information on the update system.
+
+The root `renovate.json` tracks the external base images assigned in
+`docker-bake.override.hcl`; Renovate PRs still require maintainer review. The
+`.scout/policy.json` file defines the selected fixable Critical/High vulnerability
+policy for report and comparison commands. Docker Hub Scout enrollment and the
+hosted Renovate App must be configured separately by an organization
+administrator. The existing builder publishes only when explicitly invoked;
+merging an update PR does not currently promote a new image automatically.
 ___
 
 ## Versioning containers

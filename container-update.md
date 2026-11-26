@@ -44,3 +44,30 @@ in any other repositories' workflow to build available images in the build
 system. Inputs and secrets needed for the workflow to run can be found in the 
 [workflow file](.github/workflows/docker-builder.yml). To implant the builder in 
 a remote workflow, refer to the [Github documentation](https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow).
+
+___
+
+Vulnerability maintenance
+-------------------------
+
+The base-image references Renovate manages are annotated in
+`docker-bake.override.hcl` and configured in `renovate.json`. Install the hosted
+Renovate App with repository-scoped permissions before expecting update PRs.
+Review each PR; image and scientific dependency updates are not automatically
+merged.
+
+The selected fixable Critical/High policy is stored in `.scout/policy.json`.
+Maintainers can report the current result for a published image with
+`docker scout policy <image> --policy-config .scout/policy.json`. Docker Hub
+Scout enrollment, DSOS eligibility, repository coverage, and access credentials
+must be confirmed by an organization administrator. A missing analysis must be
+treated as unknown, not as a clean report.
+
+After review, use the existing builder for the affected image and preserve the
+documented release and maintenance tag meanings. For changes to the shared
+dependency image, publish `scilus-deps` before rebuilding `scilus`, then rebuild
+`scilus-flows` against the intended `scilus` tag. The builder now attaches SBOM
+and provenance attestations to published targets. This repository does not yet
+automatically schedule Scout evaluations or promote a validated candidate
+digest after a PR merge; do not treat a second rebuild as same-digest
+promotion.

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "docker:pinDigests"
+  ],
+  "dependencyDashboard": true,
+  "automerge": false,
+  "prConcurrentLimit": 4,
+  "schedule": [
+    "after 9pm on sunday"
+  ],
+  "timezone": "UTC",
+  "dockerfile": {
+    "enabled": false
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker-bake\\.override\\.hcl$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>docker) depName=(?<depName>[^\\s]+)\\s+(?<variable>base-(?:gpu-install|cpu-install|build)-image)\\s*=\\s*\"[^\":]+:(?<currentValue>[^\"@]+)(?:@(?<currentDigest>sha256:[a-f0-9]{64}))?\""
+      ],
+      "autoReplaceStringTemplate": "# renovate: datasource={{{datasource}}} depName={{{depName}}}\n{{{variable}}}=\"{{{depName}}}:{{{newValue}}}@{{{newDigest}}}\""
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker-bake\\.override\\.hcl$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>docker) depName=(?<depName>[^\\s]+)\\s+actions-runner-version\\s*=\\s*\"(?<currentValue>[^\"@]+)\""
+      ],
+      "autoReplaceStringTemplate": "# renovate: datasource={{{datasource}}} depName={{{depName}}}\nactions-runner-version=\"{{{newValue}}}\""
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchDepNames": [
+        "ghcr.io/actions/actions-runner"
+      ],
+      "pinDigests": false
+    }
+  ]
+}
